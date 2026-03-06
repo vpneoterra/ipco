@@ -800,6 +800,177 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   cursor: pointer; transition: all var(--transition); font-family: var(--font-body);
 }
 .btn-pipeline:hover { background: rgba(139,92,246,0.22); }
+
+/* ============================================
+   PATENT PIPELINE TABLE
+   ============================================ */
+.pipeline-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px; margin-bottom: 20px;
+}
+.pipeline-toolbar-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.role-selector {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: 6px 12px;
+}
+.role-selector-label { font-size: 11px; font-weight: 600; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.role-select {
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text); font-size: 13px; font-weight: 600; padding: 5px 28px 5px 10px;
+  font-family: var(--font-body); appearance: none; outline: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%2394A3B8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
+}
+.role-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.role-dot.admin { background: #EF4444; }
+.role-dot.ip-strategist { background: #2E8B7A; }
+.role-dot.patent-lawyer { background: #2563EB; }
+.role-dot.patent-engineer { background: #8B5CF6; }
+.role-dot.ip-analyst { background: #D4A017; }
+.role-dot.inventor { background: #06B6D4; }
+
+.pipeline-search {
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text); font-size: 13px; padding: 7px 12px; font-family: var(--font-body);
+  outline: none; width: 200px; transition: border-color var(--transition);
+}
+.pipeline-search:focus { border-color: var(--accent); }
+.pipeline-search::placeholder { color: var(--text-faint); }
+
+.stage-filter-bar {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;
+}
+.stage-filter-btn {
+  padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;
+  background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted);
+  cursor: pointer; font-family: var(--font-body); transition: all var(--transition);
+  display: flex; align-items: center; gap: 4px;
+}
+.stage-filter-btn:hover { border-color: var(--border-strong); color: var(--text); }
+.stage-filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.stage-filter-count {
+  font-size: 10px; font-weight: 700; min-width: 16px; height: 16px; border-radius: 8px;
+  background: rgba(255,255,255,0.15); display: inline-flex; align-items: center; justify-content: center;
+}
+.stage-filter-btn.active .stage-filter-count { background: rgba(255,255,255,0.25); }
+
+.patent-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.patent-table {
+  width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 1100px;
+}
+.patent-table thead th {
+  background: var(--bg-card); border-bottom: 1px solid var(--border);
+  padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-faint);
+  white-space: nowrap; position: sticky; top: 0; z-index: 2;
+}
+.patent-table tbody tr {
+  border-bottom: 1px solid var(--border); transition: background var(--transition);
+}
+.patent-table tbody tr:last-child { border-bottom: none; }
+.patent-table tbody tr:hover { background: var(--bg-hover); }
+.patent-table td { padding: 12px 14px; vertical-align: middle; }
+.patent-table td.title-cell { max-width: 240px; }
+.patent-title-text {
+  font-weight: 600; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;
+}
+.patent-ws { font-size: 11px; color: var(--text-faint); margin-top: 2px; white-space: nowrap; }
+
+/* Stage progress mini-bar */
+.stage-progress {
+  display: flex; align-items: center; gap: 2px; margin-top: 6px;
+}
+.stage-pip {
+  width: 14px; height: 4px; border-radius: 2px; background: var(--bg-hover); transition: background 0.3s;
+}
+.stage-pip.done { background: var(--accent-green); }
+.stage-pip.current { background: var(--accent); animation: pip-pulse 2s infinite; }
+.stage-pip.future { background: var(--bg-hover); }
+@keyframes pip-pulse {
+  0%, 100% { opacity: 0.6; } 50% { opacity: 1; }
+}
+
+/* Stage badge */
+.stage-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;
+  white-space: nowrap;
+}
+.stage-badge .stage-icon { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+.stage-idea .stage-icon { background: #94A3B8; }
+.stage-idea { background: rgba(148,163,184,0.12); color: #94A3B8; }
+.stage-fto-analysis .stage-icon { background: #06B6D4; }
+.stage-fto-analysis { background: rgba(6,182,212,0.12); color: #06B6D4; }
+.stage-claims-drafted .stage-icon { background: #3B82F6; }
+.stage-claims-drafted { background: rgba(59,130,246,0.12); color: #3B82F6; }
+.stage-figures-gen .stage-icon { background: #8B5CF6; }
+.stage-figures-gen { background: rgba(139,92,246,0.12); color: #8B5CF6; }
+.stage-patent-drafted .stage-icon { background: #D4A017; }
+.stage-patent-drafted { background: rgba(212,160,23,0.12); color: #D4A017; }
+.stage-lawyer-review .stage-icon { background: #F59E0B; }
+.stage-lawyer-review { background: rgba(245,158,11,0.12); color: #F59E0B; }
+.stage-admin-approved .stage-icon { background: #22C55E; }
+.stage-admin-approved { background: rgba(34,197,94,0.12); color: #22C55E; }
+.stage-filed .stage-icon { background: #2563EB; }
+.stage-filed { background: rgba(37,99,235,0.15); color: #2563EB; }
+.stage-under-exam .stage-icon { background: #A855F7; }
+.stage-under-exam { background: rgba(168,85,247,0.12); color: #A855F7; }
+.stage-awarded .stage-icon { background: #10B981; }
+.stage-awarded { background: rgba(16,185,129,0.15); color: #10B981; }
+.stage-rejected .stage-icon { background: #EF4444; }
+.stage-rejected { background: rgba(239,68,68,0.12); color: #EF4444; }
+
+/* Role badge */
+.role-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; white-space: nowrap;
+}
+.role-badge-admin { background: rgba(239,68,68,0.1); color: #F87171; }
+.role-badge-lawyer { background: rgba(37,99,235,0.1); color: #60A5FA; }
+.role-badge-engineer { background: rgba(139,92,246,0.1); color: #A78BFA; }
+.role-badge-strategist { background: rgba(46,139,122,0.1); color: #2E8B7A; }
+.role-badge-analyst { background: rgba(212,160,23,0.1); color: #D4A017; }
+.role-badge-inventor { background: rgba(6,182,212,0.1); color: #06B6D4; }
+
+/* Action buttons */
+.action-group { display: flex; gap: 4px; flex-wrap: wrap; }
+.btn-action {
+  padding: 4px 10px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 600;
+  cursor: pointer; border: 1px solid; font-family: var(--font-body); transition: all var(--transition);
+  white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;
+}
+.btn-action:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-action.approve { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.25); color: #22C55E; }
+.btn-action.approve:hover:not(:disabled) { background: rgba(34,197,94,0.2); }
+.btn-action.advance { background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.25); color: #3B82F6; }
+.btn-action.advance:hover:not(:disabled) { background: rgba(37,99,235,0.2); }
+.btn-action.reject { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.2); color: #EF4444; }
+.btn-action.reject:hover:not(:disabled) { background: rgba(239,68,68,0.18); }
+.btn-action.view { background: rgba(148,163,184,0.08); border-color: rgba(148,163,184,0.2); color: #94A3B8; }
+.btn-action.view:hover:not(:disabled) { background: rgba(148,163,184,0.18); }
+
+.pipeline-summary-bar {
+  display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px;
+}
+.pipeline-summary-item {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: 10px 16px; min-width: 100px;
+}
+.pipeline-summary-val { font-size: 22px; font-weight: 700; line-height: 1; }
+.pipeline-summary-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+.approval-trail {
+  font-size: 11px; color: var(--text-faint); line-height: 1.5;
+  max-width: 200px;
+}
+.approval-entry { margin-bottom: 2px; }
+.approval-entry .who { font-weight: 600; color: var(--text-muted); }
 </style>
 </head>
 <body>
@@ -823,8 +994,8 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 
     <nav class="sidebar-nav">
       <button class="nav-item active" data-tab="overview" onclick="switchTab('overview')">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>
-        <span class="nav-item-label">Overview</span>
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h5l2 2h5v10H4V4z"/><path d="M8 10h4M8 12h2"/></svg>
+        <span class="nav-item-label">Patent Pipeline</span>
       </button>
       <button class="nav-item" data-tab="settings" onclick="switchTab('settings')">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="3"/><path d="M10 1.5v2M10 16.5v2M1.5 10h2M16.5 10h2M3.4 3.4l1.4 1.4M15.2 15.2l1.4 1.4M3.4 16.6l1.4-1.4M15.2 4.8l1.4-1.4"/></svg>
@@ -865,7 +1036,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
        ============================================ -->
   <main class="main">
     <div class="main-header">
-      <h2 id="page-title">Overview</h2>
+      <h2 id="page-title">Patent Pipeline</h2>
       <div class="main-header-actions">
         <div class="health-indicator">
           <span class="health-dot"></span>
@@ -879,19 +1050,55 @@ tr:hover td { background: rgba(255,255,255,0.02); }
            TAB 1: OVERVIEW
            ================== -->
       <div class="tab-panel active" id="panel-overview">
-        <div class="kpi-grid" id="kpi-grid">
-          <div class="kpi-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text"></div></div>
-          <div class="kpi-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text"></div></div>
-          <div class="kpi-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text"></div></div>
-          <div class="kpi-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text"></div></div>
-          <div class="kpi-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text"></div></div>
-          <div class="kpi-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text"></div></div>
+        <!-- Role Selector & Search -->
+        <div class="pipeline-toolbar">
+          <div class="pipeline-toolbar-left">
+            <div class="role-selector">
+              <span class="role-selector-label">Logged in as</span>
+              <span class="role-dot admin" id="roleDot"></span>
+              <select class="role-select" id="roleSelect" onchange="changeRole(this.value)">
+                <option value="admin">Admin</option>
+                <option value="ip-strategist">IP Strategist</option>
+                <option value="patent-lawyer">Patent Lawyer</option>
+                <option value="patent-engineer">Patent Engineer</option>
+                <option value="ip-analyst">IP Analyst</option>
+                <option value="inventor">Inventor</option>
+              </select>
+            </div>
+            <input type="text" class="pipeline-search" id="pipelineSearch" placeholder="Search patents..." oninput="renderPipelineTable()">
+          </div>
+          <div class="pipeline-toolbar-left">
+            <button class="btn btn-sm btn-primary" onclick="addNewPatent()">+ New Patent</button>
+          </div>
         </div>
-        <h3 class="section-title">Recent Activity</h3>
-        <div class="activity-list" id="recent-activity">
-          <div class="activity-item"><div class="skeleton skeleton-text" style="width:100%"></div></div>
-          <div class="activity-item"><div class="skeleton skeleton-text" style="width:100%"></div></div>
-          <div class="activity-item"><div class="skeleton skeleton-text" style="width:100%"></div></div>
+
+        <!-- KPI Summary Bar -->
+        <div class="pipeline-summary-bar" id="pipelineSummary"></div>
+
+        <!-- Stage Filter Chips -->
+        <div class="stage-filter-bar" id="stageFilterBar"></div>
+
+        <!-- Patent Pipeline Table -->
+        <div class="patent-table-wrap">
+          <table class="patent-table" id="patentPipelineTable">
+            <thead>
+              <tr>
+                <th style="width:30px">#</th>
+                <th>Patent Title</th>
+                <th>Stage</th>
+                <th>Progress</th>
+                <th>Assignee</th>
+                <th>Priority</th>
+                <th>FTO</th>
+                <th>Next Action</th>
+                <th>Approval Trail</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="pipelineBody">
+              <tr><td colspan="10"><div class="empty-state"><p>Loading pipeline...</p></div></td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -1435,7 +1642,7 @@ async function apiFetch(path, options) {
    NAVIGATION
    ============================================ */
 var tabTitles = {
-  'overview': 'Overview',
+  'overview': 'Patent Pipeline',
   'settings': 'Agent Settings',
   'workflows': 'Workflows',
   'memory': 'Memory / Knowledge Base',
@@ -1474,47 +1681,258 @@ function toggleSidebar() {
 /* ============================================
    TAB 1: OVERVIEW
    ============================================ */
-var kpiDefs = [
-  { key: 'total_messages', label: 'Chat Messages', icon: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4a1 1 0 011-1h10a1 1 0 011 1v7a1 1 0 01-1 1H7l-3 3V4z"/></svg>', color: 'var(--accent)' },
-  { key: 'active_workflows', label: 'Active Workflows', icon: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h4v4H3zM11 3h4v4h-4zM7 11h4v4H7z"/><path d="M5 7v2h2M13 7v4h-2"/></svg>', color: 'var(--accent-blue)' },
-  { key: 'memory_entries', label: 'Memory Entries', icon: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3a1 1 0 011-1h12a1 1 0 011 1v12a1 1 0 01-1 1H3a1 1 0 01-1-1V3z"/><path d="M6 2v14M2 7h14M2 12h14"/></svg>', color: 'var(--accent-violet)' },
-  { key: 'inventions', label: 'Inventions', icon: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2a4.5 4.5 0 014.5 4.5c0 2-1.3 3.6-3.2 4.2V13h-2.6v-2.3C5.8 10.1 4.5 8.5 4.5 6.5A4.5 4.5 0 019 2z"/><path d="M7.5 14h3M7.8 16h2.4"/></svg>', color: 'var(--accent-amber)' },
-  { key: 'total_tokens', label: 'Total Tokens Used', icon: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="7"/><path d="M9 5v4l3 2"/></svg>', color: 'var(--accent)' },
-  { key: 'workflow_runs', label: 'Workflow Runs', icon: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2v14h14"/><path d="M5 12l3-4 3 2 4-5"/></svg>', color: 'var(--accent-blue)' },
-  { key: 'collaterals', label: 'Patent Collaterals', icon: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h5l1.5 1.5H15v9H3V3z"/><path d="M7 9h4M7 11h2"/></svg>', color: 'var(--accent-violet)' }
+/* ============================================
+   PATENT PIPELINE — STAGES, ROLES, WORKFLOW
+   ============================================ */
+var STAGES = [
+  { id: 'idea',            label: 'Idea',              css: 'stage-idea',            order: 0 },
+  { id: 'fto-analysis',    label: 'FTO / Prior Art',   css: 'stage-fto-analysis',    order: 1 },
+  { id: 'claims-drafted',  label: 'Claims Drafted',    css: 'stage-claims-drafted',  order: 2 },
+  { id: 'figures-gen',     label: 'Figures Generated', css: 'stage-figures-gen',     order: 3 },
+  { id: 'patent-drafted',  label: 'Patent Drafted',    css: 'stage-patent-drafted',  order: 4 },
+  { id: 'lawyer-review',   label: 'Lawyer Review',     css: 'stage-lawyer-review',   order: 5 },
+  { id: 'admin-approved',  label: 'Admin Approved',    css: 'stage-admin-approved',  order: 6 },
+  { id: 'filed',           label: 'Filed (USPTO)',     css: 'stage-filed',           order: 7 },
+  { id: 'under-exam',      label: 'Under Examination', css: 'stage-under-exam',      order: 8 },
+  { id: 'awarded',         label: 'Awarded',           css: 'stage-awarded',         order: 9 },
+  { id: 'rejected',        label: 'Rejected',          css: 'stage-rejected',        order: 10 }
+];
+var STAGE_MAP = {};
+STAGES.forEach(function(s) { STAGE_MAP[s.id] = s; });
+var TOTAL_ACTIVE_STAGES = 10; // excluding rejected
+
+var ROLES = {
+  'admin':            { label: 'Admin',           badgeCss: 'role-badge-admin',      dotCss: 'admin' },
+  'ip-strategist':    { label: 'IP Strategist',   badgeCss: 'role-badge-strategist', dotCss: 'ip-strategist' },
+  'patent-lawyer':    { label: 'Patent Lawyer',   badgeCss: 'role-badge-lawyer',     dotCss: 'patent-lawyer' },
+  'patent-engineer':  { label: 'Patent Engineer', badgeCss: 'role-badge-engineer',   dotCss: 'patent-engineer' },
+  'ip-analyst':       { label: 'IP Analyst',      badgeCss: 'role-badge-analyst',    dotCss: 'ip-analyst' },
+  'inventor':         { label: 'Inventor',        badgeCss: 'role-badge-inventor',   dotCss: 'inventor' }
+};
+
+/* Approval workflow: which role can perform which stage transitions */
+var WORKFLOW = {
+  'idea':            { advance: 'fto-analysis',    advanceLabel: 'Start FTO',          advanceRole: ['admin','ip-strategist','ip-analyst'] },
+  'fto-analysis':    { advance: 'claims-drafted',  advanceLabel: 'Draft Claims',       advanceRole: ['admin','ip-strategist','patent-engineer'] },
+  'claims-drafted':  { advance: 'figures-gen',     advanceLabel: 'Generate Figures',   advanceRole: ['admin','patent-engineer'] },
+  'figures-gen':     { advance: 'patent-drafted',  advanceLabel: 'Draft Patent',       advanceRole: ['admin','patent-engineer'] },
+  'patent-drafted':  { advance: 'lawyer-review',   advanceLabel: 'Submit for Review',  advanceRole: ['admin','ip-strategist','patent-engineer'] },
+  'lawyer-review':   { approve: 'admin-approved',  approveLabel: 'Approve Filing',     approveRole: ['admin','patent-lawyer'], rejectTo: 'patent-drafted' },
+  'admin-approved':  { advance: 'filed',           advanceLabel: 'Mark Filed',         advanceRole: ['admin'] },
+  'filed':           { advance: 'under-exam',      advanceLabel: 'Under Examination',  advanceRole: ['admin','patent-lawyer'] },
+  'under-exam':      { approve: 'awarded',         approveLabel: 'Mark Awarded',       approveRole: ['admin','patent-lawyer'], rejectTo: 'rejected' },
+  'awarded':         { },
+  'rejected':        { advance: 'patent-drafted',  advanceLabel: 'Revise & Retry',     advanceRole: ['admin','ip-strategist'] }
+};
+
+var currentRole = 'admin';
+var stageFilter = 'all';
+
+/* Demo patent pipeline data */
+var pipelineData = [
+  { id: 1,  title: 'Chemistry-Agnostic Gradient Interlayer for SSB Interface', ws: 'SSE Interface Engineering', stage: 'lawyer-review', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.5, assignee: 'patent-lawyer', value: '$25M-$60M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-01-15'},{who:'IP Analyst',action:'FTO completed',date:'2026-01-28'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-02-10'},{who:'Patent Engineer',action:'Figures generated',date:'2026-02-18'},{who:'Patent Engineer',action:'Patent drafted',date:'2026-02-25'},{who:'IP Strategist',action:'Submitted for review',date:'2026-03-01'}] },
+  { id: 2,  title: 'Mechanochemical Halide Segregation for SSB Interface', ws: 'SSE Interface Engineering', stage: 'patent-drafted', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.8, assignee: 'patent-engineer', value: '$30M-$65M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-01-20'},{who:'IP Analyst',action:'FTO completed',date:'2026-02-05'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-02-15'},{who:'Patent Engineer',action:'Figures generated',date:'2026-02-22'},{who:'Patent Engineer',action:'Patent drafted',date:'2026-03-02'}] },
+  { id: 3,  title: 'Embedded Microelectrode Array for SSB Interface Impedance Mapping', ws: 'SSE Interface Engineering', stage: 'claims-drafted', priority: 'Q2 2026', fto: 'GREEN', score: 8.2, assignee: 'patent-engineer', value: '$20M-$45M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-02-01'},{who:'IP Analyst',action:'FTO completed',date:'2026-02-20'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-03-03'}] },
+  { id: 4,  title: 'ALD Dual-Phase Li3PO4/AlPO4 Coating on LMFP Cathode', ws: 'Circular Electronic Materials', stage: 'filed', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.5, assignee: 'patent-lawyer', value: '$40M-$80M', trail: [{who:'IP Strategist',action:'Created idea',date:'2025-11-10'},{who:'IP Analyst',action:'FTO completed',date:'2025-11-28'},{who:'Patent Engineer',action:'Claims drafted',date:'2025-12-12'},{who:'Patent Engineer',action:'Figures generated',date:'2025-12-20'},{who:'Patent Engineer',action:'Patent drafted',date:'2026-01-08'},{who:'Patent Lawyer',action:'Approved filing',date:'2026-01-20'},{who:'Admin',action:'Admin approved',date:'2026-01-22'},{who:'Admin',action:'Filed USPTO',date:'2026-02-01'}] },
+  { id: 5,  title: 'Grain-Boundary-Isolated MnBi Permanent Magnet', ws: 'Circular Electronic Materials', stage: 'admin-approved', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.8, assignee: 'admin', value: '$30M-$70M', trail: [{who:'IP Strategist',action:'Created idea',date:'2025-12-05'},{who:'IP Analyst',action:'FTO completed',date:'2025-12-22'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-01-10'},{who:'Patent Engineer',action:'Figures generated',date:'2026-01-18'},{who:'Patent Engineer',action:'Patent drafted',date:'2026-01-28'},{who:'Patent Lawyer',action:'Approved filing',date:'2026-02-15'},{who:'Admin',action:'Admin approved',date:'2026-02-20'}] },
+  { id: 6,  title: 'Quaternary Chalcogenide Synaptic PCM with Self-Annealing', ws: 'Neuromorphic Computing', stage: 'idea', priority: 'IMMEDIATE', fto: 'GREEN', score: 9.1, assignee: 'ip-strategist', value: '$35M-$75M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-03-04'}] },
+  { id: 7,  title: 'SNN Intermediate Representation Compiler', ws: 'Neuromorphic Computing', stage: 'fto-analysis', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.7, assignee: 'ip-analyst', value: '$40M-$90M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-02-20'},{who:'IP Analyst',action:'FTO started',date:'2026-03-01'}] },
+  { id: 8,  title: 'Dual-Timescale Synaptic Meta-Plasticity Circuit', ws: 'Neuromorphic Computing', stage: 'figures-gen', priority: 'IMMEDIATE', fto: 'GREEN', score: 9.0, assignee: 'patent-engineer', value: '$30M-$70M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-01-25'},{who:'IP Analyst',action:'FTO completed',date:'2026-02-08'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-02-18'},{who:'Patent Engineer',action:'Figures in progress',date:'2026-03-02'}] },
+  { id: 9,  title: 'Electrochemically Regenerated ATP Cell-Free System', ws: 'Cell-Free Biomanufacturing', stage: 'under-exam', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.5, assignee: 'patent-lawyer', value: '$35M-$75M', trail: [{who:'IP Strategist',action:'Created idea',date:'2025-10-01'},{who:'IP Analyst',action:'FTO completed',date:'2025-10-20'},{who:'Patent Engineer',action:'Claims drafted',date:'2025-11-05'},{who:'Patent Engineer',action:'Figures generated',date:'2025-11-12'},{who:'Patent Engineer',action:'Patent drafted',date:'2025-11-28'},{who:'Patent Lawyer',action:'Approved filing',date:'2025-12-10'},{who:'Admin',action:'Admin approved',date:'2025-12-12'},{who:'Admin',action:'Filed USPTO',date:'2025-12-20'},{who:'Admin',action:'Under examination',date:'2026-02-15'}] },
+  { id: 10, title: 'Lyophilized Cell-Free Reaction Pellets with Hydrophobic Cores', ws: 'Cell-Free Biomanufacturing', stage: 'awarded', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.7, assignee: 'admin', value: '$25M-$60M', trail: [{who:'IP Strategist',action:'Created idea',date:'2025-08-15'},{who:'IP Analyst',action:'FTO completed',date:'2025-09-02'},{who:'Patent Engineer',action:'Claims drafted',date:'2025-09-18'},{who:'Patent Engineer',action:'Figures generated',date:'2025-09-25'},{who:'Patent Engineer',action:'Patent drafted',date:'2025-10-10'},{who:'Patent Lawyer',action:'Approved filing',date:'2025-10-25'},{who:'Admin',action:'Admin approved',date:'2025-10-28'},{who:'Admin',action:'Filed USPTO',date:'2025-11-05'},{who:'Admin',action:'Under examination',date:'2026-01-10'},{who:'USPTO',action:'Patent awarded',date:'2026-03-01'}] },
+  { id: 11, title: 'Spatially Programmed Anisotropic TIM for Multi-Chiplet Packages', ws: 'Universal TIMs', stage: 'lawyer-review', priority: 'IMMEDIATE', fto: 'YELLOW', score: 8.2, assignee: 'patent-lawyer', value: '$18M-$45M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-01-10'},{who:'IP Analyst',action:'FTO completed',date:'2026-01-25'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-02-05'},{who:'Patent Engineer',action:'Figures generated',date:'2026-02-12'},{who:'Patent Engineer',action:'Patent drafted',date:'2026-02-22'},{who:'IP Strategist',action:'Submitted for review',date:'2026-03-01'}] },
+  { id: 12, title: 'BAs Nanoparticle Composite TIM for Near-Diamond Conductivity', ws: 'Universal TIMs', stage: 'idea', priority: 'IMMEDIATE', fto: 'GREEN', score: 9.0, assignee: 'ip-strategist', value: '$22M-$55M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-03-05'}] },
+  { id: 13, title: 'Streaming ASIC Decoder for QLDPC Error Correction', ws: 'QEC Hardware', stage: 'fto-analysis', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.9, assignee: 'ip-analyst', value: '$25M-$55M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-02-28'},{who:'IP Analyst',action:'FTO started',date:'2026-03-04'}] },
+  { id: 14, title: 'Adaptive Code-Distance Reconfiguration Engine', ws: 'QEC Hardware', stage: 'claims-drafted', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.5, assignee: 'patent-engineer', value: '$18M-$40M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-02-10'},{who:'IP Analyst',action:'FTO completed',date:'2026-02-22'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-03-03'}] },
+  { id: 15, title: 'Superconducting Trapped-Field Magnet Systems', ws: 'Advanced Materials', stage: 'filed', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.6, assignee: 'patent-lawyer', value: '$20M-$50M', trail: [{who:'Inventor',action:'Invention disclosure',date:'2025-09-15'},{who:'IP Analyst',action:'FTO completed',date:'2025-10-05'},{who:'Patent Engineer',action:'Claims drafted',date:'2025-10-22'},{who:'Patent Engineer',action:'Figures generated',date:'2025-11-01'},{who:'Patent Engineer',action:'Patent drafted',date:'2025-11-15'},{who:'Patent Lawyer',action:'Approved filing',date:'2025-12-05'},{who:'Admin',action:'Admin approved',date:'2025-12-08'},{who:'Admin',action:'Filed USPTO',date:'2025-12-18'}] },
+  { id: 16, title: 'Photo-Activated Self-Healing Interface Polymer for SSB', ws: 'SSE Interface Engineering', stage: 'rejected', priority: 'Q2 2026', fto: 'YELLOW', score: 7.8, assignee: 'ip-strategist', value: '$15M-$35M', trail: [{who:'IP Strategist',action:'Created idea',date:'2025-10-01'},{who:'IP Analyst',action:'FTO completed',date:'2025-10-18'},{who:'Patent Engineer',action:'Claims drafted',date:'2025-11-02'},{who:'Patent Engineer',action:'Figures generated',date:'2025-11-10'},{who:'Patent Engineer',action:'Patent drafted',date:'2025-11-22'},{who:'Patent Lawyer',action:'Approved filing',date:'2025-12-08'},{who:'Admin',action:'Admin approved',date:'2025-12-10'},{who:'Admin',action:'Filed USPTO',date:'2025-12-20'},{who:'Admin',action:'Under examination',date:'2026-01-15'},{who:'USPTO',action:'Rejected — §103',date:'2026-03-02'}] }
 ];
 
-async function loadOverview() {
-  try {
-    var data = await apiFetch('/api/stats');
-    var grid = document.getElementById('kpi-grid');
-    grid.innerHTML = kpiDefs.map(function(kpi) {
-      var val = data[kpi.key];
-      if (val === undefined || val === null) val = 0;
-      return '<div class="kpi-card">' +
-        '<div class="kpi-icon" style="background:' + kpi.color + '15;color:' + kpi.color + '">' + kpi.icon + '</div>' +
-        '<div class="kpi-value">' + numFmt.format(val) + '</div>' +
-        '<div class="kpi-label">' + kpi.label + '</div>' +
-        '</div>';
-    }).join('');
+function changeRole(role) {
+  currentRole = role;
+  var dot = document.getElementById('roleDot');
+  dot.className = 'role-dot ' + ROLES[role].dotCss;
+  renderPipelineTable();
+}
 
-    /* Recent activity */
-    var actList = document.getElementById('recent-activity');
-    if (data.recent_activity && data.recent_activity.length > 0) {
-      actList.innerHTML = data.recent_activity.slice(0, 20).map(function(a) {
-        var badgeClass = categoryBadgeClass(a.category || a.event_type);
-        return '<div class="activity-item">' +
-          '<span class="badge ' + badgeClass + '">' + escapeHtml(a.event_type || a.category || 'event') + '</span>' +
-          '<span class="activity-title">' + escapeHtml(a.title || a.detail || '') + '</span>' +
-          '<span class="activity-time">' + relativeTime(a.timestamp || a.created_at) + '</span>' +
-          '</div>';
-      }).join('');
-    } else {
-      actList.innerHTML = '<div class="empty-state"><svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M3 3v14h14"/><path d="M6 13l3-4 3 2 4-5"/></svg><p>No recent activity</p></div>';
-    }
-  } catch (e) {
-    /* Skeleton remains on error */
+function getStageOrder(stageId) {
+  var s = STAGE_MAP[stageId];
+  return s ? s.order : -1;
+}
+
+function canPerformAction(actionRoles) {
+  if (!actionRoles) return false;
+  return actionRoles.indexOf(currentRole) >= 0;
+}
+
+function advancePatent(patentId, toStage) {
+  var pat = pipelineData.find(function(p) { return p.id === patentId; });
+  if (!pat) return;
+  var fromLabel = STAGE_MAP[pat.stage] ? STAGE_MAP[pat.stage].label : pat.stage;
+  var toLabel = STAGE_MAP[toStage] ? STAGE_MAP[toStage].label : toStage;
+  pat.stage = toStage;
+  var roleLabel = ROLES[currentRole] ? ROLES[currentRole].label : currentRole;
+  /* Update assignee based on next stage */
+  var nextWf = WORKFLOW[toStage];
+  if (nextWf) {
+    var nextRoles = nextWf.advanceRole || nextWf.approveRole || [];
+    if (nextRoles.length > 0 && nextRoles[0] !== 'admin') pat.assignee = nextRoles[nextRoles.length > 1 ? 1 : 0];
+    else if (nextRoles.indexOf('patent-lawyer') >= 0) pat.assignee = 'patent-lawyer';
+    else pat.assignee = currentRole;
   }
+  pat.trail.push({ who: roleLabel, action: fromLabel + ' → ' + toLabel, date: new Date().toISOString().slice(0, 10) });
+  toast(pat.title.substring(0, 40) + '... → ' + toLabel, 'success');
+  renderPipelineTable();
+}
+
+function rejectPatent(patentId, toStage) {
+  var pat = pipelineData.find(function(p) { return p.id === patentId; });
+  if (!pat) return;
+  var fromLabel = STAGE_MAP[pat.stage] ? STAGE_MAP[pat.stage].label : pat.stage;
+  var toLabel = STAGE_MAP[toStage] ? STAGE_MAP[toStage].label : toStage;
+  pat.stage = toStage;
+  var roleLabel = ROLES[currentRole] ? ROLES[currentRole].label : currentRole;
+  pat.assignee = 'patent-engineer';
+  pat.trail.push({ who: roleLabel, action: 'Rejected → ' + toLabel, date: new Date().toISOString().slice(0, 10) });
+  toast(pat.title.substring(0, 40) + '... rejected → ' + toLabel, 'error');
+  renderPipelineTable();
+}
+
+function addNewPatent() {
+  var title = prompt('Enter patent title:');
+  if (!title || !title.trim()) return;
+  var newId = Math.max.apply(null, pipelineData.map(function(p) { return p.id; })) + 1;
+  var roleLabel = ROLES[currentRole] ? ROLES[currentRole].label : currentRole;
+  pipelineData.push({
+    id: newId, title: title.trim(), ws: 'Unassigned', stage: 'idea',
+    priority: 'TBD', fto: 'TBD', score: 0, assignee: currentRole, value: 'TBD',
+    trail: [{ who: roleLabel, action: 'Created idea', date: new Date().toISOString().slice(0, 10) }]
+  });
+  toast('Patent "' + title.substring(0, 30) + '..." added to pipeline', 'success');
+  renderPipelineTable();
+}
+
+function renderPipelineTable() {
+  var searchVal = (document.getElementById('pipelineSearch').value || '').toLowerCase();
+
+  /* Stage counts */
+  var stageCounts = {};
+  STAGES.forEach(function(s) { stageCounts[s.id] = 0; });
+  pipelineData.forEach(function(p) { if (stageCounts[p.stage] !== undefined) stageCounts[p.stage]++; });
+
+  /* Summary bar */
+  var sumBar = document.getElementById('pipelineSummary');
+  var totalActive = pipelineData.filter(function(p) { return p.stage !== 'rejected'; }).length;
+  var inReview = pipelineData.filter(function(p) { return p.stage === 'lawyer-review' || p.stage === 'admin-approved'; }).length;
+  var filed = pipelineData.filter(function(p) { return p.stage === 'filed' || p.stage === 'under-exam'; }).length;
+  var awarded = pipelineData.filter(function(p) { return p.stage === 'awarded'; }).length;
+  sumBar.innerHTML =
+    '<div class="pipeline-summary-item"><div><div class="pipeline-summary-val">' + pipelineData.length + '</div><div class="pipeline-summary-label">Total Patents</div></div></div>' +
+    '<div class="pipeline-summary-item"><div><div class="pipeline-summary-val" style="color:var(--accent)">' + totalActive + '</div><div class="pipeline-summary-label">Active Pipeline</div></div></div>' +
+    '<div class="pipeline-summary-item"><div><div class="pipeline-summary-val" style="color:var(--accent-amber)">' + inReview + '</div><div class="pipeline-summary-label">Pending Approval</div></div></div>' +
+    '<div class="pipeline-summary-item"><div><div class="pipeline-summary-val" style="color:var(--accent-blue)">' + filed + '</div><div class="pipeline-summary-label">Filed / Under Exam</div></div></div>' +
+    '<div class="pipeline-summary-item"><div><div class="pipeline-summary-val" style="color:var(--accent-green)">' + awarded + '</div><div class="pipeline-summary-label">Awarded</div></div></div>';
+
+  /* Stage filter chips */
+  var filterBar = document.getElementById('stageFilterBar');
+  var filterHtml = '<button class="stage-filter-btn ' + (stageFilter === 'all' ? 'active' : '') + '" onclick="setStageFilter(\'all\')">All <span class="stage-filter-count">' + pipelineData.length + '</span></button>';
+  STAGES.forEach(function(s) {
+    if (stageCounts[s.id] > 0) {
+      filterHtml += '<button class="stage-filter-btn ' + (stageFilter === s.id ? 'active' : '') + '" onclick="setStageFilter(\'' + s.id + '\')">' + s.label + ' <span class="stage-filter-count">' + stageCounts[s.id] + '</span></button>';
+    }
+  });
+  filterBar.innerHTML = filterHtml;
+
+  /* Filter data */
+  var filtered = pipelineData.filter(function(p) {
+    if (stageFilter !== 'all' && p.stage !== stageFilter) return false;
+    if (searchVal && p.title.toLowerCase().indexOf(searchVal) < 0 && p.ws.toLowerCase().indexOf(searchVal) < 0) return false;
+    return true;
+  });
+
+  /* Render table rows */
+  var tbody = document.getElementById('pipelineBody');
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state" style="padding:40px 0"><svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 4h5l2 2h5v10H4V4z"/></svg><p>No patents match current filters</p></div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(function(pat, idx) {
+    var stage = STAGE_MAP[pat.stage] || { label: pat.stage, css: 'stage-idea', order: 0 };
+    var wf = WORKFLOW[pat.stage] || {};
+    var stageOrder = stage.order;
+
+    /* Build progress pips */
+    var pips = '';
+    for (var i = 0; i < TOTAL_ACTIVE_STAGES; i++) {
+      var cls = i < stageOrder ? 'done' : (i === stageOrder ? 'current' : 'future');
+      pips += '<div class="stage-pip ' + cls + '"></div>';
+    }
+
+    /* FTO color */
+    var ftoClass = pat.fto === 'GREEN' ? 'badge-green' : pat.fto === 'YELLOW' ? 'badge-amber' : pat.fto === 'RED' ? 'badge-red' : 'badge-muted';
+
+    /* Priority badge */
+    var prioClass = pat.priority === 'IMMEDIATE' ? 'badge-red' : 'badge-muted';
+
+    /* Assignee role badge */
+    var assigneeRole = ROLES[pat.assignee] || { label: pat.assignee, badgeCss: 'role-badge-analyst' };
+
+    /* Next action text */
+    var nextAction = '';
+    if (wf.advance) nextAction = wf.advanceLabel || 'Advance';
+    else if (wf.approve) nextAction = wf.approveLabel || 'Approve';
+    else if (pat.stage === 'awarded') nextAction = 'Complete';
+    else if (pat.stage === 'rejected') nextAction = 'Revise & Retry';
+
+    /* Determine which actions current role can do */
+    var canAdvance = wf.advanceRole ? canPerformAction(wf.advanceRole) : false;
+    var canApprove = wf.approveRole ? canPerformAction(wf.approveRole) : false;
+    var canReject = wf.rejectTo && (wf.approveRole ? canPerformAction(wf.approveRole) : false);
+
+    /* Action buttons */
+    var actions = '';
+    if (wf.approve) {
+      actions += '<button class="btn-action approve" ' + (canApprove ? '' : 'disabled') + ' onclick="advancePatent(' + pat.id + ',\'' + wf.approve + '\')" title="' + (canApprove ? wf.approveLabel : 'Requires: ' + (wf.approveRole||[]).map(function(r){return ROLES[r]?ROLES[r].label:r;}).join(' or ')) + '">✓ ' + (wf.approveLabel || 'Approve') + '</button>';
+    }
+    if (wf.advance && !wf.approve) {
+      actions += '<button class="btn-action advance" ' + (canAdvance ? '' : 'disabled') + ' onclick="advancePatent(' + pat.id + ',\'' + wf.advance + '\')" title="' + (canAdvance ? wf.advanceLabel : 'Requires: ' + (wf.advanceRole||[]).map(function(r){return ROLES[r]?ROLES[r].label:r;}).join(' or ')) + '">→ ' + (wf.advanceLabel || 'Advance') + '</button>';
+    }
+    if (canReject) {
+      actions += '<button class="btn-action reject" onclick="rejectPatent(' + pat.id + ',\'' + wf.rejectTo + '\')" title="Reject back to ' + (STAGE_MAP[wf.rejectTo]?STAGE_MAP[wf.rejectTo].label:wf.rejectTo) + '">✕ Reject</button>';
+    }
+
+    /* Approval trail (last 3) */
+    var trailHtml = '';
+    if (pat.trail && pat.trail.length) {
+      var recent = pat.trail.slice(-3);
+      trailHtml = '<div class="approval-trail">' + recent.map(function(t) {
+        return '<div class="approval-entry"><span class="who">' + escapeHtml(t.who) + '</span> ' + escapeHtml(t.action) + '</div>';
+      }).join('') + '</div>';
+    }
+
+    return '<tr>' +
+      '<td style="color:var(--text-faint);font-weight:600">' + pat.id + '</td>' +
+      '<td class="title-cell"><div class="patent-title-text">' + escapeHtml(pat.title) + '</div><div class="patent-ws">' + escapeHtml(pat.ws) + '</div></td>' +
+      '<td><span class="stage-badge ' + stage.css + '"><span class="stage-icon"></span>' + stage.label + '</span></td>' +
+      '<td><div class="stage-progress">' + pips + '</div><div style="font-size:10px;color:var(--text-faint);margin-top:3px">' + (stageOrder + 1) + '/' + TOTAL_ACTIVE_STAGES + '</div></td>' +
+      '<td><span class="role-badge ' + assigneeRole.badgeCss + '">' + assigneeRole.label + '</span></td>' +
+      '<td><span class="badge ' + prioClass + '">' + pat.priority + '</span></td>' +
+      '<td><span class="badge ' + ftoClass + '">' + pat.fto + '</span></td>' +
+      '<td style="font-size:12px;color:var(--text-muted);max-width:120px">' + nextAction + '</td>' +
+      '<td>' + trailHtml + '</td>' +
+      '<td><div class="action-group">' + (actions || '<span style="font-size:11px;color:var(--text-faint)">—</span>') + '</div></td>' +
+      '</tr>';
+  }).join('');
+}
+
+function setStageFilter(filter) {
+  stageFilter = filter;
+  renderPipelineTable();
+}
+
+async function loadOverview() {
+  renderPipelineTable();
 }
 
 /* ============================================
