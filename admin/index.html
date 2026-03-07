@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <!--
    ______                            __
@@ -11,6 +11,8 @@
 -->
 
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://api.anthropic.com; img-src 'self' data:;">
+<link rel="stylesheet" href="../design-tokens.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Patentify Command Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,6 +48,55 @@
   --sidebar-collapsed: 60px;
   --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* ═══ LIGHT THEME ═══ */
+[data-theme="light"] {
+  --bg-primary: #FAFBFC;
+  --bg-surface: #F5F6F8;
+  --bg-card: #FFFFFF;
+  --bg-hover: #EEF1F5;
+  --bg-sidebar: #FFFFFF;
+  --border: rgba(15,23,42,0.08);
+  --border-strong: rgba(15,23,42,0.15);
+  --text: #0F172A;
+  --text-muted: #475569;
+  --text-faint: #94A3B8;
+  --accent: #2E8B7A;
+  --accent-blue: #2563EB;
+  --accent-amber: #D97706;
+  --accent-violet: #7C3AED;
+  --accent-red: #DC2626;
+  --accent-green: #059669;
+}
+[data-theme="light"] body { background: var(--bg-primary); color: var(--text); }
+[data-theme="light"] .sidebar { background: #FFFFFF; border-right-color: rgba(15,23,42,0.10); }
+[data-theme="light"] .nav-item.active { background: rgba(46,139,122,0.06); }
+[data-theme="light"] .main-header { background: #FFFFFF; border-bottom-color: rgba(15,23,42,0.08); }
+[data-theme="light"] .stat-card { background: #FFFFFF; border-color: rgba(15,23,42,0.10); }
+[data-theme="light"] .activity-item { border-bottom-color: rgba(15,23,42,0.06); }
+[data-theme="light"] .activity-item:hover { background: rgba(15,23,42,0.03); }
+[data-theme="light"] .card, [data-theme="light"] .settings-card { background: #FFFFFF; border-color: rgba(15,23,42,0.10); }
+[data-theme="light"] .form-input, [data-theme="light"] .form-select { background: #F5F6F8; border-color: rgba(15,23,42,0.12); color: #0F172A; }
+[data-theme="light"] .form-input:focus, [data-theme="light"] .form-select:focus { border-color: #2563EB; }
+[data-theme="light"] .form-select option { background: #FFFFFF; color: #0F172A; }
+[data-theme="light"] .btn-secondary { background: #F5F6F8; border-color: rgba(15,23,42,0.12); color: #334155; }
+[data-theme="light"] .btn-secondary:hover { background: #EEF1F5; }
+[data-theme="light"] .toggle-track { background: rgba(15,23,42,0.12); }
+[data-theme="light"] .toggle-track.on { background: var(--accent); }
+[data-theme="light"] .badge { background: rgba(15,23,42,0.06); color: #334155; }
+[data-theme="light"] .workflow-card { background: #FFFFFF; border-color: rgba(15,23,42,0.10); }
+[data-theme="light"] .workflow-card:hover { border-color: rgba(15,23,42,0.20); }
+[data-theme="light"] .log-card { background: #FFFFFF; border-color: rgba(15,23,42,0.10); }
+[data-theme="light"] .skeleton { background: linear-gradient(90deg, #F0F0F0 25%, #E0E0E0 50%, #F0F0F0 75%); }
+[data-theme="light"] .tab-btn.active { background: var(--accent-blue); color: #fff; }
+[data-theme="light"] .wf-visual-editor { background: #FFFFFF; border-color: rgba(15,23,42,0.10); }
+[data-theme="light"] .wf-step { background: #FFFFFF; border-color: rgba(15,23,42,0.10); }
+[data-theme="light"] .wf-props-panel { background: #FFFFFF; border-color: rgba(15,23,42,0.10); }
+[data-theme="light"] .wf-json-editor textarea { background: #F5F6F8; color: #0F172A; border-color: rgba(15,23,42,0.10); }
+[data-theme="light"] .wf-json-editor pre { background: #F5F6F8; color: #0F172A; }
+[data-theme="light"] code { background: rgba(15,23,42,0.06); color: #334155; }
+[data-theme="light"] .sidebar-header { border-bottom-color: rgba(15,23,42,0.08); }
+[data-theme="light"] .sidebar-footer { border-top-color: rgba(15,23,42,0.08); }
 
 /* ============================================
    RESET & BASE
@@ -971,7 +1022,296 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 }
 .approval-entry { margin-bottom: 2px; }
 .approval-entry .who { font-weight: 600; color: var(--text-muted); }
+
+/* Mode toggle pill */
+.mode-toggle {
+  display: inline-flex; align-items: center; gap: 0;
+  border-radius: 999px; border: 1px solid var(--border); overflow: hidden;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.03em;
+  cursor: pointer; flex-shrink: 0; user-select: none;
+  transition: border-color var(--transition);
+}
+.mode-toggle:hover { border-color: var(--border-strong); }
+.mode-seg {
+  padding: 3px 8px; transition: all 0.2s ease; white-space: nowrap;
+}
+.mode-seg.active-auto {
+  background: rgba(34,197,94,0.15); color: #22C55E;
+}
+.mode-seg.active-manual {
+  background: rgba(245,158,11,0.15); color: #F59E0B;
+}
+.mode-seg.inactive {
+  background: transparent; color: var(--text-faint);
+}
+.mode-label-inline {
+  font-size: 10px; color: var(--text-faint); text-align: center; margin-top: 3px;
+}
+.auto-chain-indicator {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 10px; font-weight: 600; color: #22C55E;
+  animation: auto-blink 1.5s ease infinite;
+}
+@keyframes auto-blink {
+  0%, 100% { opacity: 0.5; } 50% { opacity: 1; }
+}
+
+/* ============================================
+   WORKFLOW EDITOR
+   ============================================ */
+.wfe-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--bg-primary);
+  display: none; flex-direction: column;
+}
+.wfe-overlay.open { display: flex; }
+.wfe-topbar {
+  height: 48px; background: var(--bg-card); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; flex-shrink: 0;
+}
+.wfe-topbar-left { display: flex; align-items: center; gap: 12px; }
+.wfe-topbar-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.wfe-topbar-subtitle { font-size: 12px; color: var(--text-faint); }
+.wfe-topbar-right { display: flex; align-items: center; gap: 8px; }
+.wfe-body { display: flex; flex: 1; overflow: hidden; }
+
+/* Palette */
+.wfe-palette {
+  width: 210px; background: var(--bg-card); border-right: 1px solid var(--border);
+  overflow-y: auto; flex-shrink: 0; padding: 12px;
+}
+.wfe-palette-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); margin-bottom: 8px; }
+.wfe-palette-item {
+  padding: 8px 10px; border: 1px dashed var(--border); border-radius: var(--radius-sm);
+  margin-bottom: 6px; cursor: grab; font-size: 12px; font-weight: 600; color: var(--text-muted);
+  display: flex; align-items: center; gap: 8px; transition: all var(--transition);
+  background: var(--bg-surface);
+}
+.wfe-palette-item:hover { border-color: var(--accent); color: var(--text); background: var(--bg-hover); }
+.wfe-palette-item:active { cursor: grabbing; }
+.wfe-palette-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.wfe-palette-sep { height: 1px; background: var(--border); margin: 10px 0; }
+
+/* Canvas */
+.wfe-canvas-wrap {
+  flex: 1; overflow: auto; position: relative; background:
+    radial-gradient(circle, rgba(148,163,184,0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.wfe-canvas { padding: 40px; min-width: 600px; min-height: 400px; position: relative; }
+.wfe-canvas svg.wfe-edges {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;
+}
+
+/* Step card on canvas */
+.wfe-step {
+  width: 220px; background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 10px 12px; cursor: grab;
+  position: relative; margin-bottom: 8px; transition: box-shadow 0.2s, border-color 0.2s;
+  display: flex; align-items: center; gap: 10px; z-index: 1;
+}
+.wfe-step:hover { border-color: var(--accent); box-shadow: 0 2px 12px rgba(46,139,122,0.12); }
+.wfe-step.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(46,139,122,0.2); }
+.wfe-step.draft { border-style: dashed; opacity: 0.7; }
+.wfe-step.dragging { opacity: 0.4; }
+.wfe-step.drag-over { border-color: var(--accent-blue); border-width: 2px; }
+.wfe-step-bar { width: 4px; height: 36px; border-radius: 2px; flex-shrink: 0; }
+.wfe-step-info { flex: 1; min-width: 0; }
+.wfe-step-label { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wfe-step-meta { font-size: 10px; color: var(--text-faint); margin-top: 2px; display: flex; gap: 6px; align-items: center; }
+.wfe-step-type-badge {
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 1px 5px; border-radius: 3px; background: rgba(148,163,184,0.1); color: var(--text-faint);
+}
+.wfe-step-actions {
+  display: flex; gap: 2px; opacity: 0; transition: opacity 0.2s; position: absolute; top: 4px; right: 6px;
+}
+.wfe-step:hover .wfe-step-actions { opacity: 1; }
+.wfe-step-action-btn {
+  width: 20px; height: 20px; border: none; background: var(--bg-hover); border-radius: 3px;
+  color: var(--text-faint); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; transition: all 0.15s;
+}
+.wfe-step-action-btn:hover { background: rgba(239,68,68,0.15); color: #EF4444; }
+
+/* Parallel group */
+.wfe-parallel-group {
+  border: 1px dashed rgba(139,92,246,0.3); border-radius: var(--radius-md);
+  background: rgba(139,92,246,0.03); padding: 12px; margin-bottom: 8px;
+}
+.wfe-parallel-label { font-size: 10px; font-weight: 700; color: #8B5CF6; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.wfe-parallel-lanes { display: flex; gap: 12px; }
+.wfe-parallel-lane { flex: 1; min-width: 180px; }
+.wfe-parallel-lane-title { font-size: 10px; font-weight: 600; color: var(--text-faint); margin-bottom: 6px; text-align: center; }
+
+/* Arrow between steps */
+.wfe-arrow {
+  display: flex; justify-content: center; align-items: center; height: 24px; color: var(--text-faint);
+}
+.wfe-arrow svg { width: 16px; height: 16px; }
+
+/* Properties panel */
+.wfe-props {
+  width: 360px; background: var(--bg-card); border-left: 1px solid var(--border);
+  overflow-y: auto; flex-shrink: 0; display: none; flex-direction: column;
+}
+.wfe-props.open { display: flex; }
+.wfe-props-header {
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.wfe-props-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.wfe-props-body { padding: 16px; flex: 1; overflow-y: auto; }
+.wfe-props-section { margin-bottom: 20px; }
+.wfe-props-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); margin-bottom: 8px; }
+
+.wfe-prompt-editor {
+  width: 100%; min-height: 160px; max-height: 400px; resize: vertical;
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text); font-family: 'Courier New', monospace; font-size: 12px;
+  padding: 10px; outline: none; line-height: 1.6;
+}
+.wfe-prompt-editor:focus { border-color: var(--accent); }
+.wfe-token-counter { font-size: 10px; color: var(--text-faint); text-align: right; margin-top: 4px; }
+
+.wfe-attach-zone {
+  border: 2px dashed var(--border); border-radius: var(--radius-sm); padding: 16px;
+  text-align: center; color: var(--text-faint); font-size: 12px; cursor: pointer;
+  transition: all var(--transition); margin-bottom: 8px;
+}
+.wfe-attach-zone:hover { border-color: var(--accent); color: var(--text-muted); }
+.wfe-attach-zone.dragover { border-color: var(--accent); background: rgba(46,139,122,0.05); }
+.wfe-attach-item {
+  display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 11px; margin-bottom: 4px;
+}
+.wfe-attach-item .name { flex: 1; color: var(--text); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wfe-attach-role-sel { font-size: 10px; padding: 2px 4px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 3px; color: var(--text-muted); }
+.wfe-attach-remove { cursor: pointer; color: var(--text-faint); font-size: 14px; }
+.wfe-attach-remove:hover { color: #EF4444; }
+
+.wfe-role-check { display: flex; flex-wrap: wrap; gap: 8px; }
+.wfe-role-check label { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-muted); cursor: pointer; }
+.wfe-role-check input[type="checkbox"] { accent-color: var(--accent); }
+
+.wfe-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; }
+.wfe-toggle-label { font-size: 12px; color: var(--text-muted); }
+
+/* Upload modal */
+.wfe-upload-overlay {
+  position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.6);
+  display: none; align-items: center; justify-content: center;
+}
+.wfe-upload-overlay.open { display: flex; }
+.wfe-upload-card {
+  width: 480px; max-width: 90vw; background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 32px; text-align: center;
+}
+.wfe-upload-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.wfe-upload-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+.wfe-upload-drop {
+  border: 2px dashed var(--border); border-radius: var(--radius-md); padding: 40px 20px;
+  color: var(--text-faint); font-size: 13px; cursor: pointer; transition: all var(--transition);
+  margin-bottom: 16px;
+}
+.wfe-upload-drop:hover { border-color: var(--accent); color: var(--text-muted); }
+.wfe-upload-status { font-size: 12px; color: var(--accent); min-height: 20px; margin-top: 12px; }
+.wfe-upload-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Model badge on step cards */
+.wfe-step-model {
+  font-size: 9px; font-weight: 600; color: var(--accent-cyan);
+  background: rgba(6,182,212,0.1); padding: 1px 5px; border-radius: 3px;
+  white-space: nowrap; max-width: 80px; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Model Manager in Settings */
+.model-manager { margin-top: 8px; }
+.model-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.model-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  transition: border-color var(--transition);
+}
+.model-item:hover { border-color: var(--border-strong); }
+.model-item-info { flex: 1; min-width: 0; }
+.model-item-id { font-size: 13px; font-weight: 600; color: var(--text); font-family: var(--font-mono, monospace); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.model-item-label { font-size: 11px; color: var(--text-muted); }
+.model-item-provider { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 3px; white-space: nowrap; }
+.model-item-provider.anthropic { background: rgba(212,160,23,0.1); color: var(--accent-amber); }
+.model-item-provider.openai { background: rgba(34,197,94,0.1); color: var(--accent-green); }
+.model-item-provider.google { background: rgba(37,99,235,0.1); color: var(--accent-blue); }
+.model-item-provider.meta { background: rgba(139,92,246,0.1); color: var(--accent-violet); }
+.model-item-provider.other { background: rgba(148,163,184,0.1); color: var(--text-faint); }
+.model-item-default { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); background: rgba(46,139,122,0.12); padding: 2px 6px; border-radius: 3px; }
+.model-item-actions { display: flex; gap: 4px; }
+.model-remove-btn {
+  width: 24px; height: 24px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: none; color: var(--text-faint); cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 12px; transition: all var(--transition);
+}
+.model-remove-btn:hover { color: #EF4444; border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05); }
+.model-add-row { display: flex; gap: 8px; align-items: flex-end; }
+.model-add-row .form-input, .model-add-row .form-select { font-size: 12px; padding: 7px 10px; }
+
+/* CPC Classification Badges */
+.cpc-codes { display: flex; flex-direction: column; gap: 3px; max-width: 180px; }
+.cpc-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 600;
+  font-family: var(--font-mono, monospace); white-space: nowrap; cursor: default;
+  border: 1px solid transparent; transition: all 0.15s;
+}
+.cpc-badge:hover { border-color: var(--border-strong); }
+.cpc-badge .cpc-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.cpc-badge-primary { background: rgba(6,182,212,0.08); color: #06B6D4; }
+.cpc-badge-secondary { background: rgba(148,163,184,0.06); color: var(--text-faint); font-weight: 500; }
+.cpc-tooltip {
+  position: absolute; z-index: 1000; background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 12px 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  max-width: 360px; font-size: 12px; pointer-events: none; display: none;
+}
+.cpc-tooltip.visible { display: block; pointer-events: auto; }
+.cpc-tooltip-title { font-weight: 700; color: var(--text); margin-bottom: 6px; font-size: 13px; }
+.cpc-tooltip-row { display: flex; gap: 8px; margin-bottom: 4px; }
+.cpc-tooltip-label { font-weight: 600; color: var(--text-faint); min-width: 65px; text-transform: uppercase; font-size: 10px; letter-spacing: 0.04em; }
+.cpc-tooltip-value { color: var(--text-muted); flex: 1; }
+
+/* CPC Analysis Panel */
+.cpc-analysis { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+.cpc-analysis-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 16px; }
+.cpc-section-bars { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.cpc-section-bar {
+  display: flex; align-items: center; gap: 10px;
+}
+.cpc-section-label { font-size: 11px; font-weight: 600; color: var(--text-muted); min-width: 24px; text-align: center; }
+.cpc-section-name { font-size: 11px; color: var(--text-faint); min-width: 120px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cpc-section-track { flex: 1; height: 8px; background: var(--bg-hover); border-radius: 4px; overflow: hidden; }
+.cpc-section-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+.cpc-section-count { font-size: 11px; font-weight: 700; color: var(--text); min-width: 24px; text-align: right; }
+.cpc-class-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.cpc-class-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;
+  background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted);
+  cursor: pointer; transition: all var(--transition);
+}
+.cpc-class-chip:hover { border-color: var(--accent); color: var(--text); }
+.cpc-class-chip .chip-count { font-size: 9px; font-weight: 700; min-width: 14px; height: 14px; border-radius: 7px; background: rgba(148,163,184,0.15); display: inline-flex; align-items: center; justify-content: center; }
 </style>
+
+<style id="admin-light-fixes">
+.theme-toggle-btn{background:none;border:1px solid var(--border);border-radius:var(--radius-sm,6px);color:var(--text-muted);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;flex-shrink:0}
+.theme-toggle-btn:hover{color:var(--text);border-color:var(--text-muted)}
+[data-theme="light"] .theme-toggle-btn svg{display:none}
+[data-theme="light"] .theme-toggle-btn::after{content:"\263D";font-size:16px;line-height:1}
+[data-theme="dark"] .theme-toggle-btn svg{display:block}
+</style>
+<script src="../env.js"></script>
+<script>try{var s=document.createElement('script');s.src='../env.local.js';s.onerror=function(){};document.head.appendChild(s);}catch(e){}</script>
 </head>
 <body>
 
@@ -1025,6 +1365,9 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 
     <div class="sidebar-footer">
       <span class="sidebar-footer-text">Command Center v1.0</span>
+      <button class="theme-toggle-btn" onclick="toggleAdminTheme()" aria-label="Toggle theme" title="Toggle light/dark mode">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
       <button class="collapse-btn" onclick="toggleSidebar()" aria-label="Toggle sidebar">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg>
       </button>
@@ -1065,10 +1408,12 @@ tr:hover td { background: rgba(255,255,255,0.02); }
                 <option value="inventor">Inventor</option>
               </select>
             </div>
-            <input type="text" class="pipeline-search" id="pipelineSearch" placeholder="Search patents..." oninput="renderPipelineTable()">
+            <input type="text" class="pipeline-search" id="pipelineSearch" placeholder="Search patents, whitespace, CPC..." oninput="renderPipelineTable()">
           </div>
           <div class="pipeline-toolbar-left">
             <button class="btn btn-sm btn-primary" onclick="addNewPatent()">+ New Patent</button>
+            <button class="btn btn-sm btn-secondary" onclick="openWorkflowEditor()" id="btnEditWorkflow">&#9881; Edit Workflow</button>
+            <button class="btn btn-sm btn-secondary" onclick="openUploadParser()" id="btnFromDoc">&#128196; Create from Document</button>
           </div>
         </div>
 
@@ -1085,6 +1430,9 @@ tr:hover td { background: rgba(255,255,255,0.02); }
               <tr>
                 <th style="width:30px">#</th>
                 <th>Patent Title</th>
+                <th>CPC</th>
+                <th>Pat. Score</th>
+                <th>CII Score</th>
                 <th>Stage</th>
                 <th>Progress</th>
                 <th>Assignee</th>
@@ -1096,16 +1444,39 @@ tr:hover td { background: rgba(255,255,255,0.02); }
               </tr>
             </thead>
             <tbody id="pipelineBody">
-              <tr><td colspan="10"><div class="empty-state"><p>Loading pipeline...</p></div></td></tr>
+              <tr><td colspan="13"><div class="empty-state"><p>Loading pipeline...</p></div></td></tr>
             </tbody>
           </table>
         </div>
+
+        <!-- CPC Classification Analysis -->
+        <div class="cpc-analysis" id="cpcAnalysis"></div>
       </div>
 
       <!-- ==================
            TAB 2: AGENT SETTINGS
            ================== -->
       <div class="tab-panel" id="panel-settings">
+
+        <!-- API Key Configuration -->
+        <div style="margin-bottom:24px;padding:20px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md)">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+            Claude API Key
+          </h3>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.5">
+            Required for AI features (workflow generation, filing strategy, CII scoring).<br>
+            Get your key at <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--accent-blue)">console.anthropic.com</a>.
+            Your key is stored only in your browser's local storage.
+          </p>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input class="form-input" id="apiKeyInput" type="password" placeholder="sk-ant-..." style="flex:1;font-family:monospace;font-size:12px">
+            <button type="button" class="btn btn-primary" onclick="saveApiKey()" style="white-space:nowrap">Save Key</button>
+            <button type="button" class="btn btn-secondary" onclick="clearApiKey()">Clear</button>
+          </div>
+          <div id="apiKeyStatus" style="font-size:11px;margin-top:8px;color:var(--text-faint)"></div>
+        </div>
+
         <form id="settings-form" onsubmit="saveSettings(event)">
           <div class="form-group">
             <label class="form-label">Personality Name</label>
@@ -1186,6 +1557,30 @@ tr:hover td { background: rgba(255,255,255,0.02); }
               <span class="toggle-label" id="auto-research-label">Enabled</span>
             </div>
           </div>
+
+          <!-- ── LLM Model Manager ── -->
+          <div class="form-group" style="margin-top:24px; padding-top:20px; border-top:1px solid var(--border);">
+            <label class="form-label">LLM Model Registry</label>
+            <p style="font-size:12px;color:var(--text-faint);margin-bottom:12px">Manage the list of available LLM models for workflow steps. The default model is used for new steps.</p>
+            <div class="model-manager">
+              <div class="model-list" id="modelList">
+                <!-- Rendered by JS -->
+              </div>
+              <div class="model-add-row">
+                <input class="form-input" id="newModelId" placeholder="Model ID (e.g. claude-sonnet-4-20250514)" style="flex:2">
+                <input class="form-input" id="newModelLabel" placeholder="Display name" style="flex:1.2">
+                <select class="form-select" id="newModelProvider" style="flex:0.8">
+                  <option value="anthropic">Anthropic</option>
+                  <option value="openai">OpenAI</option>
+                  <option value="google">Google</option>
+                  <option value="meta">Meta</option>
+                  <option value="other">Other</option>
+                </select>
+                <button class="btn btn-sm btn-primary" onclick="addModel()" style="white-space:nowrap">+ Add Model</button>
+              </div>
+            </div>
+          </div>
+
           <button type="submit" class="btn btn-primary" style="margin-top:8px;">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 5L6.5 11.5 3 8"/></svg>
             Save Configuration
@@ -1300,9 +1695,9 @@ tr:hover td { background: rgba(255,255,255,0.02); }
           <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="var(--accent-violet)" stroke-width="1.5"><path d="M6 2h8l4 4v12H6V2z"/><path d="M14 2v4h4"/><path d="M8 10h4M8 13h6"/></svg>
           <div style="flex:1;min-width:0;">
             <div style="font-size:12px;font-weight:600;color:var(--text);">Workflow 1 Reference Documents</div>
-            <div style="font-size:11px;color:var(--text-faint);">Patent_generation_prompt_V2.docx &middot; USPTO_Patent_Drafting_Guidelines.docx &middot; USPTO_Patent_Figures_Guide.docx</div>
+            <div style="font-size:11px;color:var(--text-faint);">Patent_generation_prompt_V2.docx &middot; USPTO_Patent_Drafting_Guidelines.docx &middot; USPTO_Patent_Figures_Guide.docx &middot; AI_Patent_Language_Guide.docx &middot; USPTO_Patent_Drafting_Guidelines-2.docx</div>
           </div>
-          <span class="badge badge-violet">3 files</span>
+          <span class="badge badge-violet">5 files</span>
         </div>
 
         <!-- Pipeline steps visual -->
@@ -1451,7 +1846,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
         <input type="number" class="form-input" id="mem-whitespace" min="1" max="15" value="1">
       </div>
       <div class="form-group">
-        <label class="form-label">Relevance Score</label>
+        <label class="form-label">Patentability Score</label>
         <div class="range-group">
           <input type="range" id="mem-relevance" min="0" max="1" step="0.05" value="0.8" oninput="document.getElementById('rel-val').textContent=this.value">
           <span class="range-value" id="rel-val">0.8</span>
@@ -1524,11 +1919,88 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 <!-- Toast Container -->
 <div class="toast-container" id="toast-container"></div>
 
+<!-- ═══════════════════════════════════════
+     WORKFLOW EDITOR OVERLAY
+     ═══════════════════════════════════════ -->
+<div class="wfe-overlay" id="wfeOverlay">
+  <div class="wfe-topbar">
+    <div class="wfe-topbar-left">
+      <button class="btn btn-sm btn-secondary" onclick="closeWorkflowEditor()">← Back to Pipeline</button>
+      <span class="wfe-topbar-title" id="wfeTitle">Workflow Editor</span>
+      <span class="wfe-topbar-subtitle" id="wfeSubtitle">Standard Patent Pipeline</span>
+    </div>
+    <div class="wfe-topbar-right">
+      <button class="btn btn-sm btn-secondary" onclick="resetWorkflow()">Reset to Default</button>
+      <button class="btn btn-sm btn-secondary" onclick="openUploadParser()">&#128196; Create from Document</button>
+      <button class="btn btn-sm btn-primary" onclick="saveWorkflow()">Save Workflow</button>
+    </div>
+  </div>
+  <div class="wfe-body">
+    <!-- Step Palette -->
+    <div class="wfe-palette" id="wfePalette">
+      <div class="wfe-palette-title">Standard Steps</div>
+      <div class="wfe-palette-item" draggable="true" data-step-type="task" data-step-tpl="idea"><span class="wfe-palette-dot" style="background:#94A3B8"></span>Idea / Disclosure</div>
+      <div class="wfe-palette-item" draggable="true" data-step-type="task" data-step-tpl="fto"><span class="wfe-palette-dot" style="background:#06B6D4"></span>FTO / Prior Art</div>
+      <div class="wfe-palette-item" draggable="true" data-step-type="task" data-step-tpl="claims"><span class="wfe-palette-dot" style="background:#3B82F6"></span>Draft Claims</div>
+      <div class="wfe-palette-item" draggable="true" data-step-type="task" data-step-tpl="figures"><span class="wfe-palette-dot" style="background:#8B5CF6"></span>Generate Figures</div>
+      <div class="wfe-palette-item" draggable="true" data-step-type="document-gen" data-step-tpl="draft"><span class="wfe-palette-dot" style="background:#D4A017"></span>Draft Patent</div>
+      <div class="wfe-palette-sep"></div>
+      <div class="wfe-palette-title">Approval Gates</div>
+      <div class="wfe-palette-item" draggable="true" data-step-type="approval" data-step-tpl="lawyer-review"><span class="wfe-palette-dot" style="background:#F59E0B"></span>Lawyer Review</div>
+      <div class="wfe-palette-item" draggable="true" data-step-type="approval" data-step-tpl="admin-approval"><span class="wfe-palette-dot" style="background:#22C55E"></span>Admin Approval</div>
+      <div class="wfe-palette-item" draggable="true" data-step-type="approval" data-step-tpl="board-review"><span class="wfe-palette-dot" style="background:#EF4444"></span>Board Review</div>
+      <div class="wfe-palette-sep"></div>
+      <div class="wfe-palette-title">Filing & Post</div>
+      <div class="wfe-palette-item" draggable="true" data-step-type="task" data-step-tpl="filed"><span class="wfe-palette-dot" style="background:#2563EB"></span>File (USPTO)</div>
+      <div class="wfe-palette-item" draggable="true" data-step-type="task" data-step-tpl="examination"><span class="wfe-palette-dot" style="background:#A855F7"></span>Under Examination</div>
+      <div class="wfe-palette-item" draggable="true" data-step-type="task" data-step-tpl="awarded"><span class="wfe-palette-dot" style="background:#10B981"></span>Awarded</div>
+      <div class="wfe-palette-sep"></div>
+      <div class="wfe-palette-title">Utilities</div>
+      <div class="wfe-palette-item" draggable="true" data-step-type="parallel-start" data-step-tpl="fork"><span class="wfe-palette-dot" style="background:#8B5CF6"></span>&#9547; Parallel Fork</div>
+      <div class="wfe-palette-item" draggable="true" data-step-type="parallel-end" data-step-tpl="merge"><span class="wfe-palette-dot" style="background:#8B5CF6"></span>&#9524; Merge</div>
+      <div class="wfe-palette-item" draggable="true" data-step-type="gate" data-step-tpl="condition"><span class="wfe-palette-dot" style="background:#D4A017"></span>&#9670; Conditional Gate</div>
+      <div class="wfe-palette-item" draggable="true" data-step-type="task" data-step-tpl="custom"><span class="wfe-palette-dot" style="background:#64748B"></span>Custom Step</div>
+    </div>
+    <!-- Canvas -->
+    <div class="wfe-canvas-wrap" id="wfeCanvasWrap">
+      <div class="wfe-canvas" id="wfeCanvas"></div>
+    </div>
+    <!-- Properties Panel -->
+    <div class="wfe-props" id="wfeProps">
+      <div class="wfe-props-header">
+        <span class="wfe-props-title" id="wfePropTitle">Step Properties</span>
+        <button class="btn-icon" onclick="closePropsPanel()" title="Close">&#10005;</button>
+      </div>
+      <div class="wfe-props-body" id="wfePropBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     UPLOAD-TO-WORKFLOW MODAL
+     ═══════════════════════════════════════ -->
+<div class="wfe-upload-overlay" id="wfeUploadOverlay">
+  <div class="wfe-upload-card">
+    <div class="wfe-upload-title">Create Workflow from Document</div>
+    <div class="wfe-upload-sub">Upload a patent specification, process document, or guidelines file. The AI will decompose it into modular workflow steps.</div>
+    <div class="wfe-upload-drop" id="wfeUploadDrop" onclick="document.getElementById('wfeUploadInput').click()">
+      Drop a file here or click to browse<br><span style="font-size:11px;color:var(--text-faint)">.docx, .pdf, .txt, .md, .pptx (max 25MB)</span>
+    </div>
+    <input type="file" id="wfeUploadInput" accept=".docx,.pdf,.txt,.md,.pptx" style="display:none" onchange="handleDocUpload(this)">
+    <div class="wfe-upload-status" id="wfeUploadStatus"></div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:16px">
+      <button class="btn btn-secondary" onclick="closeUploadParser()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="../utils.js"></script>
+<script src="../cpc-taxonomy.js"></script>
 <script>
 /* ============================================
    CONSTANTS & STATE
    ============================================ */
-const API = "port/8000";
+const API = (typeof PatentifyEnv !== 'undefined' && PatentifyEnv.getApiBase()) ? PatentifyEnv.getApiBase() : '';
 const numFmt = new Intl.NumberFormat();
 let currentTab = 'overview';
 let activityRefreshTimer = null;
@@ -1728,25 +2200,213 @@ var WORKFLOW = {
 var currentRole = 'admin';
 var stageFilter = 'all';
 
-/* Demo patent pipeline data */
+/* Stages that require manual approval even in auto mode */
+var AUTO_STOP_STAGES = { 'lawyer-review': true, 'under-exam': true };
+
+/* Demo patent pipeline data — mode: 'auto' (default) or 'manual' */
 var pipelineData = [
-  { id: 1,  title: 'Chemistry-Agnostic Gradient Interlayer for SSB Interface', ws: 'SSE Interface Engineering', stage: 'lawyer-review', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.5, assignee: 'patent-lawyer', value: '$25M-$60M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-01-15'},{who:'IP Analyst',action:'FTO completed',date:'2026-01-28'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-02-10'},{who:'Patent Engineer',action:'Figures generated',date:'2026-02-18'},{who:'Patent Engineer',action:'Patent drafted',date:'2026-02-25'},{who:'IP Strategist',action:'Submitted for review',date:'2026-03-01'}] },
-  { id: 2,  title: 'Mechanochemical Halide Segregation for SSB Interface', ws: 'SSE Interface Engineering', stage: 'patent-drafted', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.8, assignee: 'patent-engineer', value: '$30M-$65M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-01-20'},{who:'IP Analyst',action:'FTO completed',date:'2026-02-05'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-02-15'},{who:'Patent Engineer',action:'Figures generated',date:'2026-02-22'},{who:'Patent Engineer',action:'Patent drafted',date:'2026-03-02'}] },
-  { id: 3,  title: 'Embedded Microelectrode Array for SSB Interface Impedance Mapping', ws: 'SSE Interface Engineering', stage: 'claims-drafted', priority: 'Q2 2026', fto: 'GREEN', score: 8.2, assignee: 'patent-engineer', value: '$20M-$45M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-02-01'},{who:'IP Analyst',action:'FTO completed',date:'2026-02-20'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-03-03'}] },
-  { id: 4,  title: 'ALD Dual-Phase Li3PO4/AlPO4 Coating on LMFP Cathode', ws: 'Circular Electronic Materials', stage: 'filed', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.5, assignee: 'patent-lawyer', value: '$40M-$80M', trail: [{who:'IP Strategist',action:'Created idea',date:'2025-11-10'},{who:'IP Analyst',action:'FTO completed',date:'2025-11-28'},{who:'Patent Engineer',action:'Claims drafted',date:'2025-12-12'},{who:'Patent Engineer',action:'Figures generated',date:'2025-12-20'},{who:'Patent Engineer',action:'Patent drafted',date:'2026-01-08'},{who:'Patent Lawyer',action:'Approved filing',date:'2026-01-20'},{who:'Admin',action:'Admin approved',date:'2026-01-22'},{who:'Admin',action:'Filed USPTO',date:'2026-02-01'}] },
-  { id: 5,  title: 'Grain-Boundary-Isolated MnBi Permanent Magnet', ws: 'Circular Electronic Materials', stage: 'admin-approved', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.8, assignee: 'admin', value: '$30M-$70M', trail: [{who:'IP Strategist',action:'Created idea',date:'2025-12-05'},{who:'IP Analyst',action:'FTO completed',date:'2025-12-22'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-01-10'},{who:'Patent Engineer',action:'Figures generated',date:'2026-01-18'},{who:'Patent Engineer',action:'Patent drafted',date:'2026-01-28'},{who:'Patent Lawyer',action:'Approved filing',date:'2026-02-15'},{who:'Admin',action:'Admin approved',date:'2026-02-20'}] },
-  { id: 6,  title: 'Quaternary Chalcogenide Synaptic PCM with Self-Annealing', ws: 'Neuromorphic Computing', stage: 'idea', priority: 'IMMEDIATE', fto: 'GREEN', score: 9.1, assignee: 'ip-strategist', value: '$35M-$75M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-03-04'}] },
-  { id: 7,  title: 'SNN Intermediate Representation Compiler', ws: 'Neuromorphic Computing', stage: 'fto-analysis', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.7, assignee: 'ip-analyst', value: '$40M-$90M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-02-20'},{who:'IP Analyst',action:'FTO started',date:'2026-03-01'}] },
-  { id: 8,  title: 'Dual-Timescale Synaptic Meta-Plasticity Circuit', ws: 'Neuromorphic Computing', stage: 'figures-gen', priority: 'IMMEDIATE', fto: 'GREEN', score: 9.0, assignee: 'patent-engineer', value: '$30M-$70M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-01-25'},{who:'IP Analyst',action:'FTO completed',date:'2026-02-08'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-02-18'},{who:'Patent Engineer',action:'Figures in progress',date:'2026-03-02'}] },
-  { id: 9,  title: 'Electrochemically Regenerated ATP Cell-Free System', ws: 'Cell-Free Biomanufacturing', stage: 'under-exam', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.5, assignee: 'patent-lawyer', value: '$35M-$75M', trail: [{who:'IP Strategist',action:'Created idea',date:'2025-10-01'},{who:'IP Analyst',action:'FTO completed',date:'2025-10-20'},{who:'Patent Engineer',action:'Claims drafted',date:'2025-11-05'},{who:'Patent Engineer',action:'Figures generated',date:'2025-11-12'},{who:'Patent Engineer',action:'Patent drafted',date:'2025-11-28'},{who:'Patent Lawyer',action:'Approved filing',date:'2025-12-10'},{who:'Admin',action:'Admin approved',date:'2025-12-12'},{who:'Admin',action:'Filed USPTO',date:'2025-12-20'},{who:'Admin',action:'Under examination',date:'2026-02-15'}] },
-  { id: 10, title: 'Lyophilized Cell-Free Reaction Pellets with Hydrophobic Cores', ws: 'Cell-Free Biomanufacturing', stage: 'awarded', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.7, assignee: 'admin', value: '$25M-$60M', trail: [{who:'IP Strategist',action:'Created idea',date:'2025-08-15'},{who:'IP Analyst',action:'FTO completed',date:'2025-09-02'},{who:'Patent Engineer',action:'Claims drafted',date:'2025-09-18'},{who:'Patent Engineer',action:'Figures generated',date:'2025-09-25'},{who:'Patent Engineer',action:'Patent drafted',date:'2025-10-10'},{who:'Patent Lawyer',action:'Approved filing',date:'2025-10-25'},{who:'Admin',action:'Admin approved',date:'2025-10-28'},{who:'Admin',action:'Filed USPTO',date:'2025-11-05'},{who:'Admin',action:'Under examination',date:'2026-01-10'},{who:'USPTO',action:'Patent awarded',date:'2026-03-01'}] },
-  { id: 11, title: 'Spatially Programmed Anisotropic TIM for Multi-Chiplet Packages', ws: 'Universal TIMs', stage: 'lawyer-review', priority: 'IMMEDIATE', fto: 'YELLOW', score: 8.2, assignee: 'patent-lawyer', value: '$18M-$45M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-01-10'},{who:'IP Analyst',action:'FTO completed',date:'2026-01-25'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-02-05'},{who:'Patent Engineer',action:'Figures generated',date:'2026-02-12'},{who:'Patent Engineer',action:'Patent drafted',date:'2026-02-22'},{who:'IP Strategist',action:'Submitted for review',date:'2026-03-01'}] },
-  { id: 12, title: 'BAs Nanoparticle Composite TIM for Near-Diamond Conductivity', ws: 'Universal TIMs', stage: 'idea', priority: 'IMMEDIATE', fto: 'GREEN', score: 9.0, assignee: 'ip-strategist', value: '$22M-$55M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-03-05'}] },
-  { id: 13, title: 'Streaming ASIC Decoder for QLDPC Error Correction', ws: 'QEC Hardware', stage: 'fto-analysis', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.9, assignee: 'ip-analyst', value: '$25M-$55M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-02-28'},{who:'IP Analyst',action:'FTO started',date:'2026-03-04'}] },
-  { id: 14, title: 'Adaptive Code-Distance Reconfiguration Engine', ws: 'QEC Hardware', stage: 'claims-drafted', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.5, assignee: 'patent-engineer', value: '$18M-$40M', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-02-10'},{who:'IP Analyst',action:'FTO completed',date:'2026-02-22'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-03-03'}] },
-  { id: 15, title: 'Superconducting Trapped-Field Magnet Systems', ws: 'Advanced Materials', stage: 'filed', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.6, assignee: 'patent-lawyer', value: '$20M-$50M', trail: [{who:'Inventor',action:'Invention disclosure',date:'2025-09-15'},{who:'IP Analyst',action:'FTO completed',date:'2025-10-05'},{who:'Patent Engineer',action:'Claims drafted',date:'2025-10-22'},{who:'Patent Engineer',action:'Figures generated',date:'2025-11-01'},{who:'Patent Engineer',action:'Patent drafted',date:'2025-11-15'},{who:'Patent Lawyer',action:'Approved filing',date:'2025-12-05'},{who:'Admin',action:'Admin approved',date:'2025-12-08'},{who:'Admin',action:'Filed USPTO',date:'2025-12-18'}] },
-  { id: 16, title: 'Photo-Activated Self-Healing Interface Polymer for SSB', ws: 'SSE Interface Engineering', stage: 'rejected', priority: 'Q2 2026', fto: 'YELLOW', score: 7.8, assignee: 'ip-strategist', value: '$15M-$35M', trail: [{who:'IP Strategist',action:'Created idea',date:'2025-10-01'},{who:'IP Analyst',action:'FTO completed',date:'2025-10-18'},{who:'Patent Engineer',action:'Claims drafted',date:'2025-11-02'},{who:'Patent Engineer',action:'Figures generated',date:'2025-11-10'},{who:'Patent Engineer',action:'Patent drafted',date:'2025-11-22'},{who:'Patent Lawyer',action:'Approved filing',date:'2025-12-08'},{who:'Admin',action:'Admin approved',date:'2025-12-10'},{who:'Admin',action:'Filed USPTO',date:'2025-12-20'},{who:'Admin',action:'Under examination',date:'2026-01-15'},{who:'USPTO',action:'Rejected — §103',date:'2026-03-02'}] }
+  { id: 1,  title: 'Chemistry-Agnostic Gradient Interlayer for SSB Interface', ws: 'SSE Interface Engineering', stage: 'lawyer-review', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.5, assignee: 'patent-lawyer', value: '$25M-$60M', mode: 'auto', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-01-15'},{who:'IP Analyst',action:'FTO completed',date:'2026-01-28'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-02-10'},{who:'Patent Engineer',action:'Figures generated',date:'2026-02-18'},{who:'Patent Engineer',action:'Patent drafted',date:'2026-02-25'},{who:'IP Strategist',action:'Submitted for review',date:'2026-03-01'}] },
+  { id: 2,  title: 'Mechanochemical Halide Segregation for SSB Interface', ws: 'SSE Interface Engineering', stage: 'patent-drafted', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.8, assignee: 'patent-engineer', value: '$30M-$65M', mode: 'auto', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-01-20'},{who:'IP Analyst',action:'FTO completed',date:'2026-02-05'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-02-15'},{who:'Patent Engineer',action:'Figures generated',date:'2026-02-22'},{who:'Patent Engineer',action:'Patent drafted',date:'2026-03-02'}] },
+  { id: 3,  title: 'Embedded Microelectrode Array for SSB Interface Impedance Mapping', ws: 'SSE Interface Engineering', stage: 'claims-drafted', priority: 'Q2 2026', fto: 'GREEN', score: 8.2, assignee: 'patent-engineer', value: '$20M-$45M', mode: 'auto', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-02-01'},{who:'IP Analyst',action:'FTO completed',date:'2026-02-20'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-03-03'}] },
+  { id: 4,  title: 'ALD Dual-Phase Li3PO4/AlPO4 Coating on LMFP Cathode', ws: 'Circular Electronic Materials', stage: 'filed', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.5, assignee: 'patent-lawyer', value: '$40M-$80M', mode: 'auto', trail: [{who:'IP Strategist',action:'Created idea',date:'2025-11-10'},{who:'IP Analyst',action:'FTO completed',date:'2025-11-28'},{who:'Patent Engineer',action:'Claims drafted',date:'2025-12-12'},{who:'Patent Engineer',action:'Figures generated',date:'2025-12-20'},{who:'Patent Engineer',action:'Patent drafted',date:'2026-01-08'},{who:'Patent Lawyer',action:'Approved filing',date:'2026-01-20'},{who:'Admin',action:'Admin approved',date:'2026-01-22'},{who:'Admin',action:'Filed USPTO',date:'2026-02-01'}] },
+  { id: 5,  title: 'Grain-Boundary-Isolated MnBi Permanent Magnet', ws: 'Circular Electronic Materials', stage: 'admin-approved', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.8, assignee: 'admin', value: '$30M-$70M', mode: 'auto', trail: [{who:'IP Strategist',action:'Created idea',date:'2025-12-05'},{who:'IP Analyst',action:'FTO completed',date:'2025-12-22'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-01-10'},{who:'Patent Engineer',action:'Figures generated',date:'2026-01-18'},{who:'Patent Engineer',action:'Patent drafted',date:'2026-01-28'},{who:'Patent Lawyer',action:'Approved filing',date:'2026-02-15'},{who:'Admin',action:'Admin approved',date:'2026-02-20'}] },
+  { id: 6,  title: 'Quaternary Chalcogenide Synaptic PCM with Self-Annealing', ws: 'Neuromorphic Computing', stage: 'idea', priority: 'IMMEDIATE', fto: 'GREEN', score: 9.1, assignee: 'ip-strategist', value: '$35M-$75M', mode: 'auto', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-03-04'}] },
+  { id: 7,  title: 'SNN Intermediate Representation Compiler', ws: 'Neuromorphic Computing', stage: 'fto-analysis', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.7, assignee: 'ip-analyst', value: '$40M-$90M', mode: 'auto', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-02-20'},{who:'IP Analyst',action:'FTO started',date:'2026-03-01'}] },
+  { id: 8,  title: 'Dual-Timescale Synaptic Meta-Plasticity Circuit', ws: 'Neuromorphic Computing', stage: 'figures-gen', priority: 'IMMEDIATE', fto: 'GREEN', score: 9.0, assignee: 'patent-engineer', value: '$30M-$70M', mode: 'manual', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-01-25'},{who:'IP Analyst',action:'FTO completed',date:'2026-02-08'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-02-18'},{who:'Patent Engineer',action:'Figures in progress',date:'2026-03-02'}] },
+  { id: 9,  title: 'Electrochemically Regenerated ATP Cell-Free System', ws: 'Cell-Free Biomanufacturing', stage: 'under-exam', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.5, assignee: 'patent-lawyer', value: '$35M-$75M', mode: 'auto', trail: [{who:'IP Strategist',action:'Created idea',date:'2025-10-01'},{who:'IP Analyst',action:'FTO completed',date:'2025-10-20'},{who:'Patent Engineer',action:'Claims drafted',date:'2025-11-05'},{who:'Patent Engineer',action:'Figures generated',date:'2025-11-12'},{who:'Patent Engineer',action:'Patent drafted',date:'2025-11-28'},{who:'Patent Lawyer',action:'Approved filing',date:'2025-12-10'},{who:'Admin',action:'Admin approved',date:'2025-12-12'},{who:'Admin',action:'Filed USPTO',date:'2025-12-20'},{who:'Admin',action:'Under examination',date:'2026-02-15'}] },
+  { id: 10, title: 'Lyophilized Cell-Free Reaction Pellets with Hydrophobic Cores', ws: 'Cell-Free Biomanufacturing', stage: 'awarded', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.7, assignee: 'admin', value: '$25M-$60M', mode: 'auto', trail: [{who:'IP Strategist',action:'Created idea',date:'2025-08-15'},{who:'IP Analyst',action:'FTO completed',date:'2025-09-02'},{who:'Patent Engineer',action:'Claims drafted',date:'2025-09-18'},{who:'Patent Engineer',action:'Figures generated',date:'2025-09-25'},{who:'Patent Engineer',action:'Patent drafted',date:'2025-10-10'},{who:'Patent Lawyer',action:'Approved filing',date:'2025-10-25'},{who:'Admin',action:'Admin approved',date:'2025-10-28'},{who:'Admin',action:'Filed USPTO',date:'2025-11-05'},{who:'Admin',action:'Under examination',date:'2026-01-10'},{who:'USPTO',action:'Patent awarded',date:'2026-03-01'}] },
+  { id: 11, title: 'Spatially Programmed Anisotropic TIM for Multi-Chiplet Packages', ws: 'Universal TIMs', stage: 'lawyer-review', priority: 'IMMEDIATE', fto: 'YELLOW', score: 8.2, assignee: 'patent-lawyer', value: '$18M-$45M', mode: 'manual', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-01-10'},{who:'IP Analyst',action:'FTO completed',date:'2026-01-25'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-02-05'},{who:'Patent Engineer',action:'Figures generated',date:'2026-02-12'},{who:'Patent Engineer',action:'Patent drafted',date:'2026-02-22'},{who:'IP Strategist',action:'Submitted for review',date:'2026-03-01'}] },
+  { id: 12, title: 'BAs Nanoparticle Composite TIM for Near-Diamond Conductivity', ws: 'Universal TIMs', stage: 'idea', priority: 'IMMEDIATE', fto: 'GREEN', score: 9.0, assignee: 'ip-strategist', value: '$22M-$55M', mode: 'auto', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-03-05'}] },
+  { id: 13, title: 'Streaming ASIC Decoder for QLDPC Error Correction', ws: 'QEC Hardware', stage: 'fto-analysis', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.9, assignee: 'ip-analyst', value: '$25M-$55M', mode: 'auto', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-02-28'},{who:'IP Analyst',action:'FTO started',date:'2026-03-04'}] },
+  { id: 14, title: 'Adaptive Code-Distance Reconfiguration Engine', ws: 'QEC Hardware', stage: 'claims-drafted', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.5, assignee: 'patent-engineer', value: '$18M-$40M', mode: 'auto', trail: [{who:'IP Strategist',action:'Created idea',date:'2026-02-10'},{who:'IP Analyst',action:'FTO completed',date:'2026-02-22'},{who:'Patent Engineer',action:'Claims drafted',date:'2026-03-03'}] },
+  { id: 15, title: 'AI-Controlled Gradient Transition Zone for Multi-Material AM', ws: 'Multi-Material AM', stage: 'filed', priority: 'IMMEDIATE', fto: 'GREEN', score: 8.3, assignee: 'patent-lawyer', value: '$22M-$48M', mode: 'auto', trail: [{who:'IP Strategist',action:'Created idea',date:'2025-09-10'},{who:'IP Analyst',action:'FTO completed',date:'2025-09-28'},{who:'Patent Engineer',action:'Claims drafted',date:'2025-10-15'},{who:'Patent Engineer',action:'Figures generated',date:'2025-10-28'},{who:'Patent Engineer',action:'Patent drafted',date:'2025-11-10'},{who:'Patent Lawyer',action:'Approved filing',date:'2025-12-01'},{who:'Admin',action:'Admin approved',date:'2025-12-05'},{who:'Admin',action:'Filed USPTO',date:'2025-12-15'}] },
+  { id: 16, title: 'Photo-Activated Self-Healing Interface Polymer for SSB', ws: 'SSE Interface Engineering', stage: 'rejected', priority: 'Q2 2026', fto: 'YELLOW', score: 7.8, assignee: 'ip-strategist', value: '$15M-$35M', mode: 'manual', trail: [{who:'IP Strategist',action:'Created idea',date:'2025-10-01'},{who:'IP Analyst',action:'FTO completed',date:'2025-10-18'},{who:'Patent Engineer',action:'Claims drafted',date:'2025-11-02'},{who:'Patent Engineer',action:'Figures generated',date:'2025-11-10'},{who:'Patent Engineer',action:'Patent drafted',date:'2025-11-22'},{who:'Patent Lawyer',action:'Approved filing',date:'2025-12-08'},{who:'Admin',action:'Admin approved',date:'2025-12-10'},{who:'Admin',action:'Filed USPTO',date:'2025-12-20'},{who:'Admin',action:'Under examination',date:'2026-01-15'},{who:'USPTO',action:'Rejected — §103',date:'2026-03-02'}] }
 ];
+
+/* ── CPC Classification Data per Patent ── */
+var CPC_PATENT_DATA = {
+  1:  { primary: 'H01M 10/0562', secondary: ['C04B 35/01', 'C01G 25/00', 'Y02E 60/10'] },
+  2:  { primary: 'H01M 10/0525', secondary: ['C01G 53/00', 'C23C 14/08'] },
+  3:  { primary: 'G01R 31/385', secondary: ['H01M 10/48', 'H01L 21/66'] },
+  4:  { primary: 'C23C 16/44',  secondary: ['H01M 4/5825', 'B82Y 30/00', 'Y02E 60/10'] },
+  5:  { primary: 'H01F 1/08',   secondary: ['C22C 12/00', 'B22F 3/10', 'H01F 7/02'] },
+  6:  { primary: 'G06N 3/063',  secondary: ['H10N 70/00', 'G11C 13/00'] },
+  7:  { primary: 'G06F 8/41',   secondary: ['G06N 3/04', 'G06F 9/50'] },
+  8:  { primary: 'H10N 70/20',  secondary: ['G06N 3/063', 'G11C 11/54'] },
+  9:  { primary: 'C12N 9/00',   secondary: ['C12P 19/34', 'C07K 2/00', 'Y02P 20/50'] },
+  10: { primary: 'C12N 11/14',  secondary: ['A61K 38/43', 'B01J 13/02'] },
+  11: { primary: 'H01L 23/373', secondary: ['F28F 21/02', 'C09K 5/14', 'H01L 25/065'] },
+  12: { primary: 'H01L 23/373', secondary: ['B82Y 30/00', 'C01B 35/04', 'C04B 35/583'] },
+  13: { primary: 'G06F 11/10',  secondary: ['H03M 13/11', 'G06N 10/70'] },
+  14: { primary: 'G06F 11/10',  secondary: ['H03M 13/15', 'G06N 10/40'] },
+  15: { primary: 'B33Y 50/02',  secondary: ['B33Y 10/00', 'B22F 10/28', 'G06N 3/08'] },
+  16: { primary: 'H01M 10/0565',secondary: ['C08L 71/02', 'C08J 5/22'] }
+};
+
+/* Merge CPC data into pipelineData */
+pipelineData.forEach(function(pat) {
+  var cpcData = CPC_PATENT_DATA[pat.id];
+  if (cpcData) {
+    pat.cpc = {
+      primary: cpcData.primary,
+      secondary: cpcData.secondary || [],
+      parsed: typeof CPC !== 'undefined' ? CPC.parse(cpcData.primary) : null
+    };
+  } else {
+    pat.cpc = { primary: '', secondary: [], parsed: null };
+  }
+});
+
+
+/* ── CII Score Data Lookup ── */
+var CIIS_LOOKUP = {"45":{"ciis":0.7605,"nc":0.8183,"ev":0.7538,"cde":0.7824,"msi":0.665,"rank":1,"cpcP":["B33Y50/00","B33Y50/02","G01N21/25 (spectrophotometry)"],"cpcS":["B22F10/28","G06V10/764 (ML image classification)","G01J3/28 (spectrometers)","B22F10/85 (monitoring in AM)","G05B19/418","H04N23/10 (hyperspectral imaging)"]},"28":{"ciis":0.7537,"nc":0.8615,"ev":0.8392,"cde":0.706,"msi":0.585,"rank":2,"cpcP":["C12M1/00","A61J3/07"],"cpcS":["C12P21/00","G16H20/10","H04L9/32","A61L2/00"]},"20":{"ciis":0.7441,"nc":0.8782,"ev":0.7807,"cde":0.7147,"msi":0.575,"rank":3,"cpcP":["H04L12/40 (bus networks)","G06N3/063 (hardware neural network implementations)"],"cpcS":["H01L25/065 (stacked semiconductor chips)","H04L47/50 (flow control)","G06F15/173 (interconnection architectures)","H04L69/22 (protocol design)"]},"56":{"ciis":0.7394,"nc":0.8288,"ev":0.7196,"cde":0.7001,"msi":0.69,"rank":4,"cpcP":["G06N3/098","G06F21/6254","G16H10/60"],"cpcS":["G06F21/62","H04L9/3236","G16H50/20","G06Q50/22"]},"51":{"ciis":0.7388,"nc":0.8847,"ev":0.7464,"cde":0.6527,"msi":0.65,"rank":5,"cpcP":["G06N3/098","H04L9/3218","G06F21/6254"],"cpcS":["H04L9/3252","G06N20/00","G06F16/23","H04L9/008"]},"15":{"ciis":0.7356,"nc":0.8676,"ev":0.7963,"cde":0.7247,"msi":0.53,"rank":6,"cpcP":["H10N70/20 (phase-change memory devices)","H10N70/861 (PCM compositions)"],"cpcS":["G11C13/00 (resistive change memory)","H01L45/06 (electrode materials for non-volatile memory)","G06N3/063 (hardware neural network implementations)","C22C28/00 (chalcogenide alloys)"]},"43":{"ciis":0.7333,"nc":0.808,"ev":0.7462,"cde":0.6733,"msi":0.69,"rank":7,"cpcP":["B22F10/28","B33Y10/00","B33Y50/02"],"cpcS":["B22F12/50","B33Y70/10","G01N21/71 (LIBS spectroscopy)","B22F2203/11 (composition control)","C22C1/04","G05B19/418"]},"70":{"ciis":0.7331,"nc":0.8413,"ev":0.6824,"cde":0.7218,"msi":0.665,"rank":8,"cpcP":["G06F21/62 (protection of private/personal data)","G06N20/00 (machine learning)","A61B5/369 (EEG)"],"cpcS":["H04L9/00 (cryptographic mechanisms)","G06F21/60 (security for data)","G06N3/08 (neural network training - federated)","A61B5/0022 (wearable body sensor)"]},"72":{"ciis":0.7321,"nc":0.8513,"ev":0.7116,"cde":0.6589,"msi":0.69,"rank":9,"cpcP":["B60W 50/02 (condition monitoring of AV operation)","G06F 11/07 (fault monitoring)","G05B 23/02 (testing/monitoring control systems)"],"cpcS":["B60W 60/00 (autonomous driving)","G06N 20/00 (machine learning safety)","G08G 1/16 (collision avoidance)"]},"95":{"ciis":0.724,"nc":0.8187,"ev":0.6925,"cde":0.6786,"msi":0.69,"rank":10,"cpcP":["G01M 11/00","H04B 10/071"],"cpcS":["G02B 6/42","H04B 10/07","G02B 6/293","H01L 31/02","H04B 10/2507"]},"71":{"ciis":0.7154,"nc":0.8393,"ev":0.7091,"cde":0.6433,"msi":0.65,"rank":11,"cpcP":["G06F 11/3604 (verification/validation of software systems)","G06N 3/08 (training neural networks)","B60W 60/00 (autonomous vehicle control)"],"cpcS":["G06F 21/64 (integrity verification)","G05D 1/00 (control of position/course)","G06N 20/00 (machine learning \u2014 safety)"]},"92":{"ciis":0.7148,"nc":0.8019,"ev":0.6891,"cde":0.6969,"msi":0.65,"rank":12,"cpcP":["H04B 10/40","H04J 14/02"],"cpcS":["G02B 6/42","H04L 69/30","H04B 10/2507","H04J 14/0221","G06F 13/38"]},"50":{"ciis":0.7133,"nc":0.8226,"ev":0.6878,"cde":0.6714,"msi":0.65,"rank":13,"cpcP":["G06N3/098","G06F21/60","G06F21/72"],"cpcS":["H04L9/3268","G06F21/57","G06N20/00","H04W12/08"]},"102":{"ciis":0.7061,"nc":0.8583,"ev":0.6937,"cde":0.6499,"msi":0.5975,"rank":14,"cpcP":["H04L9/08","G09C1/00"],"cpcS":["H04L9/32","G06F21/73","H04L9/30","G06F21/72"]},"2":{"ciis":0.7042,"nc":0.7048,"ev":0.8017,"cde":0.6244,"msi":0.695,"rank":15,"cpcP":["H01M4/1391 (electrode treatment for solid-state batteries), B02C17/00 (grinding/mixing processes)"],"cpcS":["H01M10/0562, H01M4/625, H01M4/136, B01J19/18 (mechanochemical reactions), C01D15/00 (lithium compounds)"]},"17":{"ciis":0.7003,"nc":0.8347,"ev":0.758,"cde":0.629,"msi":0.5575,"rank":16,"cpcP":["G06N3/063 (hardware neural network implementations)","G11C11/54 (biologically-inspired storage elements)"],"cpcS":["G06N3/08 (learning methods)","H10N70/20 (PCM devices)","H10B51/00 (FeRAM)","G11C13/00 (resistive memory)"]},"32":{"ciis":0.699,"nc":0.823,"ev":0.714,"cde":0.6742,"msi":0.5575,"rank":17,"cpcP":["H01L23/373","C09K5/00","B82Y30/00"],"cpcS":["H01L23/3735","H01L25/18","C23C16/455","C01B32/00","H01L21/48"]},"75":{"ciis":0.6989,"nc":0.8005,"ev":0.6164,"cde":0.7342,"msi":0.6275,"rank":18,"cpcP":["B60W 60/00 (autonomous vehicle control)","B60W 50/08 (AV system conditions monitoring)","G05D 1/02 (position/course control \u2014 land vehicles)"],"cpcS":["G06N 7/00 (knowledge-based probabilistic methods)","G08G 1/16 (collision avoidance)","H04W 4/40 (V2X communications)"]},"59":{"ciis":0.6987,"nc":0.8169,"ev":0.706,"cde":0.7941,"msi":0.465,"rank":19,"cpcP":["G02F1/01","H04J14/02","G06N10/40"],"cpcS":["H01S5/0683","G02B6/42","H04B10/25","H01L31/0232"]},"58":{"ciis":0.6971,"nc":0.8219,"ev":0.6749,"cde":0.6798,"msi":0.585,"rank":20,"cpcP":["G06F30/398","H01L21/82","G06F30/392"],"cpcS":["G06N10/40","H01L23/367","G06F30/3312","H03K19/003"]},"6":{"ciis":0.6968,"nc":0.8281,"ev":0.6493,"cde":0.7266,"msi":0.5575,"rank":21,"cpcP":["H01M10/0562, G06N20/00 (machine learning), G06N3/08 (neural networks for physical systems)"],"cpcS":["H01M4/1391, G01N27/00 (electrochemical sensing and characterization), C23C14/34 (sputtering for combinatorial synthesis), G16C20/70 (informatics for materials science)"]},"21":{"ciis":0.6949,"nc":0.8829,"ev":0.7285,"cde":0.6858,"msi":0.465,"rank":22,"cpcP":["H01L27/0248 (radiation-hardened circuits)","G06N3/063 (hardware neural implementations)"],"cpcS":["H10B51/00 (FeRAM)","H10N70/20 (HfO2 devices)","G06F11/10 (error correction)","H01L29/788 (radiation-hardened FETs)"]},"41":{"ciis":0.6949,"nc":0.813,"ev":0.6949,"cde":0.7433,"msi":0.505,"rank":23,"cpcP":["G06N10/40","H01L39/22"],"cpcS":["G06N10/70","H03K19/195","H01P1/10","G01R33/035"]},"99":{"ciis":0.6947,"nc":0.7785,"ev":0.6327,"cde":0.6689,"msi":0.69,"rank":24,"cpcP":["H04L9/06","H04L9/003"],"cpcS":["G06F7/72","H04L9/30","G06F21/75","H03M13/00"]},"53":{"ciis":0.6912,"nc":0.8806,"ev":0.7007,"cde":0.6527,"msi":0.5075,"rank":25,"cpcP":["G06N3/098","G06N3/04","G06N3/08"],"cpcS":["G06N20/00","G06F9/50","H04L67/104","G06N3/02"]},"39":{"ciis":0.6891,"nc":0.6836,"ev":0.7255,"cde":0.7286,"msi":0.61,"rank":26,"cpcP":["G06N10/40","H01L25/065"],"cpcS":["G06N10/70","H01L39/00","G11C11/44","H04B10/25"]},"101":{"ciis":0.6887,"nc":0.816,"ev":0.6643,"cde":0.6527,"msi":0.5975,"rank":27,"cpcP":["H04L9/06","G06F1/3231"],"cpcS":["H04L9/30","H04W12/04","G06F21/72","H04L9/08"]},"77":{"ciis":0.6883,"nc":0.7765,"ev":0.6058,"cde":0.753,"msi":0.6025,"rank":28,"cpcP":["H04W 4/46 (V2V communications)","G05D 1/02 (vehicle position/course control)","H04L 9/32 (cryptographic protocols)"],"cpcS":["B60W 60/00 (autonomous driving)","G06F 21/64 (data integrity verification)","G08G 1/09 (traffic control systems)"]},"73":{"ciis":0.6876,"nc":0.8036,"ev":0.6584,"cde":0.643,"msi":0.625,"rank":29,"cpcP":["G06N 5/04 (reasoning/inference in expert systems)","G06F 11/3604 (verification/testing)","B60W 50/04 (indication/warning of AV malfunctions)"],"cpcS":["G06N 20/00 (machine learning)","G06V 20/58 (scene understanding for AV)","G07C 5/08 (vehicle data recorder)"]},"9":{"ciis":0.6867,"nc":0.6946,"ev":0.806,"cde":0.6363,"msi":0.6075,"rank":30,"cpcP":["H01F1/032 (hard magnetic inorganic materials)","H01F1/04 (hard magnetic metals/alloys)"],"cpcS":["H01F41/0253 (manufacturing permanent magnets)","H02K1/276 (permanent magnet rotors)","C22C28/00 (alloys based on Mn)","B22F1/102 (powder coating)"]},"25":{"ciis":0.6847,"nc":0.7456,"ev":0.8126,"cde":0.6139,"msi":0.5575,"rank":31,"cpcP":["C12M3/04","C12P21/00"],"cpcS":["B01D63/02","C12M1/12","G01N30/00","C12M3/06"]},"85":{"ciis":0.6846,"nc":0.8067,"ev":0.69,"cde":0.6845,"msi":0.53,"rank":32,"cpcP":["G16B40/20 (Machine learning applied to molecular biology)","G16B15/00 (Protein structure prediction)","C12N15/10 (Recombinant DNA technology)"],"cpcS":["G06N3/08 (Neural networks - supervised learning)","C08H1/00 (Macromolecular products derived from proteins)","G16B5/30 (Sequence-activity relationships)"]},"65":{"ciis":0.6845,"nc":0.8457,"ev":0.7227,"cde":0.6417,"msi":0.505,"rank":33,"cpcP":["G06N3/04 (neural networks)","A61B5/369 (EEG)","G06F3/015 (eye/body activity input)"],"cpcS":["G16H50/20 (ICT for diagnosis using machine learning)","A61B5/7267 (non-linear analysis of brain signals)","G06N20/00 (machine learning general)","A61B5/48 (BCI applications)"]},"55":{"ciis":0.6844,"nc":0.849,"ev":0.6505,"cde":0.7064,"msi":0.5075,"rank":34,"cpcP":["G06N3/098","H04L69/04","H03M7/30"],"cpcS":["H04W28/06","G06N20/00","H04L67/104","H04B7/0413"]},"19":{"ciis":0.6822,"nc":0.8419,"ev":0.7017,"cde":0.6714,"msi":0.49,"rank":35,"cpcP":["H04N25/47 (event-based image sensors)","G06N3/063 (hardware neural network implementations)"],"cpcS":["G06T1/20 (special purpose image processing)","G06N3/04 (neural architectures)","H04N25/75 (pixel circuits)","G06V10/25 (image analysis \u2014 event cameras)"]},"44":{"ciis":0.6818,"nc":0.7278,"ev":0.6939,"cde":0.7002,"msi":0.585,"rank":36,"cpcP":["B22F10/28","B33Y50/02","C04B35/628 (ceramic processing)"],"cpcS":["B33Y70/10","C22C1/04","G05B19/418","G01J5/00 (pyrometry)","B22F10/366 (DED)","C04B37/02 (metal-ceramic bonding)"]},"88":{"ciis":0.6815,"nc":0.8304,"ev":0.6287,"cde":0.7377,"msi":0.5075,"rank":37,"cpcP":["G16B40/00 (Bioinformatics/computational biology tools)","C12M1/36 (Fermentation apparatus with automatic control)","C12N15/10 (DNA engineering)"],"cpcS":["G06N7/01 (Probabilistic graphical models)","B01L3/00 (Laboratory vessels/handling equipment)","G05B19/042 (Programmable logic controllers)"]},"36":{"ciis":0.6805,"nc":0.812,"ev":0.713,"cde":0.6417,"msi":0.53,"rank":38,"cpcP":["G06N10/70","H03M13/00"],"cpcS":["G06F7/544","G11C11/44","G06N3/063","H03M13/37"]},"22":{"ciis":0.6799,"nc":0.7621,"ev":0.7757,"cde":0.6593,"msi":0.505,"rank":39,"cpcP":["C12P21/00","C12M1/42"],"cpcS":["C12N9/1229","H01M8/10","C12M3/00","B01J19/00","C12Q1/00"]},"27":{"ciis":0.6798,"nc":0.8053,"ev":0.7161,"cde":0.7263,"msi":0.455,"rank":40,"cpcP":["G16B20/00","C12N15/10"],"cpcS":["C12P21/00","G06N20/00","B01L3/00","C40B30/08"]},"74":{"ciis":0.6782,"nc":0.7834,"ev":0.6085,"cde":0.7546,"msi":0.5475,"rank":41,"cpcP":["G06F 21/57 (assessing security vulnerabilities)","G06V 10/82 (neural networks for image recognition)","B60W 60/00 (autonomous driving)"],"cpcS":["G06N 3/08 (NN training)","G06T 7/00 (image analysis)","H04L 9/32 (cryptographic authentication)"]},"38":{"ciis":0.6776,"nc":0.7797,"ev":0.6714,"cde":0.6877,"msi":0.545,"rank":42,"cpcP":["G06N10/40","G06N10/70"],"cpcS":["H04L13/00","G06F9/44","G06F13/40","H03M13/00"]},"31":{"ciis":0.6753,"nc":0.7914,"ev":0.6956,"cde":0.6838,"msi":0.505,"rank":43,"cpcP":["H01L23/373","H01L23/34","H05K7/20"],"cpcS":["C04B35/495","H01L23/42","H01L25/065","G05D23/19","C09K5/00"]},"54":{"ciis":0.6748,"nc":0.8349,"ev":0.655,"cde":0.6902,"msi":0.495,"rank":44,"cpcP":["G06N3/098","H04N1/32149","G06F21/10"],"cpcS":["H04L9/3247","G06N20/00","G06F21/16","G06T1/0028"]},"100":{"ciis":0.6747,"nc":0.7722,"ev":0.6491,"cde":0.6339,"msi":0.625,"rank":45,"cpcP":["H04L9/08","G06F21/72"],"cpcS":["H04L9/30","H04L9/32","G06F9/455","H04L63/06"]},"12":{"ciis":0.6732,"nc":0.665,"ev":0.8039,"cde":0.5451,"msi":0.715,"rank":46,"cpcP":["H01M10/54 (secondary cells \u2014 recovery of active material)","C22B26/12 (recovery of Li)"],"cpcS":["C25B3/00 (electrolytic processes)","H01M4/58 (polyanion cathode active materials)","C22B7/00 (working-up of residues from metallurgical processes)"]},"30":{"ciis":0.673,"nc":0.8401,"ev":0.7007,"cde":0.6518,"msi":0.4775,"rank":47,"cpcP":["H01L21/02","H01L23/373","B82Y30/00"],"cpcS":["B82Y40/00","C09K5/00","H01L25/065","C08K3/38","H01L21/48"]},"57":{"ciis":0.67,"nc":0.7722,"ev":0.6649,"cde":0.7312,"msi":0.49,"rank":48,"cpcP":["H03K19/1958","G06N10/40","H04L27/26"],"cpcS":["H03H11/04","H01P1/203","G06N10/20","H03F3/193"]},"48":{"ciis":0.6693,"nc":0.7572,"ev":0.7642,"cde":0.5747,"msi":0.57,"rank":49,"cpcP":["B22F10/28","B33Y10/00","B23K26/06 (laser beam control)"],"cpcS":["B22F10/366 (DED)","B33Y70/10","B23K26/0007 (beam properties)","B23K26/342 (multiple beams)","C22C9/00 (copper alloys)","C22C14/00 (titanium alloys)"]},"69":{"ciis":0.6686,"nc":0.8413,"ev":0.6375,"cde":0.7406,"msi":0.4425,"rank":50,"cpcP":["A61N1/3603 (neurostimulation control systems)","G06F3/016 (haptic user interface)","A61B5/369 (EEG)"],"cpcS":["A61H23/02 (vibration therapy)","G06F3/015 (body motion input)","A61N1/36031 (physiological parameter control)","H04R1/00 (transducer/acoustic device)"]},"37":{"ciis":0.6664,"nc":0.7671,"ev":0.6576,"cde":0.6003,"msi":0.625,"rank":51,"cpcP":["G06N10/70","G06F11/07"],"cpcS":["G06N10/40","G06F11/20","H03M13/35"]},"52":{"ciis":0.6654,"nc":0.6747,"ev":0.6797,"cde":0.6527,"msi":0.65,"rank":52,"cpcP":["G06N3/098","H04L9/3236","G06F11/07"],"cpcS":["H04L9/3239","G06F21/57","G06N20/00","H04L67/104"]},"103":{"ciis":0.663,"nc":0.7534,"ev":0.6237,"cde":0.6339,"msi":0.625,"rank":53,"cpcP":["H04L9/30","H04L9/0816"],"cpcS":["H04L9/08","H04L63/06","G06F21/72","H04L9/003"]},"89":{"ciis":0.6604,"nc":0.695,"ev":0.6688,"cde":0.6408,"msi":0.625,"rank":54,"cpcP":["C12N1/20 (Bacteria - Komagataeibacter)","C08B11/00 (Cellulose derivatives)","C12N15/63 (Genetic engineering of bacteria)"],"cpcS":["D21H11/20 (Non-fibrous material added to fibrous raw material)","B32B5/02 (Layered composite)","C12P19/04 (Cellulose production)"]},"86":{"ciis":0.6591,"nc":0.7559,"ev":0.6997,"cde":0.6815,"msi":0.4775,"rank":55,"cpcP":["C12P21/00 (Preparation of peptides or proteins by fermentation)","C12M1/00 (Apparatus for enzymology or microbiology)","C08H1/00 (Macromolecular products from proteins)"],"cpcS":["B29C48/00 (Extrusion moulding)","G05B19/00 (Process control)","D01F4/02 (Artificial filaments from proteins)"]},"33":{"ciis":0.6573,"nc":0.8458,"ev":0.6522,"cde":0.6717,"msi":0.4425,"rank":56,"cpcP":["H01L23/34","G01R31/28","G01N29/04"],"cpcS":["H05K1/02","G01N29/44","H01L23/373","H01L25/18","B81B3/00"]},"46":{"ciis":0.6561,"nc":0.729,"ev":0.6812,"cde":0.6682,"msi":0.5225,"rank":57,"cpcP":["B33Y80/00","B33Y10/00","G01D21/02 (embedded sensing)"],"cpcS":["B22F10/28","B33Y70/10","H01Q1/40 (antennas in conducting materials)","G01L1/22 (strain measurement)","B22F7/08 (bonded metal structures with inserts)"]},"64":{"ciis":0.6559,"nc":0.8599,"ev":0.7259,"cde":0.5077,"msi":0.53,"rank":58,"cpcP":["A61B5/291 (EEG electrodes)","A61B5/263 (electrode materials)","A61B5/302 (capacitive/MOSFET input circuits)"],"cpcS":["A61B5/268 (conductive polymer electrodes)","H01L27/146 (CMOS image sensors - analogous ASIC architecture)","A61B5/31 (EEG input circuits)","A61B2562/0209 (special electrode features)"]},"47":{"ciis":0.6554,"nc":0.6533,"ev":0.6314,"cde":0.7306,"msi":0.6025,"rank":59,"cpcP":["B33Y50/00","B33Y50/02","G06N3/04 (neural networks)"],"cpcS":["G06F30/23 (FEA-based design)","G05B23/02 (monitoring/diagnosis)","B22F10/28","G01N33/20 (material property measurement)","G06N20/00 (machine learning)"]},"62":{"ciis":0.6554,"nc":0.65,"ev":0.6727,"cde":0.7211,"msi":0.57,"rank":60,"cpcP":["H03M1/66","G06N10/40","H01L27/07845"],"cpcS":["H03M3/02","H01L29/786","H03F3/193","G11C27/02"]},"94":{"ciis":0.6544,"nc":0.7844,"ev":0.6598,"cde":0.5006,"msi":0.69,"rank":61,"cpcP":["G02B 6/4201","G02B 6/30"],"cpcS":["G02B 6/4204","G02B 27/44","H01L 31/0232","G02B 5/18","G02B 6/122"]},"18":{"ciis":0.6525,"nc":0.6481,"ev":0.7204,"cde":0.7116,"msi":0.5225,"rank":62,"cpcP":["H10B51/30 (FeRAM with FTJ)","H10N70/20 (HfO2-based devices)"],"cpcS":["H01L21/28 (BEOL processing)","G11C11/56 (ferroelectric memory)","G06N3/063 (hardware neural networks)","H10B51/00 (ferroelectric memory devices)"]},"49":{"ciis":0.6488,"nc":0.6786,"ev":0.6162,"cde":0.6867,"msi":0.6025,"rank":63,"cpcP":["B33Y40/20","C21D9/00 (heat treatment of fabricated articles)","B22F3/24 (HIP)"],"cpcS":["B33Y80/00","G01L5/00 (residual stress measurement)","C21D10/00 (heat treatment with irradiation)","B23K26/356 (laser shock processing)","C04B41/80 (surface treatment of ceramic-metal)","B22F2998/10 (heat treatment of AM parts)"]},"60":{"ciis":0.648,"nc":0.77,"ev":0.62,"cde":0.697,"msi":0.4825,"rank":64,"cpcP":["H02J50/10","H02J50/90","G06N10/40"],"cpcS":["H02J7/00","H01F38/14","H02M3/00","H01L39/00"]},"84":{"ciis":0.6431,"nc":0.805,"ev":0.6056,"cde":0.7036,"msi":0.4425,"rank":65,"cpcP":["G01N29/04","H01L23/58"],"cpcS":["G06N3/084","G01N29/11","H01L25/07","G01N2291/02","H02M1/32"]},"96":{"ciis":0.6412,"nc":0.7617,"ev":0.553,"cde":0.6714,"msi":0.5625,"rank":66,"cpcP":["G06F 13/38","H04B 10/07"],"cpcS":["G06F 9/455","H04L 41/0896","H04B 10/40","H04J 14/02","G06F 13/42"]},"1":{"ciis":0.6411,"nc":0.6505,"ev":0.753,"cde":0.4744,"msi":0.7475,"rank":67,"cpcP":["H01M10/0562 (solid-state electrolyte), H01M4/1391 (treatment of electrodes for solid-state batteries)"],"cpcS":["H01M50/46 (separators with surface coatings), C23C16/455 (ALD processes), H01M10/0585 (flat construction elements), H01M4/625 (coating of electrode materials)"]},"63":{"ciis":0.6411,"nc":0.7794,"ev":0.5976,"cde":0.7896,"msi":0.4025,"rank":68,"cpcP":["H01P5/00","B81B3/00","G06N10/40"],"cpcS":["H01L39/02","F17C13/00","H04Q3/52","G06F1/20"]},"68":{"ciis":0.6402,"nc":0.7075,"ev":0.7678,"cde":0.5384,"msi":0.545,"rank":69,"cpcP":["A61B8/0808 (ultrasound imaging brain)","A61N7/02 (therapeutic ultrasound brain)","A61B8/12 (blood flow Doppler)"],"cpcS":["A61B5/369 (EEG - for hybrid hybrid system claims)","A61B8/4455 (phased array transducers)","H04R17/00 (piezoelectric transducers)","A61N7/00 (ultrasonic neuromodulation)"]},"83":{"ciis":0.6397,"nc":0.8208,"ev":0.639,"cde":0.5951,"msi":0.4825,"rank":70,"cpcP":["H01L23/473","H01L23/36"],"cpcS":["H01L23/14","H01L21/48","B81B1/00","H01L23/34","F28F13/00"]},"10":{"ciis":0.6378,"nc":0.6394,"ev":0.7171,"cde":0.5729,"msi":0.6275,"rank":71,"cpcP":["H05K1/03 (insulating substrates for PCBs)","C08G59/18 (epoxy resins with curing)"],"cpcS":["H05K3/00 (manufacturing PCBs)","C08G2650/00 (covalent adaptable networks)","B32B27/38 (epoxy resin layers)","H05K2203/175 (substrate recovery)"]},"42":{"ciis":0.6359,"nc":0.6673,"ev":0.7166,"cde":0.6003,"msi":0.5475,"rank":72,"cpcP":["G06N10/70","G06N10/40"],"cpcS":["G06F9/38","H03M13/37","G06F15/78","G06F9/50"]},"23":{"ciis":0.6354,"nc":0.6758,"ev":0.7072,"cde":0.6247,"msi":0.5175,"rank":73,"cpcP":["A61K9/50","C12P21/00"],"cpcS":["A61K9/19","C12M1/00","B01J13/04","C12N1/08"]},"78":{"ciis":0.6341,"nc":0.7569,"ev":0.6223,"cde":0.5689,"msi":0.57,"rank":74,"cpcP":["H01L23/498","H01L23/373"],"cpcS":["H01L23/14","H05K1/0293","C04B35/587","H01L21/48","H01L23/36"]},"29":{"ciis":0.6283,"nc":0.6415,"ev":0.6776,"cde":0.7077,"msi":0.4775,"rank":75,"cpcP":["H01L23/373","H01L25/065","H01L25/18"],"cpcS":["B82Y30/00","H01L23/42","C09K5/00","H01L21/48","G06F30/23"]},"13":{"ciis":0.6282,"nc":0.6369,"ev":0.6707,"cde":0.6321,"msi":0.5625,"rank":76,"cpcP":["G16C20/70 (machine learning in materials informatics)","G06N3/04 (neural networks)"],"cpcS":["C01G (inorganic compounds \u2014 discovery context)","G06F30/17 (computer-aided materials design)","G06N3/08 (neural network training methods)"]},"104":{"ciis":0.6257,"nc":0.6037,"ev":0.6141,"cde":0.6339,"msi":0.665,"rank":77,"cpcP":["G06F21/72","H04L9/08"],"cpcS":["G06F21/57","H04L9/32","G06F21/73","H04L9/30"]},"35":{"ciis":0.6255,"nc":0.6767,"ev":0.6125,"cde":0.7496,"msi":0.455,"rank":78,"cpcP":["G06F30/20","H01L23/34","G05D23/19"],"cpcS":["G06N20/00","H01L25/18","G06F119/08","H05K7/20","G01R31/28"]},"11":{"ciis":0.6215,"nc":0.6928,"ev":0.6751,"cde":0.6149,"msi":0.4825,"rank":79,"cpcP":["H10N10/17 (thermoelectric module fabrication)","H10N10/85 (thermoelectric active materials)"],"cpcS":["H10N10/80 (thermoelectric module constructional details)","C22C23/00 (Mg alloys)","B22F3/14 (spark plasma sintering)","F28F21/06 (waste heat recovery surfaces)"]},"5":{"ciis":0.6196,"nc":0.5606,"ev":0.6685,"cde":0.5824,"msi":0.7075,"rank":80,"cpcP":["C23C16/455 (MLD/ALD processes), H01M4/625 (coating for battery electrodes), H01M10/0562"],"cpcS":["C23C16/40 (ALD metal oxide), H01M4/1391, H01M50/46, B05D1/00 (roll-to-roll coating processes)"]},"82":{"ciis":0.6191,"nc":0.8231,"ev":0.6284,"cde":0.5289,"msi":0.4825,"rank":81,"cpcP":["H01L23/29","C08K3/38"],"cpcS":["H01L23/31","C08L27/18","C08K9/06","H01L21/56","C08K3/04"]},"40":{"ciis":0.6184,"nc":0.6493,"ev":0.6323,"cde":0.6527,"msi":0.5225,"rank":82,"cpcP":["G06N10/40","G06F9/38"],"cpcS":["G06N10/70","G06F9/50","H04L45/00","G06F13/14"]},"90":{"ciis":0.6175,"nc":0.7102,"ev":0.649,"cde":0.6232,"msi":0.465,"rank":83,"cpcP":["C04B28/02 (Compositions using Portland cement)","C12N1/20 (Bacteria)","E04G21/02 (Concrete laying)"],"cpcS":["C12N15/63 (Genetic engineering)","B33Y70/00 (3D printing with biological material)","C04B18/00 (Inorganic additives for hydraulic binders)"]},"3":{"ciis":0.6093,"nc":0.681,"ev":0.6307,"cde":0.5146,"msi":0.61,"rank":84,"cpcP":["H01M10/48 (accumulators with condition-monitoring arrangements), H01M10/4257 (battery with incorporated microchip/electronic circuit)"],"cpcS":["G01R31/389 (EIS battery testing), H01M10/0562, H01M50/569 (sensors inside battery), G01N27/02 (electrochemical sensing)"]},"81":{"ciis":0.6068,"nc":0.7651,"ev":0.6671,"cde":0.4658,"msi":0.53,"rank":85,"cpcP":["H03K17/0412","H01L27/0617"],"cpcS":["H01L23/498","H01L25/07","H02M1/08","H03K17/16","H01L21/8258"]},"61":{"ciis":0.602,"nc":0.5976,"ev":0.588,"cde":0.6964,"msi":0.5225,"rank":86,"cpcP":["H01L27/18","G06N10/40","H01L39/22"],"cpcS":["H03K19/195","H01L23/12","G10K11/22","H01L39/025"]},"67":{"ciis":0.6016,"nc":0.6989,"ev":0.6624,"cde":0.5999,"msi":0.4275,"rank":87,"cpcP":["A61B5/7207 (motion artifact cancellation)","A61B5/7214 (noise cancellation using dual sensor)","A61B5/291 (EEG)"],"cpcS":["A61B5/6804 (ambulatory monitoring)","G01C21/16 (inertial navigation/MEMS)","H03H21/00 (adaptive digital filters)","A61B5/31 (EEG input circuits)"]},"105":{"ciis":0.6005,"nc":0.6129,"ev":0.625,"cde":0.6339,"msi":0.5175,"rank":88,"cpcP":["H04L9/08","H04L63/16"],"cpcS":["H04L9/30","H04L63/06","G06F21/72","H04L67/141"]},"66":{"ciis":0.5966,"nc":0.6825,"ev":0.7271,"cde":0.4577,"msi":0.53,"rank":89,"cpcP":["A61B5/14532 (measuring blood oxygen, fNIRS)","A61B5/369 (EEG)","A61B5/0022 (wearable body sensor)"],"cpcS":["A61B5/291 (EEG electrodes)","A61B5/7267 (non-linear signal analysis)","G16H50/20 (healthcare ML)","A61B5/048 (EEG for BCI applications)"]},"76":{"ciis":0.5949,"nc":0.6125,"ev":0.54,"cde":0.662,"msi":0.5625,"rank":90,"cpcP":["G06F 11/3604 (verification/validation)","B60W 60/00 (autonomous driving)","G06T 17/00 (3D modeling/simulation)"],"cpcS":["G06N 20/00 (machine learning)","G05D 1/00 (vehicle control)","G06F 30/20 (simulation/CAD)"]},"91":{"ciis":0.5946,"nc":0.6335,"ev":0.6427,"cde":0.5811,"msi":0.505,"rank":91,"cpcP":["C08H1/00 (Macromolecular products from proteins)","C12N15/62 (DNA sequences encoding fusion proteins)","C12P21/02 (Preparation of peptides)"],"cpcS":["D01F4/02 (Artificial filaments from proteins)","C12N9/00 (Enzymes)","C08L89/00 (Compositions based on proteins)"]},"98":{"ciis":0.5936,"nc":0.6895,"ev":0.4575,"cde":0.658,"msi":0.5775,"rank":92,"cpcP":["G03F 1/68","G06F 30/392"],"cpcS":["G02B 6/122","G02B 6/1228","H01L 21/027","G06F 30/20","G06F 30/398"]},"8":{"ciis":0.5915,"nc":0.6191,"ev":0.7799,"cde":0.4744,"msi":0.515,"rank":93,"cpcP":["H01M4/36 (electrodes, active material preparation)","H01M4/58 (inorganic active materials with polyanion structures)"],"cpcS":["H01M4/131 (olivine-type active materials)","C23C16/44 (ALD process)","H01M4/62 (binders and inactive ingredients)","H01M10/0525 (lithium-ion cells)"]},"24":{"ciis":0.5863,"nc":0.6767,"ev":0.6473,"cde":0.5731,"msi":0.43,"rank":94,"cpcP":["C12P1/00","C12N11/04"],"cpcS":["C12M1/00","B82Y5/00","C12P21/00","C07H21/00"]},"34":{"ciis":0.5862,"nc":0.6276,"ev":0.6119,"cde":0.6482,"msi":0.4425,"rank":95,"cpcP":["H01L23/373","H01L23/3736","C09K5/00"],"cpcS":["H01L23/42","B32B5/00","C08G75/14","H01L21/48","H01L25/065"]},"93":{"ciis":0.586,"nc":0.5249,"ev":0.626,"cde":0.6634,"msi":0.545,"rank":96,"cpcP":["H04J 14/02","H04B 10/2507"],"cpcS":["G02B 6/293","H01S 5/024","H05K 7/20","G02F 1/0147","H04J 14/0221"]},"16":{"ciis":0.5823,"nc":0.8197,"ev":0.8015,"cde":0.2875,"msi":0.565,"rank":97,"cpcP":["G06F8/41 (compilers)","G06N3/04 (neural network architectures)"],"cpcS":["G06F9/30 (instruction sets)","G06N3/063 (hardware neural network implementations)","G06F15/80 (special purpose computers)","G06N3/08 (learning methods)"]},"14":{"ciis":0.5799,"nc":0.5967,"ev":0.7165,"cde":0.4696,"msi":0.555,"rank":98,"cpcP":["H01M4/131 (alkali metal cathode active materials)","H01M10/054 (sodium-ion cells)"],"cpcS":["C01G45/00 (Mn compounds)","H01M4/136 (layered oxide active materials)","C01G29/00 (Bi compounds)","H01M4/485 (mixed oxide/hydroxide active materials)"]},"26":{"ciis":0.5782,"nc":0.5327,"ev":0.6903,"cde":0.5795,"msi":0.5225,"rank":99,"cpcP":["C12P21/00","C07K1/107"],"cpcS":["C12N9/10","C12P19/18","C12M1/00","A61K38/00"]},"87":{"ciis":0.5704,"nc":0.5428,"ev":0.6402,"cde":0.583,"msi":0.5175,"rank":100,"cpcP":["C12N1/14 (Fungi)","C12N1/20 (Bacteria)","E04C2/00 (Structural elements)"],"cpcS":["C04B28/00 (Mortars/plasters/concretes)","C12N15/63 (Genetic engineering of microorganisms)","C08L99/00 (Compositions based on natural macromolecular compounds)"]},"80":{"ciis":0.5662,"nc":0.5998,"ev":0.6387,"cde":0.4562,"msi":0.585,"rank":101,"cpcP":["H01L23/473","H01L23/467"],"cpcS":["H01L23/36","H01L23/498","H02M7/003","H01L21/48","H05K7/20"]},"7":{"ciis":0.5651,"nc":0.4816,"ev":0.5604,"cde":0.6714,"msi":0.585,"rank":102,"cpcP":["H01M4/1391, C08G77/04 (organosilicon compounds for bonding), B82B3/00 (nanotechnology fabrication including SAMs)"],"cpcS":["H01M10/0562, H01M4/625, C09J11/00 (surface adhesion chemistry), C23C16/04 (chemical vapor deposition of adhesion layers)"]},"97":{"ciis":0.5524,"nc":0.5035,"ev":0.56,"cde":0.6366,"msi":0.5225,"rank":103,"cpcP":["H01S 5/024","G02B 6/122"],"cpcS":["G02F 1/0147","H04J 14/02","G02B 6/293","H04B 10/2507","G02B 6/12"]},"4":{"ciis":0.5482,"nc":0.5065,"ev":0.5867,"cde":0.6399,"msi":0.4675,"rank":104,"cpcP":["H01M10/0562, H01M4/625 (coating electrode materials), C08F2/50 (photopolymerization)"],"cpcS":["H01M10/0585, H01M4/1391, C09D183/04 (silicone coatings), B82Y30/00 (nanoscale material applications)"]},"79":{"ciis":0.4858,"nc":0.8305,"ev":0.6997,"cde":0.1616,"msi":0.545,"rank":105,"cpcP":["H01L24/29","H01L21/603"],"cpcS":["H01L23/10","H01L24/83","H01L21/48","H01L23/058","H01L24/27"]}};
+
+function ciisColor(v) {
+  if (v >= 0.72) return 'var(--accent-green, #22C55E)';
+  if (v >= 0.65) return 'var(--accent, #2E8B7A)';
+  if (v >= 0.58) return 'var(--accent-amber, #D4A017)';
+  return 'var(--accent-red, #EF4444)';
+}
+
+/* Merge CII Score into pipelineData */
+pipelineData.forEach(function(pat) {
+  var ciisEntry = CIIS_LOOKUP[pat.id];
+  if (ciisEntry) {
+    pat.ciis = ciisEntry.ciis;
+    pat.ciisRank = ciisEntry.rank;
+  } else {
+    pat.ciis = null;
+    pat.ciisRank = null;
+  }
+});
+
+/* ── CPC Rendering Helpers ── */
+function renderCpcBadges(pat) {
+  if (!pat.cpc || !pat.cpc.primary) return '<span style="font-size:11px;color:var(--text-faint)">—</span>';
+  var p = pat.cpc.parsed || (typeof CPC !== 'undefined' ? CPC.parse(pat.cpc.primary) : null);
+  var sectionColor = (typeof CPC !== 'undefined' && p) ? CPC.sectionColor(p.section) : '#94A3B8';
+  var html = '<div class="cpc-codes">';
+  html += '<span class="cpc-badge cpc-badge-primary" onmouseenter="showCpcTooltip(event,' + pat.id + ',true)" onmouseleave="hideCpcTooltip()">';
+  html += '<span class="cpc-dot" style="background:' + sectionColor + '"></span>';
+  html += escapeHtml(pat.cpc.primary.substring(0, 12));
+  html += '</span>';
+  if (pat.cpc.secondary.length > 0) {
+    html += '<span class="cpc-badge cpc-badge-secondary" onmouseenter="showCpcTooltip(event,' + pat.id + ',false)" onmouseleave="hideCpcTooltip()">';
+    html += '+' + pat.cpc.secondary.length + ' more';
+    html += '</span>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* CPC Tooltip */
+function showCpcTooltip(e, patentId, isPrimary) {
+  var pat = pipelineData.find(function(p) { return p.id === patentId; });
+  if (!pat || !pat.cpc) return;
+  var tooltip = document.getElementById('cpcTooltip');
+  if (!tooltip) {
+    tooltip = document.createElement('div');
+    tooltip.id = 'cpcTooltip';
+    tooltip.className = 'cpc-tooltip';
+    document.body.appendChild(tooltip);
+  }
+  var html = '';
+  if (isPrimary && pat.cpc.primary) {
+    var p = typeof CPC !== 'undefined' ? CPC.parse(pat.cpc.primary) : null;
+    html += '<div class="cpc-tooltip-title">' + escapeHtml(pat.cpc.primary) + '</div>';
+    if (p) {
+      html += '<div class="cpc-tooltip-row"><span class="cpc-tooltip-label">Section</span><span class="cpc-tooltip-value">' + p.section + ' — ' + escapeHtml(p.sectionTitle) + '</span></div>';
+      html += '<div class="cpc-tooltip-row"><span class="cpc-tooltip-label">Class</span><span class="cpc-tooltip-value">' + p.class + ' — ' + escapeHtml(p.classTitle) + '</span></div>';
+      html += '<div class="cpc-tooltip-row"><span class="cpc-tooltip-label">Subclass</span><span class="cpc-tooltip-value">' + p.subclass + ' — ' + escapeHtml(p.subclassTitle) + '</span></div>';
+      if (p.mainGroup) html += '<div class="cpc-tooltip-row"><span class="cpc-tooltip-label">Group</span><span class="cpc-tooltip-value">' + p.mainGroup + '/' + (p.subGroup || '00') + '</span></div>';
+    }
+  } else {
+    html += '<div class="cpc-tooltip-title">Secondary Classifications</div>';
+    pat.cpc.secondary.forEach(function(code) {
+      var p = typeof CPC !== 'undefined' ? CPC.parse(code) : null;
+      html += '<div class="cpc-tooltip-row"><span class="cpc-tooltip-label" style="font-family:monospace;min-width:90px">' + escapeHtml(code.substring(0, 12)) + '</span><span class="cpc-tooltip-value">' + (p ? escapeHtml(p.subclassTitle || p.classTitle || '') : '') + '</span></div>';
+    });
+  }
+  tooltip.innerHTML = html;
+  tooltip.classList.add('visible');
+  var rect = e.target.getBoundingClientRect();
+  tooltip.style.left = Math.min(rect.left, window.innerWidth - 380) + 'px';
+  tooltip.style.top = (rect.bottom + 6) + 'px';
+}
+
+function hideCpcTooltip() {
+  var tooltip = document.getElementById('cpcTooltip');
+  if (tooltip) tooltip.classList.remove('visible');
+}
+
+/* ── CPC Analysis Panel Rendering ── */
+function renderCpcAnalysis() {
+  var panel = document.getElementById('cpcAnalysis');
+  if (!panel || typeof CPC === 'undefined') return;
+
+  /* Count sections */
+  var sectionCounts = {};
+  var classCounts = {};
+  var totalCodes = 0;
+  pipelineData.forEach(function(pat) {
+    if (!pat.cpc || !pat.cpc.primary) return;
+    var allCodes = [pat.cpc.primary].concat(pat.cpc.secondary || []);
+    allCodes.forEach(function(code) {
+      var p = CPC.parse(code);
+      if (!p) return;
+      totalCodes++;
+      sectionCounts[p.section] = (sectionCounts[p.section] || 0) + 1;
+      classCounts[p.class] = (classCounts[p.class] || 0) + 1;
+    });
+  });
+
+  var maxCount = Math.max.apply(null, Object.values(sectionCounts).concat([1]));
+
+  var html = '<div class="cpc-analysis-title">CPC Classification Analysis</div>';
+
+  /* Section distribution bars */
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">';
+  html += '<div>';
+  html += '<div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:10px">Section Distribution (' + totalCodes + ' total classifications)</div>';
+  html += '<div class="cpc-section-bars">';
+  var sortedSections = Object.keys(sectionCounts).sort(function(a, b) { return sectionCounts[b] - sectionCounts[a]; });
+  sortedSections.forEach(function(sec) {
+    var count = sectionCounts[sec];
+    var pct = (count / maxCount * 100).toFixed(0);
+    var color = CPC.sectionColor(sec);
+    var title = CPC.SECTIONS[sec] || '';
+    if (title.length > 30) title = title.substring(0, 27) + '...';
+    html += '<div class="cpc-section-bar">';
+    html += '<span class="cpc-section-label" style="color:' + color + '">' + sec + '</span>';
+    html += '<span class="cpc-section-name">' + escapeHtml(title) + '</span>';
+    html += '<div class="cpc-section-track"><div class="cpc-section-fill" style="width:' + pct + '%;background:' + color + '"></div></div>';
+    html += '<span class="cpc-section-count">' + count + '</span>';
+    html += '</div>';
+  });
+  html += '</div></div>';
+
+  /* Class breakdown chips */
+  html += '<div>';
+  html += '<div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:10px">Top CPC Classes</div>';
+  html += '<div class="cpc-class-chips">';
+  var sortedClasses = Object.keys(classCounts).sort(function(a, b) { return classCounts[b] - classCounts[a]; });
+  sortedClasses.slice(0, 20).forEach(function(cls) {
+    var count = classCounts[cls];
+    var sec = cls.charAt(0);
+    var color = CPC.sectionColor(sec);
+    var title = CPC.CLASSES[cls] || '';
+    if (title.length > 40) title = title.substring(0, 37) + '...';
+    html += '<span class="cpc-class-chip" title="' + escapeHtml(CPC.CLASSES[cls] || '') + '">';
+    html += '<span class="cpc-dot" style="width:6px;height:6px;border-radius:50%;background:' + color + '"></span>';
+    html += cls;
+    html += '<span class="chip-count">' + count + '</span>';
+    html += '</span>';
+  });
+  html += '</div></div>';
+  html += '</div>';
+
+  panel.innerHTML = html;
+}
 
 function changeRole(role) {
   currentRole = role;
@@ -1765,13 +2425,22 @@ function canPerformAction(actionRoles) {
   return actionRoles.indexOf(currentRole) >= 0;
 }
 
-function advancePatent(patentId, toStage) {
+function togglePatentMode(patentId) {
   var pat = pipelineData.find(function(p) { return p.id === patentId; });
   if (!pat) return;
+  var oldMode = pat.mode || 'auto';
+  pat.mode = oldMode === 'auto' ? 'manual' : 'auto';
+  var roleLabel = ROLES[currentRole] ? ROLES[currentRole].label : currentRole;
+  pat.trail.push({ who: roleLabel, action: 'Mode → ' + (pat.mode === 'auto' ? 'Automatic' : 'Manual'), date: new Date().toISOString().slice(0, 10) });
+  toast('#' + pat.id + ' switched to ' + (pat.mode === 'auto' ? 'Automatic' : 'Manual') + ' mode', 'info');
+  renderPipelineTable();
+}
+
+/* Core advance: moves patent one step, logs trail entry */
+function _stepPatent(pat, toStage, actor) {
   var fromLabel = STAGE_MAP[pat.stage] ? STAGE_MAP[pat.stage].label : pat.stage;
   var toLabel = STAGE_MAP[toStage] ? STAGE_MAP[toStage].label : toStage;
   pat.stage = toStage;
-  var roleLabel = ROLES[currentRole] ? ROLES[currentRole].label : currentRole;
   /* Update assignee based on next stage */
   var nextWf = WORKFLOW[toStage];
   if (nextWf) {
@@ -1780,8 +2449,37 @@ function advancePatent(patentId, toStage) {
     else if (nextRoles.indexOf('patent-lawyer') >= 0) pat.assignee = 'patent-lawyer';
     else pat.assignee = currentRole;
   }
-  pat.trail.push({ who: roleLabel, action: fromLabel + ' → ' + toLabel, date: new Date().toISOString().slice(0, 10) });
-  toast(pat.title.substring(0, 40) + '... → ' + toLabel, 'success');
+  pat.trail.push({ who: actor, action: fromLabel + ' → ' + toLabel, date: new Date().toISOString().slice(0, 10) });
+}
+
+function advancePatent(patentId, toStage) {
+  var pat = pipelineData.find(function(p) { return p.id === patentId; });
+  if (!pat) return;
+  var roleLabel = ROLES[currentRole] ? ROLES[currentRole].label : currentRole;
+
+  /* First step — always happens */
+  _stepPatent(pat, toStage, roleLabel);
+
+  /* Auto-chain: if mode is auto, keep advancing until we hit an approval gate or terminal */
+  if (pat.mode === 'auto') {
+    var safety = 0;
+    while (safety < 15) {
+      safety++;
+      var nextWf = WORKFLOW[pat.stage];
+      if (!nextWf) break;
+      /* Stop at approval gates — these always require manual human approval */
+      if (AUTO_STOP_STAGES[pat.stage]) break;
+      /* Stop if no advance path (terminal or approve-only that isn't an auto-stop) */
+      var nextTarget = nextWf.advance;
+      if (!nextTarget) break;
+      /* If the next stage IS an approval gate, advance into it but then stop */
+      _stepPatent(pat, nextTarget, 'Auto-Pipeline');
+      if (AUTO_STOP_STAGES[nextTarget]) break;
+    }
+  }
+
+  var finalLabel = STAGE_MAP[pat.stage] ? STAGE_MAP[pat.stage].label : pat.stage;
+  toast(pat.title.substring(0, 40) + '... → ' + finalLabel, 'success');
   renderPipelineTable();
 }
 
@@ -1806,6 +2504,7 @@ function addNewPatent() {
   pipelineData.push({
     id: newId, title: title.trim(), ws: 'Unassigned', stage: 'idea',
     priority: 'TBD', fto: 'TBD', score: 0, assignee: currentRole, value: 'TBD',
+    mode: 'auto',
     trail: [{ who: roleLabel, action: 'Created idea', date: new Date().toISOString().slice(0, 10) }]
   });
   toast('Patent "' + title.substring(0, 30) + '..." added to pipeline', 'success');
@@ -1826,12 +2525,14 @@ function renderPipelineTable() {
   var inReview = pipelineData.filter(function(p) { return p.stage === 'lawyer-review' || p.stage === 'admin-approved'; }).length;
   var filed = pipelineData.filter(function(p) { return p.stage === 'filed' || p.stage === 'under-exam'; }).length;
   var awarded = pipelineData.filter(function(p) { return p.stage === 'awarded'; }).length;
+  var autoCount = pipelineData.filter(function(p) { return (p.mode || 'auto') === 'auto'; }).length;
   sumBar.innerHTML =
     '<div class="pipeline-summary-item"><div><div class="pipeline-summary-val">' + pipelineData.length + '</div><div class="pipeline-summary-label">Total Patents</div></div></div>' +
     '<div class="pipeline-summary-item"><div><div class="pipeline-summary-val" style="color:var(--accent)">' + totalActive + '</div><div class="pipeline-summary-label">Active Pipeline</div></div></div>' +
     '<div class="pipeline-summary-item"><div><div class="pipeline-summary-val" style="color:var(--accent-amber)">' + inReview + '</div><div class="pipeline-summary-label">Pending Approval</div></div></div>' +
     '<div class="pipeline-summary-item"><div><div class="pipeline-summary-val" style="color:var(--accent-blue)">' + filed + '</div><div class="pipeline-summary-label">Filed / Under Exam</div></div></div>' +
-    '<div class="pipeline-summary-item"><div><div class="pipeline-summary-val" style="color:var(--accent-green)">' + awarded + '</div><div class="pipeline-summary-label">Awarded</div></div></div>';
+    '<div class="pipeline-summary-item"><div><div class="pipeline-summary-val" style="color:var(--accent-green)">' + awarded + '</div><div class="pipeline-summary-label">Awarded</div></div></div>' +
+    '<div class="pipeline-summary-item"><div><div class="pipeline-summary-val" style="color:#22C55E">' + autoCount + '</div><div class="pipeline-summary-label">Auto Mode</div></div></div>';
 
   /* Stage filter chips */
   var filterBar = document.getElementById('stageFilterBar');
@@ -1846,14 +2547,14 @@ function renderPipelineTable() {
   /* Filter data */
   var filtered = pipelineData.filter(function(p) {
     if (stageFilter !== 'all' && p.stage !== stageFilter) return false;
-    if (searchVal && p.title.toLowerCase().indexOf(searchVal) < 0 && p.ws.toLowerCase().indexOf(searchVal) < 0) return false;
+    if (searchVal && p.title.toLowerCase().indexOf(searchVal) < 0 && p.ws.toLowerCase().indexOf(searchVal) < 0 && (!p.cpc || (p.cpc.primary || '').toLowerCase().indexOf(searchVal) < 0)) return false;
     return true;
   });
 
   /* Render table rows */
   var tbody = document.getElementById('pipelineBody');
   if (filtered.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state" style="padding:40px 0"><svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 4h5l2 2h5v10H4V4z"/></svg><p>No patents match current filters</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="13"><div class="empty-state" style="padding:40px 0"><svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 4h5l2 2h5v10H4V4z"/></svg><p>No patents match current filters</p></div></td></tr>';
     return;
   }
 
@@ -1861,6 +2562,7 @@ function renderPipelineTable() {
     var stage = STAGE_MAP[pat.stage] || { label: pat.stage, css: 'stage-idea', order: 0 };
     var wf = WORKFLOW[pat.stage] || {};
     var stageOrder = stage.order;
+    var isAuto = (pat.mode || 'auto') === 'auto';
 
     /* Build progress pips */
     var pips = '';
@@ -1878,25 +2580,55 @@ function renderPipelineTable() {
     /* Assignee role badge */
     var assigneeRole = ROLES[pat.assignee] || { label: pat.assignee, badgeCss: 'role-badge-analyst' };
 
-    /* Next action text */
+    /* Determine next action text and what auto would do */
     var nextAction = '';
-    if (wf.advance) nextAction = wf.advanceLabel || 'Advance';
-    else if (wf.approve) nextAction = wf.approveLabel || 'Approve';
-    else if (pat.stage === 'awarded') nextAction = 'Complete';
-    else if (pat.stage === 'rejected') nextAction = 'Revise & Retry';
+    var autoWillChain = false;
+    if (wf.advance && !wf.approve) {
+      nextAction = wf.advanceLabel || 'Advance';
+      /* In auto mode, check if clicking will chain through multiple stages */
+      if (isAuto && !AUTO_STOP_STAGES[pat.stage]) {
+        var peekStage = wf.advance;
+        var peekSafety = 0;
+        while (peekSafety < 15) {
+          peekSafety++;
+          if (AUTO_STOP_STAGES[peekStage]) { autoWillChain = true; break; }
+          var peekWf = WORKFLOW[peekStage];
+          if (!peekWf || !peekWf.advance) break;
+          autoWillChain = true;
+          peekStage = peekWf.advance;
+        }
+      }
+    } else if (wf.approve) {
+      nextAction = wf.approveLabel || 'Approve';
+    } else if (pat.stage === 'awarded') {
+      nextAction = 'Complete';
+    } else if (pat.stage === 'rejected') {
+      nextAction = 'Revise & Retry';
+    }
 
     /* Determine which actions current role can do */
     var canAdvance = wf.advanceRole ? canPerformAction(wf.advanceRole) : false;
     var canApprove = wf.approveRole ? canPerformAction(wf.approveRole) : false;
     var canReject = wf.rejectTo && (wf.approveRole ? canPerformAction(wf.approveRole) : false);
 
+    /* Mode toggle pill */
+    var modeToggle = '<div style="margin-bottom:5px">' +
+      '<div class="mode-toggle" onclick="togglePatentMode(' + pat.id + ')" title="Click to switch to ' + (isAuto ? 'Manual' : 'Automatic') + ' mode">' +
+      '<span class="mode-seg ' + (isAuto ? 'active-auto' : 'inactive') + '">⚡ AUTO</span>' +
+      '<span class="mode-seg ' + (!isAuto ? 'active-manual' : 'inactive') + '">✋ MANUAL</span>' +
+      '</div></div>';
+
     /* Action buttons */
-    var actions = '';
+    var actions = modeToggle;
     if (wf.approve) {
       actions += '<button class="btn-action approve" ' + (canApprove ? '' : 'disabled') + ' onclick="advancePatent(' + pat.id + ',\'' + wf.approve + '\')" title="' + (canApprove ? wf.approveLabel : 'Requires: ' + (wf.approveRole||[]).map(function(r){return ROLES[r]?ROLES[r].label:r;}).join(' or ')) + '">✓ ' + (wf.approveLabel || 'Approve') + '</button>';
     }
     if (wf.advance && !wf.approve) {
-      actions += '<button class="btn-action advance" ' + (canAdvance ? '' : 'disabled') + ' onclick="advancePatent(' + pat.id + ',\'' + wf.advance + '\')" title="' + (canAdvance ? wf.advanceLabel : 'Requires: ' + (wf.advanceRole||[]).map(function(r){return ROLES[r]?ROLES[r].label:r;}).join(' or ')) + '">→ ' + (wf.advanceLabel || 'Advance') + '</button>';
+      var advLabel = wf.advanceLabel || 'Advance';
+      if (isAuto && autoWillChain) {
+        advLabel = '⚡ Auto-Run to Review';
+      }
+      actions += '<button class="btn-action advance" ' + (canAdvance ? '' : 'disabled') + ' onclick="advancePatent(' + pat.id + ',\'' + wf.advance + '\')" title="' + (canAdvance ? (isAuto && autoWillChain ? 'Auto-advance through stages until lawyer review gate' : wf.advanceLabel) : 'Requires: ' + (wf.advanceRole||[]).map(function(r){return ROLES[r]?ROLES[r].label:r;}).join(' or ')) + '">' + (isAuto && autoWillChain ? '' : '→ ') + advLabel + '</button>';
     }
     if (canReject) {
       actions += '<button class="btn-action reject" onclick="rejectPatent(' + pat.id + ',\'' + wf.rejectTo + '\')" title="Reject back to ' + (STAGE_MAP[wf.rejectTo]?STAGE_MAP[wf.rejectTo].label:wf.rejectTo) + '">✕ Reject</button>';
@@ -1914,6 +2646,9 @@ function renderPipelineTable() {
     return '<tr>' +
       '<td style="color:var(--text-faint);font-weight:600">' + pat.id + '</td>' +
       '<td class="title-cell"><div class="patent-title-text">' + escapeHtml(pat.title) + '</div><div class="patent-ws">' + escapeHtml(pat.ws) + '</div></td>' +
+      '<td>' + renderCpcBadges(pat) + '</td>' +
+      '<td><span style="font-size:13px;font-weight:700;color:' + (pat.score >= 8.5 ? 'var(--accent-green,#22C55E)' : pat.score >= 7 ? 'var(--accent-amber,#D4A017)' : 'var(--accent-red,#EF4444)') + '">' + pat.score.toFixed(1) + '</span></td>' +
+      '<td>' + (pat.ciis !== null ? '<span style="font-size:12px;font-weight:700;color:' + ciisColor(pat.ciis) + '">' + pat.ciis.toFixed(3) + '</span><div style="font-size:9px;color:var(--text-faint)">#' + pat.ciisRank + '</div>' : '<span style="font-size:11px;color:var(--text-faint)">—</span>') + '</td>' +
       '<td><span class="stage-badge ' + stage.css + '"><span class="stage-icon"></span>' + stage.label + '</span></td>' +
       '<td><div class="stage-progress">' + pips + '</div><div style="font-size:10px;color:var(--text-faint);margin-top:3px">' + (stageOrder + 1) + '/' + TOTAL_ACTIVE_STAGES + '</div></td>' +
       '<td><span class="role-badge ' + assigneeRole.badgeCss + '">' + assigneeRole.label + '</span></td>' +
@@ -1921,9 +2656,10 @@ function renderPipelineTable() {
       '<td><span class="badge ' + ftoClass + '">' + pat.fto + '</span></td>' +
       '<td style="font-size:12px;color:var(--text-muted);max-width:120px">' + nextAction + '</td>' +
       '<td>' + trailHtml + '</td>' +
-      '<td><div class="action-group">' + (actions || '<span style="font-size:11px;color:var(--text-faint)">—</span>') + '</div></td>' +
+      '<td><div class="action-group" style="flex-direction:column;align-items:flex-start">' + actions + '</div></td>' +
       '</tr>';
   }).join('');
+  renderCpcAnalysis();
 }
 
 function setStageFilter(filter) {
@@ -1933,6 +2669,712 @@ function setStageFilter(filter) {
 
 async function loadOverview() {
   renderPipelineTable();
+}
+
+/* ============================================
+   LLM MODEL REGISTRY
+   ============================================ */
+var availableModels = [
+  { id: 'claude-opus-4-6',            label: 'Claude Opus 4.6',            provider: 'anthropic', isDefault: true },
+  { id: 'claude-sonnet-4-6',          label: 'Claude Sonnet 4.6',          provider: 'anthropic', isDefault: false },
+  { id: 'claude-haiku-4-5-20251001',  label: 'Claude Haiku 4.5',           provider: 'anthropic', isDefault: false },
+  { id: 'gpt-4o',                     label: 'GPT-4o',                     provider: 'openai',    isDefault: false },
+  { id: 'gpt-4o-mini',               label: 'GPT-4o Mini',                provider: 'openai',    isDefault: false },
+  { id: 'o3',                         label: 'o3',                         provider: 'openai',    isDefault: false },
+  { id: 'gemini-2.5-pro',             label: 'Gemini 2.5 Pro',             provider: 'google',    isDefault: false },
+  { id: 'gemini-2.5-flash',           label: 'Gemini 2.5 Flash',           provider: 'google',    isDefault: false },
+  { id: 'llama-4-maverick',           label: 'Llama 4 Maverick',           provider: 'meta',      isDefault: false }
+];
+
+function getDefaultModelId() {
+  var def = availableModels.find(function(m) { return m.isDefault; });
+  return def ? def.id : (availableModels.length > 0 ? availableModels[0].id : 'claude-sonnet-4-6');
+}
+
+function getModelLabel(modelId) {
+  var m = availableModels.find(function(m) { return m.id === modelId; });
+  return m ? m.label : modelId;
+}
+
+function getModelShortLabel(modelId) {
+  var label = getModelLabel(modelId);
+  /* Abbreviate for step card badge: "Claude Sonnet 4.6" → "Sonnet 4.6" */
+  return label.replace(/^Claude\s+/i, '').replace(/^GPT-/i, 'GPT-').replace(/^Gemini\s+/i, 'Gem ');
+}
+
+function addModel() {
+  var idInput = document.getElementById('newModelId');
+  var labelInput = document.getElementById('newModelLabel');
+  var providerInput = document.getElementById('newModelProvider');
+  var id = (idInput.value || '').trim();
+  var label = (labelInput.value || '').trim();
+  var provider = providerInput.value || 'other';
+  if (!id) { toast('Model ID is required', 'error'); return; }
+  if (!label) label = id;
+  if (availableModels.some(function(m) { return m.id === id; })) {
+    toast('Model "' + id + '" already exists', 'error');
+    return;
+  }
+  availableModels.push({ id: id, label: label, provider: provider, isDefault: false });
+  idInput.value = '';
+  labelInput.value = '';
+  renderModelList();
+  toast('Model "' + label + '" added', 'success');
+}
+
+function removeModel(modelId) {
+  var m = availableModels.find(function(m) { return m.id === modelId; });
+  if (!m) return;
+  if (m.isDefault) { toast('Cannot remove the default model', 'error'); return; }
+  availableModels = availableModels.filter(function(m) { return m.id !== modelId; });
+  renderModelList();
+  toast('Model removed', 'info');
+}
+
+function setDefaultModel(modelId) {
+  availableModels.forEach(function(m) { m.isDefault = (m.id === modelId); });
+  renderModelList();
+  toast(getModelLabel(modelId) + ' set as default', 'success');
+}
+
+function renderModelList() {
+  var list = document.getElementById('modelList');
+  if (!list) return;
+  list.innerHTML = availableModels.map(function(m) {
+    return '<div class="model-item">' +
+      '<div class="model-item-info">' +
+        '<div class="model-item-id">' + escapeHtml(m.id) + '</div>' +
+        '<div class="model-item-label">' + escapeHtml(m.label) + '</div>' +
+      '</div>' +
+      '<span class="model-item-provider ' + m.provider + '">' + m.provider + '</span>' +
+      (m.isDefault ? '<span class="model-item-default">DEFAULT</span>' : '<button class="btn btn-sm btn-secondary" onclick="setDefaultModel(\'' + escapeHtml(m.id) + '\')" style="font-size:10px;padding:2px 8px">Set Default</button>') +
+      '<div class="model-item-actions">' +
+        '<button class="model-remove-btn" onclick="removeModel(\'' + escapeHtml(m.id) + '\')" title="Remove model">&#10005;</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* Build model <option> list for dropdowns */
+function buildModelOptions(selectedId) {
+  return availableModels.map(function(m) {
+    var sel = m.id === selectedId ? ' selected' : '';
+    var def = m.isDefault ? ' ★' : '';
+    return '<option value="' + escapeHtml(m.id) + '"' + sel + '>' + escapeHtml(m.label) + ' (' + m.provider + ')' + def + '</option>';
+  }).join('');
+}
+
+/* ============================================
+   MODULAR WORKFLOW EDITOR ENGINE
+   ============================================ */
+
+/* Step template library — prompt defaults for each step type */
+var STEP_TEMPLATES = {
+  'idea':           { label: 'Idea / Disclosure',    color: '#94A3B8', type: 'task',           roleGate: ['admin','ip-strategist','inventor'], autoSkip: true, approvalRequired: false, model: null, prompt: 'Review and formalize the invention disclosure for {{patent_title}} in the {{whitespace_name}} domain. Identify the core technical contribution, potential claims scope, and initial prior art landscape.' },
+  'fto':            { label: 'FTO / Prior Art',       color: '#06B6D4', type: 'task',           roleGate: ['admin','ip-strategist','ip-analyst'], autoSkip: true, approvalRequired: false, model: null, prompt: 'Conduct a freedom-to-operate analysis for {{patent_title}} in the {{whitespace_name}} domain. Search for blocking patents, identify design-around opportunities, and rate FTO risk as GREEN/YELLOW/RED.' },
+  'claims':         { label: 'Draft Claims',          color: '#3B82F6', type: 'task',           roleGate: ['admin','patent-engineer'], autoSkip: true, approvalRequired: false, model: null, prompt: 'Draft 3 independent claims and 8-12 dependent claims for {{patent_title}}. Follow USPTO 35 USC 112 enablement requirements. Structure: broadest system claim, autonomous control claim, method claim.' },
+  'figures':        { label: 'Generate Figures',      color: '#8B5CF6', type: 'task',           roleGate: ['admin','patent-engineer'], autoSkip: true, approvalRequired: false, model: null, prompt: 'Generate 5 patent figures per 37 CFR 1.84 standards for {{patent_title}}: (1) System block diagram, (2) Cross-sectional view, (3) Method flowchart, (4) Control system diagram, (5) Performance comparison.' },
+  'draft':          { label: 'Draft USPTO Filing',    color: '#D4A017', type: 'document-gen',   roleGate: ['admin','patent-engineer'], autoSkip: true, approvalRequired: false, model: null, prompt: 'Draft a complete USPTO patent specification for {{patent_title}}.\n\n═══ DOCUMENT FORMAT (37 CFR §1.52) ═══\nAll text must be in English. Use sequential paragraph numbering ([0001], [0002], etc.) in continuous prose. No bullet points, parenthetical shorthand, or abbreviated data tables in the specification body. Each claim begins with a capital letter and ends with a period. Claims commence on a separate sheet.\n\n═══ SPECIFICATION STRUCTURE (37 CFR §1.71, §1.77) ═══\nProduce the following sections in this exact order with UPPERCASE headings (no underlining or bold):\n1. TITLE OF THE INVENTION — short, specific, ≤500 characters\n2. CROSS-REFERENCE TO RELATED APPLICATIONS\n3. STATEMENT REGARDING FEDERALLY SPONSORED RESEARCH (if applicable)\n4. BACKGROUND OF THE INVENTION — Technical Field + Related Art. Limit to 3–4 paragraphs: field context → technical problem → why existing approaches are incomplete (generically) → transition to invention. Never cite specific authors, academic papers, publication years, or competitors by name. Use \"known methods,\" \"traditional composites,\" \"conventional approaches.\" Reserve strongest differentiation for prosecution.\n5. BRIEF SUMMARY OF THE INVENTION\n6. BRIEF DESCRIPTION OF THE DRAWINGS — Reference FIG. 1, FIG. 2, etc. with consecutive Arabic numerals.\n7. DETAILED DESCRIPTION OF THE INVENTION — Exhaustive narrative prose with [0001]+ paragraph numbering. Describe preferred embodiments in sufficient detail to enable any person skilled in the art (35 U.S.C. 112 Enablement). Reference numerals must correspond to drawing figures. Disclose best mode.\n8. CLAIM(S) — On a separate sheet. Number consecutively in Arabic numerals. Each element/step separated by line indentation.\n9. ABSTRACT OF THE DISCLOSURE — On a separate sheet, max 150 words.\n\n═══ FOUR PARALLEL DELIVERABLES ═══\nProduce four separate outputs (never combine into one document):\n(a) Claims Set — Independent + dependent claims\n(b) Specification — Full narrative detailed description\n(c) Abstract — ≤150 words\n(d) Figures Description — Brief Description of Drawings\n\n═══ CLAIM DRAFTING RULES (37 CFR §1.75) ═══\n• Claims must particularly point out and distinctly claim the subject matter (35 U.S.C. 112(b))\n• Claims must differ substantially from each other and not be unduly multiplied\n• All claim terms must find clear support/antecedent basis in the description\n• Structure: broadest system claim → autonomous control claim → method claim\n• Independent claims: self-contained, no reference to other claims\n• Dependent claims: reference a single prior claim, further limit that claim\n• Improvement claims: preamble (conventional elements) → \"wherein the improvement comprises\" → improvement elements\n• For multiple elements/steps, separate each by line indentation\n\n═══ AI PATENT LANGUAGE RULES (NON-NEGOTIABLE) ═══\n\nPROHIBITED TERMS (replace immediately):\n- \"superior\" → \"improved\" or \"enhanced relative to\"\n- \"critical\" → \"in some embodiments\" or \"in certain configurations\"\n- \"must\" → \"in some embodiments\" or \"may be configured to\"\n- \"our\" / \"we\" → \"the present invention\" or \"the disclosed embodiment\"\n- \"solves\" → \"addresses\" or \"provides [quantified] improvement in\"\n- \"completely eliminates\" → \"reduces or substantially eliminates\"\n- \"fails to\" → neutral factual characterization\n- \"unique\" / \"novel\" (in specification) → \"in accordance with aspects of the disclosure\"\n- \"best\" / \"optimal\" → \"in some embodiments\" with hedged alternatives\n- \"always\" / \"never\" → qualified temporal/conditional language\n- \"impossible\" → \"difficult to achieve with conventional approaches\"\n\nAPPROVED PATENT-NATIVE PHRASES (prioritize these):\n- \"in accordance with an embodiment\"\n- \"in some embodiments\"\n- \"configured to\"\n- \"operatively coupled to\"\n- \"at least one of\"\n- \"substantially\" / \"approximately\"\n- \"a plurality of\"\n- \"wherein\"\n- \"the method further comprising\"\n\n═══ QUANTITATIVE LANGUAGE PATTERNS ═══\nFor numerical ranges, thresholds, and tolerances:\n- Use \"from about X to about Y\" or \"in a range of approximately X to Y\"\n- Include \"approximately\" before specific numerical values\n- Express tolerances as \"within ±X% of the nominal value\"\n- For thresholds: \"at least about X\" or \"no greater than approximately Y\"\n\n═══ PROPHETIC vs. WORKING EXAMPLES ═══\n- Prophetic examples (not yet performed): use future tense or subjunctive (\"would be expected to,\" \"may be configured to\")\n- Working examples (actually performed): use past tense with specific measured values\n- Never mix tenses within a single example\n\n═══ NEGATIVE LIMITATIONS ═══\nDefine the invention by what it excludes when strategically valuable:\n- \"free of\" / \"substantially free of\" / \"devoid of\"\n- \"without the need for\" / \"in the absence of\"\n- Use to distinguish from prior art requiring excluded elements\n\n═══ COINED TERMS & MEASUREMENT STANDARDS ═══\nWhen coining a new term (e.g., \"Engineered Deflection Interface\"):\n- Explicitly define how associated parameters are measured\n- Specify industry-standard measurement methods (ASTM, ISO) for each quantitative parameter\n- Add worked examples showing calculated parameter values\n- Include a terminology glossary in the Detailed Description\n\n═══ DRAWING STANDARDS (37 CFR §1.84) ═══\n- Figures numbered consecutively: FIG. 1, FIG. 2, etc.; partial views as FIG. 1A, FIG. 1B\n- Same reference character for the same part across all figures\n- Reference characters ≥0.32 cm (1/8 in) height\n- All views on same sheet face same direction\n- Scale large enough to show details without crowding at 2/3 reduction\n- One view must be suitable for the published patent front page\n\n═══ TONE CALIBRATION ═══\n- Replace argumentative language with neutral factual characterization\n- Remove priority/superiority claims; reframe as capability disclosure\n- Replace absolutes with hedged alternatives (\"in some embodiments,\" \"approximately\")\n- Remove possessive pronouns (\"our\"); use \"the disclosed\" or \"the present\"\n- Replace \"solves\" with quantified improvement language\n\n═══ PRE-FILING CHECKLIST ═══\nBefore finalizing, verify:\n□ No prohibited terms remain\n□ All claims have antecedent basis in specification\n□ Four deliverables are separate documents\n□ Background contains no specific author/paper citations\n□ All numerical values use \"approximately\" or range language\n□ Prophetic examples use future/subjunctive tense\n□ Working examples use past tense\n□ All coined terms are explicitly defined with measurement methods\n□ Drawing references match between specification and figures\n□ Abstract ≤150 words, on separate sheet\n□ Claims on separate sheet, consecutively numbered\n\nReference Documents: AI_Patent_Language_Guide.docx, USPTO_Patent_Drafting_Guidelines-2.docx, Patent_generation_prompt_V2.docx, USPTO_Patent_Drafting_Guidelines.docx, USPTO_Patent_Figures_Guide.docx' },
+  'lawyer-review':  { label: 'Lawyer Review',         color: '#F59E0B', type: 'approval',       roleGate: ['admin','patent-lawyer'], autoSkip: false, approvalRequired: true, model: null, prompt: 'Review the draft patent for {{patent_title}} for: (1) Claim scope adequacy, (2) 35 USC 101/102/103/112 compliance, (3) Prior art differentiation, (4) Prosecution risk. Provide approve/reject with notes.' },
+  'admin-approval': { label: 'Admin Approval',        color: '#22C55E', type: 'approval',       roleGate: ['admin'], autoSkip: false, approvalRequired: true, model: null, prompt: 'Final administrative review before filing. Verify: budget allocation, jurisdiction selection, inventor declarations, assignment documents complete.' },
+  'board-review':   { label: 'Board Review',          color: '#EF4444', type: 'approval',       roleGate: ['admin'], autoSkip: false, approvalRequired: true, model: null, prompt: 'Strategic board-level review. Assess commercial value, competitive landscape positioning, and licensing potential before committing to filing costs.' },
+  'filed':          { label: 'Filed (USPTO)',         color: '#2563EB', type: 'task',           roleGate: ['admin'], autoSkip: false, approvalRequired: false, model: null, prompt: 'File the patent application with USPTO. Record filing date, application number, and confirmation receipt.' },
+  'examination':    { label: 'Under Examination',     color: '#A855F7', type: 'task',           roleGate: ['admin','patent-lawyer'], autoSkip: false, approvalRequired: false, model: null, prompt: 'Track examination status. Monitor office actions, respond to examiner rejections within statutory deadlines.' },
+  'awarded':        { label: 'Awarded',               color: '#10B981', type: 'task',           roleGate: ['admin','patent-lawyer'], autoSkip: false, approvalRequired: false, model: null, prompt: 'Patent granted. Record grant date, patent number. Initiate licensing strategy and maintenance fee schedule.' },
+  'fork':           { label: 'Parallel Fork',         color: '#8B5CF6', type: 'parallel-start', roleGate: ['admin'], autoSkip: true, approvalRequired: false, model: null, prompt: '' },
+  'merge':          { label: 'Merge',                 color: '#8B5CF6', type: 'parallel-end',   roleGate: ['admin'], autoSkip: true, approvalRequired: false, model: null, prompt: '' },
+  'condition':      { label: 'Conditional Gate',      color: '#D4A017', type: 'gate',           roleGate: ['admin','ip-strategist'], autoSkip: true, approvalRequired: false, model: null, prompt: 'Evaluate condition: {{condition_expression}}. Route to appropriate branch based on result.' },
+  'custom':         { label: 'Custom Step',           color: '#64748B', type: 'task',           roleGate: ['admin'], autoSkip: true, approvalRequired: false, model: null, prompt: 'Describe what this step should accomplish for {{patent_title}}.' }
+};
+
+/* Active workflow being edited */
+var activeWorkflow = null;
+var selectedStepId = null;
+var wfeDragSourceIdx = null;
+
+/* Default workflow matching existing 11-stage pipeline */
+function createDefaultWorkflow() {
+  var steps = [
+    { id: 'ws-1',  tpl: 'idea',           order: 0 },
+    { id: 'ws-2',  tpl: 'fto',            order: 1 },
+    { id: 'ws-3',  tpl: 'claims',         order: 2 },
+    { id: 'ws-4',  tpl: 'figures',        order: 3 },
+    { id: 'ws-5',  tpl: 'draft',          order: 4 },
+    { id: 'ws-6',  tpl: 'lawyer-review',  order: 5 },
+    { id: 'ws-7',  tpl: 'admin-approval', order: 6 },
+    { id: 'ws-8',  tpl: 'filed',          order: 7 },
+    { id: 'ws-9',  tpl: 'examination',    order: 8 },
+    { id: 'ws-10', tpl: 'awarded',        order: 9 }
+  ].map(function(s) {
+    var tpl = STEP_TEMPLATES[s.tpl];
+    return {
+      id: s.id, label: tpl.label, type: tpl.type, order: s.order, tpl: s.tpl,
+      prompt: tpl.prompt, model: tpl.model || getDefaultModelId(),
+      roleGate: tpl.roleGate.slice(), autoSkip: tpl.autoSkip,
+      approvalRequired: tpl.approvalRequired, color: tpl.color,
+      attachments: [], estimatedDuration: '', dependencies: [],
+      parallelGroup: null, parallelLane: null
+    };
+  });
+  return {
+    id: 'wf-default', name: 'Standard Patent Pipeline', version: 1,
+    steps: steps, defaultMode: 'auto',
+    metadata: { createdBy: 'system', createdAt: '2026-01-01', sourceDocument: null }
+  };
+}
+
+/* Whitespace Discovery Pipeline — Workflow 2 */
+function createWhitespaceWorkflow() {
+  var WS_STEP_DEFS = [
+    { id: 'wsd-1',  label: 'Domain & Scope Definition',                   tpl: 'idea',           color: '#94A3B8', type: 'task',         roleGate: ['admin','ip-strategist'],                     autoSkip: false, approvalRequired: false, estimatedDuration: '30 min',  deps: [] },
+    { id: 'wsd-2',  label: 'Patent Landscape Scan',                       tpl: 'fto',            color: '#06B6D4', type: 'task',         roleGate: ['admin','ip-strategist','ip-analyst'],        autoSkip: true,  approvalRequired: false, estimatedDuration: '2 hours',  deps: ['wsd-1'] },
+    { id: 'wsd-3',  label: 'Whitespace Identification & Scoring',         tpl: 'custom',         color: '#3B82F6', type: 'task',         roleGate: ['admin','ip-strategist'],                     autoSkip: true,  approvalRequired: false, estimatedDuration: '3 hours',  deps: ['wsd-2'] },
+    { id: 'wsd-4',  label: 'Solution Architecture & Claim Sketching',     tpl: 'claims',         color: '#8B5CF6', type: 'task',         roleGate: ['admin','patent-engineer','ip-strategist'],   autoSkip: true,  approvalRequired: false, estimatedDuration: '4 hours',  deps: ['wsd-3'] },
+    { id: 'wsd-5',  label: 'FTO & Prior Art Deep Dive',                   tpl: 'fto',            color: '#06B6D4', type: 'task',         roleGate: ['admin','ip-strategist','ip-analyst'],        autoSkip: true,  approvalRequired: false, estimatedDuration: '3 hours',  deps: ['wsd-4'] },
+    { id: 'wsd-6',  label: 'Filing Strategy & Jurisdiction Planning',     tpl: 'custom',         color: '#D4A017', type: 'task',         roleGate: ['admin','ip-strategist'],                     autoSkip: true,  approvalRequired: false, estimatedDuration: '2 hours',  deps: ['wsd-5'] },
+    { id: 'wsd-7',  label: 'Competitive Intelligence & Retaliation Risk', tpl: 'custom',         color: '#EF4444', type: 'task',         roleGate: ['admin','ip-strategist'],                     autoSkip: true,  approvalRequired: false, estimatedDuration: '2 hours',  deps: ['wsd-6'] },
+    { id: 'wsd-8',  label: 'Strategic Review Gate',                       tpl: 'lawyer-review',  color: '#F59E0B', type: 'approval',     roleGate: ['admin','patent-lawyer','ip-strategist'],     autoSkip: false, approvalRequired: true,  estimatedDuration: '1-2 days', deps: ['wsd-7'] },
+    { id: 'wsd-9',  label: 'Whitespace Record Finalization',              tpl: 'draft',          color: '#22C55E', type: 'document-gen', roleGate: ['admin','ip-strategist'],                     autoSkip: true,  approvalRequired: false, estimatedDuration: '1 hour',   deps: ['wsd-8'] },
+    { id: 'wsd-10', label: 'Portfolio Dashboard Update',                  tpl: 'custom',         color: '#2563EB', type: 'task',         roleGate: ['admin'],                                     autoSkip: true,  approvalRequired: false, estimatedDuration: '30 min',   deps: ['wsd-9'] }
+  ];
+
+  var WS_PROMPTS = {
+    'wsd-1': 'You are an elite Chief Intellectual Property Officer (CIPO). Define the scope for a whitespace analysis in the {{domain_name}} technology domain.\n\n1. Identify relevant CPC classification codes (section, class, subclass).\n2. Map primary CPC groups and secondary cross-reference codes.\n3. Identify 3-6 target industry verticals.\n4. List 2-4 macro-drivers accelerating innovation.\n5. Identify convergence zones with adjacent technology areas.\n\nReturn a JSON object with: cpcSection, cpcClass, cpcSubclass, cpcGroups[], industries[], macroDrivers[], convergenceZones[], scopeRationale.',
+    'wsd-2': 'You are a patent landscape analyst. Using the scope from the prior step for {{domain_name}} with CPC codes {{cpc_codes}}, conduct a comprehensive patent landscape analysis.\n\nFor each sub-area: (1) Filing density classification (very_low → saturated), (2) Academic publication density (low → very_high), (3) Competitor presence with portfolioStrength & filingVelocity, (4) Jurisdictional coverage across USPTO/EPO/CNIPA/JPO/KIPO, (5) Patentability risk scores: alice101, enablement112, priorArt102.\n\nFlag sub-areas where filingDensity is LOW and academicDensity is HIGH as priority whitespace candidates.',
+    'wsd-3': 'You are a whitespace discovery strategist. Using the patent landscape for {{domain_name}}, identify discrete whitespace opportunities.\n\nFor each: (1) ID format WS-{{cpcClass}}-NNN, (2) Name (max 60 chars), (3) Technical description with commercialization rationale, (4) Whitespace Score 0.0-10.0 (gap magnitude 30%, commercial potential 25%, feasibility 20%, competitive window 15%, cross-domain 10%), (5) TAM estimate, (6) TRL 1-9, (7) FTO risk, (8) 1-3 challenges with severity/type/currentApproaches.\n\nSort by whitespaceScore descending. Target 5-20 whitespaces per domain.',
+    'wsd-4': 'You are a patent engineer. For each whitespace in {{domain_name}}, architect patentable solutions.\n\nPer whitespace, generate 1-3 solutions: (1) Solution ID SOL-NNN, (2) Title, (3) Novelty/feasibility/patentabilityScore 1-10, (4) Description, (5) Independent claim sketch in USPTO format (preamble + 3+ limitations), (6) CPC classification, (7) Prior art risk, (8) Estimated TRL, (9) Filing priority.',
+    'wsd-5': 'You are a freedom-to-operate analyst. For each high-priority solution from {{domain_name}}:\n\n(1) Blocking patent search — identify patents with claims reading on proposed solutions, (2) Claim overlap analysis — rate as clear/design-around/caution/blocked, (3) Updated FTO risk rating, (4) Design-around recommendations for elevated-risk solutions, (5) Prior art refinement.\n\nFlag solutions with FTO risk escalated to high or critical for immediate review.',
+    'wsd-6': 'You are a patent filing strategist. For each validated whitespace in {{domain_name}}:\n\n(1) Phase assignment (Phase 1: file within 6 months / Phase 2: 12-18 months), (2) Priority ranking, (3) Provisional count, (4) PCT target boolean, (5) Jurisdictional strategy (USPTO/EPO/CNIPA/JPO/KIPO), (6) Continuation cascade plan for Phase 1 filings.\n\nInclude portfolio-level summary: total provisionals, estimated costs, timeline milestones.',
+    'wsd-7': 'You are a competitive intelligence analyst. For each whitespace in {{domain_name}}:\n\n(1) Competitor deep dive — updated portfolio strength, filing velocity, retaliation risk, key patents, strategic posture, (2) PTAB/IPR survivability 1-10, (3) Open source risk, (4) Convergence zone dynamics, (5) Defensive recommendations: patent thicket density, cross-licensing leverage, pool participation.',
+    'wsd-8': 'STRATEGIC REVIEW GATE — MANUAL APPROVAL REQUIRED\n\nPresent the complete whitespace analysis for {{domain_name}} to the review panel. Verify:\n(1) Whitespace validity — genuine gaps not data artifacts, (2) Score calibration — consistent and realistic, (3) Claim sketch review — §101/§102/§103/§112 compliance, (4) FTO clearance — accurate ratings with viable design-arounds, (5) Budget alignment, (6) Competitive sensitivity.\n\nDECISION: APPROVE / REJECT / REVISE',
+    'wsd-9': 'You are a data engineer for Patentify. Compile approved whitespace analysis for {{domain_name}} into final platform-compatible records. Each record must match the exact Patentify whitespace JSON schema with all required fields: id, name, cpcSection, cpcClass, cpcSubclass, cpcGroups, description, challenges, solutions, tamEstimate, filingDensity, academicDensity, whitespaceScore, ftoRisk, patentabilityRisk, competitorPresence, jurisdictions, trl, industries, convergenceZones, macroDrivers, filingStrategy, createdBy, createdAt, rank.\n\nValidate all scores are within stated ranges.',
+    'wsd-10': 'You are a portfolio analytics engine. Using finalized whitespace records for {{domain_name}}, generate dashboard update data:\n\n(1) Convergence map: x,y coordinates (x=Technical Maturity from TRL, y=Commercial Readiness from TAM+priority), (2) Whitespace radar: axes for Novelty, Feasibility, Market Size, IP Gap, FTO Safety, (3) 24-month filing timeline: Phase 1 provisionals → PCT → Phase 2 → national phase → continuations, (4) Revenue projections: 10-year licensing potential per whitespace.\n\nReturn JSON: convergenceMap, radarData, filingTimeline, revenueProjections.'
+  };
+
+  var steps = WS_STEP_DEFS.map(function(def) {
+    var baseTpl = STEP_TEMPLATES[def.tpl] || STEP_TEMPLATES['custom'];
+    return {
+      id: def.id, label: def.label, type: def.type, order: parseInt(def.id.split('-')[1]) - 1, tpl: def.tpl,
+      prompt: WS_PROMPTS[def.id] || baseTpl.prompt,
+      model: baseTpl.model || getDefaultModelId(),
+      roleGate: def.roleGate.slice(), autoSkip: def.autoSkip,
+      approvalRequired: def.approvalRequired, color: def.color,
+      attachments: [], estimatedDuration: def.estimatedDuration,
+      dependencies: def.deps || [],
+      parallelGroup: null, parallelLane: null
+    };
+  });
+  return {
+    id: 'wf-whitespace-discovery', name: 'Whitespace Discovery & Analysis Pipeline', version: 1,
+    steps: steps, defaultMode: 'auto',
+    metadata: { createdBy: 'system', createdAt: '2026-01-01', sourceDocument: 'whitespace_workflow_import.json' }
+  };
+}
+
+/* Active whitespace workflow for WS Lab editor */
+var activePatentWorkflow = null;
+var activeWhitespaceWorkflow = null;
+
+/* Generate unique ID */
+function wfeUid() { return 'ws-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4); }
+
+/* ── Editor open/close ── */
+function openWorkflowEditor() {
+  if (currentRole !== 'admin' && currentRole !== 'ip-strategist') {
+    toast('Workflow editing requires Admin or IP Strategist role', 'error');
+    return;
+  }
+  if (!activeWorkflow) activeWorkflow = createDefaultWorkflow();
+  document.getElementById('wfeOverlay').classList.add('open');
+  document.getElementById('wfeTitle').textContent = 'Workflow Editor';
+  document.getElementById('wfeSubtitle').textContent = activeWorkflow.name + ' (v' + activeWorkflow.version + ')';
+  selectedStepId = null;
+  renderWfeCanvas();
+}
+
+/* Open the visual workflow editor for Workflow 1 (Patent Generation Pipeline) */
+function openWorkflowEditorForPatent() {
+  activeWorkflow = activePatentWorkflow || createDefaultWorkflow();
+  activePatentWorkflow = activeWorkflow;
+  document.getElementById('wfeOverlay').classList.add('open');
+  document.getElementById('wfeTitle').textContent = 'Workflow Editor';
+  document.getElementById('wfeSubtitle').textContent = activeWorkflow.name + ' (v' + activeWorkflow.version + ')';
+  selectedStepId = null;
+  renderWfeCanvas();
+}
+
+function closeWorkflowEditor() {
+  document.getElementById('wfeOverlay').classList.remove('open');
+  closePropsPanel();
+}
+
+function saveWorkflow() {
+  if (activeWorkflow) activeWorkflow.version++;
+  document.getElementById('wfeSubtitle').textContent = activeWorkflow.name + ' (v' + activeWorkflow.version + ')';
+  toast('Workflow saved — v' + activeWorkflow.version, 'success');
+}
+
+function resetWorkflow() {
+  if (!confirm('Reset workflow to default 10-stage pipeline? All customizations will be lost.')) return;
+  activeWorkflow = createDefaultWorkflow();
+  selectedStepId = null;
+  closePropsPanel();
+  renderWfeCanvas();
+  toast('Workflow reset to default', 'info');
+}
+
+/* ── Canvas rendering ── */
+function renderWfeCanvas() {
+  var canvas = document.getElementById('wfeCanvas');
+  if (!activeWorkflow) return;
+  var steps = activeWorkflow.steps.sort(function(a, b) { return a.order - b.order; });
+
+  /* Check for parallel groups */
+  var parallelGroups = {};
+  steps.forEach(function(s) {
+    if (s.parallelGroup) {
+      if (!parallelGroups[s.parallelGroup]) parallelGroups[s.parallelGroup] = {};
+      var lane = s.parallelLane || 'A';
+      if (!parallelGroups[s.parallelGroup][lane]) parallelGroups[s.parallelGroup][lane] = [];
+      parallelGroups[s.parallelGroup][lane].push(s);
+    }
+  });
+
+  var html = '';
+  var renderedParallels = {};
+
+  steps.forEach(function(step, idx) {
+    /* Skip steps already rendered inside a parallel group */
+    if (step.parallelGroup && renderedParallels[step.parallelGroup]) return;
+
+    if (step.parallelGroup && parallelGroups[step.parallelGroup]) {
+      renderedParallels[step.parallelGroup] = true;
+      var pg = parallelGroups[step.parallelGroup];
+      var laneKeys = Object.keys(pg);
+      html += '<div class="wfe-parallel-group">';
+      html += '<div class="wfe-parallel-label">&#9547; Parallel Execution Group</div>';
+      html += '<div class="wfe-parallel-lanes">';
+      laneKeys.forEach(function(lk) {
+        html += '<div class="wfe-parallel-lane">';
+        html += '<div class="wfe-parallel-lane-title">Lane ' + lk + '</div>';
+        pg[lk].forEach(function(ls) {
+          html += renderStepCard(ls, steps.indexOf(ls));
+        });
+        html += '</div>';
+      });
+      html += '</div></div>';
+      if (idx < steps.length - 1) html += renderArrow();
+      return;
+    }
+
+    html += renderStepCard(step, idx);
+    if (idx < steps.length - 1 && !(steps[idx + 1] && steps[idx + 1].parallelGroup && !step.parallelGroup)) {
+      html += renderArrow();
+    }
+  });
+
+  canvas.innerHTML = html;
+
+  /* Wire drag events on step cards */
+  canvas.querySelectorAll('.wfe-step').forEach(function(el) {
+    el.addEventListener('dragstart', onStepDragStart);
+    el.addEventListener('dragover', onStepDragOver);
+    el.addEventListener('dragleave', onStepDragLeave);
+    el.addEventListener('drop', onStepDrop);
+    el.addEventListener('dragend', onStepDragEnd);
+    el.addEventListener('click', function(e) {
+      if (e.target.closest('.wfe-step-action-btn')) return;
+      selectStep(el.dataset.stepId);
+    });
+  });
+}
+
+function renderStepCard(step, idx) {
+  var sel = selectedStepId === step.id ? ' selected' : '';
+  var typeLabel = step.type === 'approval' ? 'APPROVAL' : step.type === 'gate' ? 'GATE' : step.type === 'parallel-start' ? 'FORK' : step.type === 'parallel-end' ? 'MERGE' : step.type === 'document-gen' ? 'DOC-GEN' : 'TASK';
+  var roleStr = (step.roleGate || []).map(function(r) { return ROLES[r] ? ROLES[r].label : r; }).join(', ');
+  var attachCount = step.attachments ? step.attachments.length : 0;
+  var modelBadge = step.model ? '<span class="wfe-step-model" title="' + escapeHtml(getModelLabel(step.model)) + '">' + escapeHtml(getModelShortLabel(step.model)) + '</span>' : '';
+  return '<div class="wfe-step' + sel + '" draggable="true" data-step-id="' + step.id + '" data-step-idx="' + idx + '">' +
+    '<div class="wfe-step-bar" style="background:' + (step.color || '#64748B') + '"></div>' +
+    '<div class="wfe-step-info">' +
+      '<div class="wfe-step-label">' + escapeHtml(step.label) + '</div>' +
+      '<div class="wfe-step-meta">' +
+        '<span class="wfe-step-type-badge">' + typeLabel + '</span>' +
+        modelBadge +
+        '<span>' + roleStr + '</span>' +
+        (attachCount > 0 ? '<span>&#128206;' + attachCount + '</span>' : '') +
+        (step.approvalRequired ? '<span style="color:#F59E0B">&#9888;</span>' : '') +
+      '</div>' +
+    '</div>' +
+    '<div class="wfe-step-actions">' +
+      '<button class="wfe-step-action-btn" onclick="removeStep(\'' + step.id + '\')" title="Remove step">&#10005;</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderArrow() {
+  return '<div class="wfe-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v12M4 10l4 4 4-4"/></svg></div>';
+}
+
+/* ── Drag & drop reorder ── */
+function onStepDragStart(e) {
+  wfeDragSourceIdx = parseInt(e.currentTarget.dataset.stepIdx);
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', e.currentTarget.dataset.stepId);
+}
+function onStepDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+function onStepDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+function onStepDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  var targetIdx = parseInt(e.currentTarget.dataset.stepIdx);
+  var sourceId = e.dataTransfer.getData('text/plain');
+
+  /* Check if this is from the palette (new step) */
+  var paletteTpl = e.dataTransfer.getData('palette-tpl');
+  if (paletteTpl) {
+    insertNewStep(paletteTpl, targetIdx);
+    return;
+  }
+
+  if (wfeDragSourceIdx === null || wfeDragSourceIdx === targetIdx) return;
+  var steps = activeWorkflow.steps;
+  var moved = steps.splice(wfeDragSourceIdx, 1)[0];
+  steps.splice(targetIdx, 0, moved);
+  steps.forEach(function(s, i) { s.order = i; });
+  renderWfeCanvas();
+  toast('Step reordered', 'info');
+}
+function onStepDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  wfeDragSourceIdx = null;
+}
+
+/* ── Palette drag into canvas ── */
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.wfe-palette-item').forEach(function(el) {
+    el.addEventListener('dragstart', function(e) {
+      e.dataTransfer.setData('palette-tpl', el.dataset.stepTpl);
+      e.dataTransfer.setData('text/plain', 'palette');
+      e.dataTransfer.effectAllowed = 'copy';
+    });
+  });
+
+  /* Canvas-level drop for palette items onto empty space */
+  var canvasWrap = document.getElementById('wfeCanvasWrap');
+  if (canvasWrap) {
+    canvasWrap.addEventListener('dragover', function(e) { e.preventDefault(); });
+    canvasWrap.addEventListener('drop', function(e) {
+      var tpl = e.dataTransfer.getData('palette-tpl');
+      if (tpl && activeWorkflow) {
+        e.preventDefault();
+        insertNewStep(tpl, activeWorkflow.steps.length);
+      }
+    });
+  }
+});
+
+function insertNewStep(tplKey, atIndex) {
+  var tpl = STEP_TEMPLATES[tplKey];
+  if (!tpl) return;
+  var newStep = {
+    id: wfeUid(), label: tpl.label, type: tpl.type, order: atIndex, tpl: tplKey,
+    prompt: tpl.prompt, model: tpl.model || getDefaultModelId(),
+    roleGate: tpl.roleGate.slice(), autoSkip: tpl.autoSkip,
+    approvalRequired: tpl.approvalRequired, color: tpl.color,
+    attachments: [], estimatedDuration: '', dependencies: [],
+    parallelGroup: null, parallelLane: null
+  };
+  activeWorkflow.steps.splice(atIndex, 0, newStep);
+  activeWorkflow.steps.forEach(function(s, i) { s.order = i; });
+  renderWfeCanvas();
+  selectStep(newStep.id);
+  toast('Added: ' + tpl.label, 'success');
+}
+
+function removeStep(stepId) {
+  if (!activeWorkflow) return;
+  var step = activeWorkflow.steps.find(function(s) { return s.id === stepId; });
+  if (!step) return;
+  if (step.approvalRequired && !confirm('Remove approval gate "' + step.label + '"? This may affect filing compliance.')) return;
+  activeWorkflow.steps = activeWorkflow.steps.filter(function(s) { return s.id !== stepId; });
+  activeWorkflow.steps.forEach(function(s, i) { s.order = i; });
+  if (selectedStepId === stepId) { selectedStepId = null; closePropsPanel(); }
+  renderWfeCanvas();
+  toast('Removed: ' + step.label, 'info');
+}
+
+/* ── Make parallel group ── */
+function makeParallel(stepId) {
+  if (!activeWorkflow) return;
+  var idx = activeWorkflow.steps.findIndex(function(s) { return s.id === stepId; });
+  if (idx < 0 || idx >= activeWorkflow.steps.length - 1) return;
+  var groupId = 'pg-' + Date.now().toString(36);
+  activeWorkflow.steps[idx].parallelGroup = groupId;
+  activeWorkflow.steps[idx].parallelLane = 'A';
+  activeWorkflow.steps[idx + 1].parallelGroup = groupId;
+  activeWorkflow.steps[idx + 1].parallelLane = 'B';
+  renderWfeCanvas();
+  toast('Parallel group created', 'success');
+}
+
+function unParallel(stepId) {
+  var step = activeWorkflow.steps.find(function(s) { return s.id === stepId; });
+  if (!step || !step.parallelGroup) return;
+  var gid = step.parallelGroup;
+  activeWorkflow.steps.forEach(function(s) {
+    if (s.parallelGroup === gid) { s.parallelGroup = null; s.parallelLane = null; }
+  });
+  renderWfeCanvas();
+  toast('Parallel group dissolved', 'info');
+}
+
+/* ── Select step → Properties panel ── */
+function selectStep(stepId) {
+  selectedStepId = stepId;
+  var step = activeWorkflow.steps.find(function(s) { return s.id === stepId; });
+  if (!step) return;
+  renderWfeCanvas();
+  renderPropsPanel(step);
+}
+
+function closePropsPanel() {
+  document.getElementById('wfeProps').classList.remove('open');
+  selectedStepId = null;
+}
+
+function renderPropsPanel(step) {
+  var panel = document.getElementById('wfeProps');
+  var title = document.getElementById('wfePropTitle');
+  var body = document.getElementById('wfePropBody');
+  panel.classList.add('open');
+  title.textContent = step.label;
+
+  var html = '';
+
+  /* Step label */
+  html += '<div class="wfe-props-section"><div class="wfe-props-section-title">Step Label</div>';
+  html += '<input class="form-input" value="' + escapeHtml(step.label) + '" onchange="updateStepField(\'' + step.id + '\',\'label\',this.value)" style="font-size:13px">';
+  html += '</div>';
+
+  /* Step type */
+  html += '<div class="wfe-props-section"><div class="wfe-props-section-title">Step Type</div>';
+  html += '<select class="form-select" onchange="updateStepField(\'' + step.id + '\',\'type\',this.value)" style="font-size:12px">';
+  ['task','approval','gate','parallel-start','parallel-end','document-gen'].forEach(function(t) {
+    html += '<option value="' + t + '"' + (step.type === t ? ' selected' : '') + '>' + t + '</option>';
+  });
+  html += '</select></div>';
+
+  /* LLM Model */
+  html += '<div class="wfe-props-section"><div class="wfe-props-section-title">LLM Model</div>';
+  html += '<select class="form-select" onchange="updateStepField(\'' + step.id + '\',\'model\',this.value)" style="font-size:12px">';
+  html += buildModelOptions(step.model || getDefaultModelId());
+  html += '</select>';
+  html += '<div style="font-size:10px;color:var(--text-faint);margin-top:4px">Select which AI model executes this step. Manage models in Settings → LLM Model Registry.</div>';
+  html += '</div>';
+
+  /* AI Prompt */
+  html += '<div class="wfe-props-section"><div class="wfe-props-section-title">AI Prompt</div>';
+  html += '<textarea class="wfe-prompt-editor" id="wfePromptEditor" onchange="updateStepField(\'' + step.id + '\',\'prompt\',this.value)" oninput="updateTokenCount(this.value)">' + escapeHtml(step.prompt || '') + '</textarea>';
+  html += '<div class="wfe-token-counter" id="wfeTokenCount">~' + Math.ceil((step.prompt || '').length / 4) + ' tokens</div>';
+  html += '<div style="margin-top:6px"><button class="btn btn-sm btn-secondary" onclick="testPrompt(\'' + step.id + '\')">&#9654; Test Prompt</button></div>';
+  html += '</div>';
+
+  /* Attachments */
+  html += '<div class="wfe-props-section"><div class="wfe-props-section-title">Attachments</div>';
+  html += '<div class="wfe-attach-zone" id="wfeAttachZone" onclick="document.getElementById(\'wfeAttachInput\').click()">Drop files here or click to upload</div>';
+  html += '<input type="file" id="wfeAttachInput" multiple style="display:none" onchange="handleAttachUpload(\'' + step.id + '\',this)">';
+  if (step.attachments && step.attachments.length) {
+    step.attachments.forEach(function(att, ai) {
+      html += '<div class="wfe-attach-item">';
+      html += '<span class="name">' + escapeHtml(att.filename) + '</span>';
+      html += '<select class="wfe-attach-role-sel" onchange="updateAttachRole(\'' + step.id + '\',' + ai + ',this.value)">';
+      ['template','reference','example','constraint'].forEach(function(r) {
+        html += '<option value="' + r + '"' + (att.role === r ? ' selected' : '') + '>' + r + '</option>';
+      });
+      html += '</select>';
+      html += '<span class="wfe-attach-remove" onclick="removeAttachment(\'' + step.id + '\',' + ai + ')">&#10005;</span>';
+      html += '</div>';
+    });
+  }
+  html += '</div>';
+
+  /* Role Gates */
+  html += '<div class="wfe-props-section"><div class="wfe-props-section-title">Role Gates (Who can execute)</div>';
+  html += '<div class="wfe-role-check">';
+  Object.keys(ROLES).forEach(function(rk) {
+    var checked = (step.roleGate || []).indexOf(rk) >= 0 ? ' checked' : '';
+    html += '<label><input type="checkbox"' + checked + ' onchange="toggleStepRole(\'' + step.id + '\',\'' + rk + '\',this.checked)"> ' + ROLES[rk].label + '</label>';
+  });
+  html += '</div></div>';
+
+  /* Toggles */
+  html += '<div class="wfe-props-section"><div class="wfe-props-section-title">Execution Settings</div>';
+  html += '<div class="wfe-toggle-row"><span class="wfe-toggle-label">Auto-skip (in auto mode)</span><input type="checkbox"' + (step.autoSkip ? ' checked' : '') + ' onchange="updateStepField(\'' + step.id + '\',\'autoSkip\',this.checked)" style="accent-color:var(--accent)"></div>';
+  html += '<div class="wfe-toggle-row"><span class="wfe-toggle-label">Approval required (always manual)</span><input type="checkbox"' + (step.approvalRequired ? ' checked' : '') + ' onchange="updateStepField(\'' + step.id + '\',\'approvalRequired\',this.checked)" style="accent-color:var(--accent)"></div>';
+  html += '<div class="wfe-toggle-row"><span class="wfe-toggle-label">Estimated duration</span><input class="form-input" value="' + escapeHtml(step.estimatedDuration || '') + '" onchange="updateStepField(\'' + step.id + '\',\'estimatedDuration\',this.value)" placeholder="e.g. 2 hours" style="width:120px;font-size:12px;padding:4px 8px"></div>';
+  html += '</div>';
+
+  /* Parallel controls */
+  html += '<div class="wfe-props-section"><div class="wfe-props-section-title">Parallel Processing</div>';
+  if (step.parallelGroup) {
+    html += '<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">In parallel group: ' + step.parallelGroup + ' (Lane ' + (step.parallelLane || 'A') + ')</div>';
+    html += '<button class="btn btn-sm btn-secondary" onclick="unParallel(\'' + step.id + '\')">Dissolve Parallel Group</button>';
+  } else {
+    html += '<button class="btn btn-sm btn-secondary" onclick="makeParallel(\'' + step.id + '\')">&#9547; Fork into Parallel with Next Step</button>';
+  }
+  html += '</div>';
+
+  body.innerHTML = html;
+}
+
+/* ── Step field updates ── */
+function updateStepField(stepId, field, value) {
+  var step = activeWorkflow.steps.find(function(s) { return s.id === stepId; });
+  if (!step) return;
+  step[field] = value;
+  if (field === 'label' || field === 'model') renderWfeCanvas();
+}
+
+function toggleStepRole(stepId, role, checked) {
+  var step = activeWorkflow.steps.find(function(s) { return s.id === stepId; });
+  if (!step) return;
+  if (checked && step.roleGate.indexOf(role) < 0) step.roleGate.push(role);
+  if (!checked) step.roleGate = step.roleGate.filter(function(r) { return r !== role; });
+  renderWfeCanvas();
+}
+
+function updateTokenCount(text) {
+  var el = document.getElementById('wfeTokenCount');
+  if (el) el.textContent = '~' + Math.ceil((text || '').length / 4) + ' tokens';
+}
+
+function updateAttachRole(stepId, attachIdx, role) {
+  var step = activeWorkflow.steps.find(function(s) { return s.id === stepId; });
+  if (step && step.attachments[attachIdx]) step.attachments[attachIdx].role = role;
+}
+
+function removeAttachment(stepId, attachIdx) {
+  var step = activeWorkflow.steps.find(function(s) { return s.id === stepId; });
+  if (step) { step.attachments.splice(attachIdx, 1); renderPropsPanel(step); }
+}
+
+function handleAttachUpload(stepId, input) {
+  var step = activeWorkflow.steps.find(function(s) { return s.id === stepId; });
+  if (!step || !input.files) return;
+  Array.from(input.files).forEach(function(file) {
+    var role = file.name.match(/\.(docx|pptx)$/i) ? 'template' : file.name.match(/\.pdf$/i) ? 'reference' : 'example';
+    step.attachments.push({
+      id: 'att-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 3),
+      filename: file.name, mimeType: file.type, size: file.size,
+      url: URL.createObjectURL(file), role: role, description: ''
+    });
+  });
+  renderPropsPanel(step);
+  toast(input.files.length + ' file(s) attached', 'success');
+  input.value = '';
+}
+
+function testPrompt(stepId) {
+  var step = activeWorkflow.steps.find(function(s) { return s.id === stepId; });
+  if (!step) return;
+  toast('Test prompt sent to AI (mock) — response would appear in preview pane', 'info');
+}
+
+/* ── Document-to-Workflow Parser ── */
+function openUploadParser() {
+  document.getElementById('wfeUploadOverlay').classList.add('open');
+  document.getElementById('wfeUploadStatus').innerHTML = '';
+}
+
+function closeUploadParser() {
+  document.getElementById('wfeUploadOverlay').classList.remove('open');
+}
+
+async function handleDocUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  var statusEl = document.getElementById('wfeUploadStatus');
+  statusEl.innerHTML = '<span class="wfe-upload-spinner"></span> Parsing "' + escapeHtml(file.name) + '" with AI...';
+
+  try {
+    /* Read file as base64 */
+    var base64 = await new Promise(function(res, rej) {
+      var r = new FileReader();
+      r.onload = function() { res(r.result.split(',')[1]); };
+      r.onerror = function() { rej(new Error('Read failed')); };
+      r.readAsDataURL(file);
+    });
+
+    /* Determine media type */
+    var mediaType = file.type || 'application/octet-stream';
+    if (file.name.match(/\.txt$/i)) mediaType = 'text/plain';
+    if (file.name.match(/\.md$/i)) mediaType = 'text/markdown';
+
+    /* Call Claude API to decompose */
+    var messages = [{ role: 'user', content: [
+      { type: 'document', source: { type: 'base64', media_type: mediaType, data: base64 } },
+      { type: 'text', text: 'Analyze this document and decompose it into a patent workflow definition. For each identifiable process step, section, or decision point, create a step object. Rules: (1) Each major section becomes a "task" step. (2) Sections requiring human judgment become "approval" steps. (3) Simultaneous tasks become parallel groups. (4) For each step, generate a detailed AI prompt with {{variables}}. (5) Identify dependencies. (6) Assign roleGate: technical="patent-engineer", legal="patent-lawyer", strategic="ip-strategist". Respond ONLY with a JSON array of step objects, each with fields: label, type (task|approval|document-gen|gate), prompt, roleGate (string[]), autoSkip (bool), approvalRequired (bool), color (hex string). No markdown, no backticks.' }
+    ] }];
+
+    var data = await PatentifyEnv.claudeRequest({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4000,
+      messages: messages
+    });
+    var text = (data.content || []).map(function(c) { return c.text || ''; }).join('');
+    var clean = text.replace(/```json|```/g, '').trim();
+    var parsed = JSON.parse(clean);
+
+    if (!Array.isArray(parsed)) throw new Error('Expected array of steps');
+
+    /* Build workflow from parsed steps */
+    var newWorkflow = {
+      id: 'wf-' + Date.now().toString(36),
+      name: 'From: ' + file.name.replace(/\.[^.]+$/, ''),
+      version: 1, defaultMode: 'auto',
+      metadata: { createdBy: currentRole, createdAt: new Date().toISOString().slice(0, 10), sourceDocument: file.name },
+      steps: parsed.map(function(ps, i) {
+        return {
+          id: wfeUid(), label: ps.label || 'Step ' + (i + 1),
+          type: ps.type || 'task', order: i, tpl: 'custom',
+          prompt: ps.prompt || '', model: ps.model || getDefaultModelId(),
+          roleGate: ps.roleGate || ['admin'],
+          autoSkip: ps.autoSkip !== undefined ? ps.autoSkip : true,
+          approvalRequired: ps.approvalRequired || false,
+          color: ps.color || '#64748B',
+          attachments: [], estimatedDuration: '', dependencies: [],
+          parallelGroup: null, parallelLane: null
+        };
+      })
+    };
+
+    activeWorkflow = newWorkflow;
+    statusEl.innerHTML = '<span style="color:#22C55E;font-weight:600">&#10003; Generated ' + newWorkflow.steps.length + ' workflow steps</span>';
+    closeUploadParser();
+    openWorkflowEditor();
+    toast('Workflow generated from "' + file.name + '" — ' + newWorkflow.steps.length + ' steps', 'success');
+  } catch (err) {
+    statusEl.innerHTML = '<span style="color:#EF4444">Error: ' + escapeHtml(err.message) + '. Generating fallback workflow from filename...</span>';
+    /* Fallback: create a basic workflow */
+    setTimeout(function() {
+      activeWorkflow = createDefaultWorkflow();
+      activeWorkflow.name = 'From: ' + file.name.replace(/\.[^.]+$/, '');
+      activeWorkflow.metadata.sourceDocument = file.name;
+      closeUploadParser();
+      openWorkflowEditor();
+      toast('Fallback: default workflow loaded. Edit manually.', 'info');
+    }, 1500);
+  }
+  input.value = '';
 }
 
 /* ============================================
@@ -1958,6 +3400,7 @@ async function loadSettings() {
       document.getElementById('auto-research-label').textContent = data.auto_research ? 'Enabled' : 'Disabled';
     }
   } catch (e) { /* leave defaults */ }
+  renderModelList();
 }
 
 document.getElementById('cfg-auto-research').addEventListener('change', function() {
@@ -2288,7 +3731,7 @@ async function loadInventions() {
 
         return '<div class="card invention-card" onclick="this.classList.toggle(\'expanded\')">' +
           '<div style="display:flex;gap:16px;align-items:flex-start;">' +
-            '<div class="invention-score ' + sCls + '">' + score.toFixed(1) + '</div>' +
+            '<div class="invention-score ' + sCls + '" title="Patentability Score">' + score.toFixed(1) + '</div>' +
             '<div style="flex:1;min-width:0;">' +
               '<div class="card-title">' + escapeHtml(inv.title) + '</div>' +
               '<div style="font-size:12px;color:var(--text-faint);margin-top:2px;">' + escapeHtml(inv.whitespace_name || 'Whitespace ' + (inv.whitespace_id || '?')) + '</div>' +
@@ -2567,14 +4010,15 @@ loadWorkflows = async function() {
         '<span class="badge badge-violet">patent generation</span>' +
         '<div class="workflow-actions">' +
           '<button class="btn btn-sm btn-primary" onclick="toast(\'Select an invention from the Inventions tab to run this pipeline\', \'info\')">Run Now</button>' +
-          '<button class="btn btn-sm btn-secondary" onclick="toggleEditWorkflow(\'' + wf.id + '\')">Edit</button>' +
+          '<button class="btn btn-sm btn-secondary" onclick="openWorkflowEditorForPatent()">Visual Editor</button>' +
+          '<button class="btn btn-sm btn-secondary" onclick="toggleEditWorkflow(\'' + wf.id + '\')">Edit JSON</button>' +
         '</div>' +
       '</div>' +
       '<div class="workflow-meta">' +
         '<span class="stat-pill">🔄 8 Steps</span>' +
         '<span class="stat-pill">💰 $' + wf.cost_cap + ' cap</span>' +
         '<span class="stat-pill">🔒 Human Gate</span>' +
-        '<span class="stat-pill">📁 3 Reference Docs</span>' +
+        '<span class="stat-pill">📁 5 Reference Docs</span>' +
         '<div class="toggle-wrap" style="margin-left:auto;">' +
           '<label class="toggle"><input type="checkbox" checked disabled><span class="toggle-track"></span><span class="toggle-thumb"></span></label>' +
           '<span class="toggle-label" style="font-size:11px;">Enabled</span>' +
@@ -2600,6 +4044,380 @@ loadWorkflows = async function() {
 };
 
 /* ============================================
+   PRE-LOADED WORKFLOW 2: Whitespace Discovery & Analysis Pipeline
+   ============================================ */
+var WHITESPACE_DISCOVERY_WORKFLOW = {
+  id: 'wf-whitespace-discovery',
+  name: 'Whitespace Discovery & Analysis Pipeline',
+  description: 'AI-driven workflow for identifying, scoring, validating, and producing patent whitespace records. 10 sequential steps from domain scoping through portfolio dashboard updates. Editable in WhiteSpaces > WhiteSpace Lab.',
+  type: 'landscape_scan',
+  schedule: '0 8 * * 1',
+  cost_cap: 25.00,
+  human_gate: true,
+  enabled: true,
+  reference_docs: [
+    'whitespace_workflow_import.json',
+    'whitespace_workflow.docx'
+  ],
+  output_path: '/data/whitespaces/{domain_name}/{run_timestamp}/',
+  steps: [
+    { step: 1,  action: 'domain_scope_definition',        name: 'Domain & Scope Definition',                   model: 'claude-sonnet-4-5-20250929', mode: 'standard',           description: 'Define CPC scope, industries, macro-drivers, and convergence zones for the target domain.',                        output: '{domain_name}_scope.json' },
+    { step: 2,  action: 'patent_landscape_scan',           name: 'Patent Landscape Scan',                       model: 'claude-sonnet-4-5-20250929', mode: 'deep_research',      description: 'Analyze filing density, academic density, competitor presence, jurisdictional coverage, and patentability risk.',    output: '{domain_name}_landscape.json' },
+    { step: 3,  action: 'whitespace_identification',       name: 'Whitespace Identification & Scoring',         model: 'claude-opus-4-6',            mode: 'extended_thinking',  description: 'Identify discrete whitespace opportunities with composite scoring, TAM estimates, TRL, FTO risk, and challenges.', output: '{domain_name}_whitespaces.json' },
+    { step: 4,  action: 'solution_architecture',           name: 'Solution Architecture & Claim Sketching',     model: 'claude-opus-4-6',            mode: 'extended_thinking',  description: 'Architect patentable solutions with independent claim sketches in USPTO format for each whitespace.',               output: '{domain_name}_solutions.json' },
+    { step: 5,  action: 'fto_deep_dive',                   name: 'FTO & Prior Art Deep Dive',                   model: 'claude-sonnet-4-5-20250929', mode: 'deep_research',      description: 'Blocking patent search, claim overlap analysis, design-around recommendations.',                                   output: '{domain_name}_fto.json' },
+    { step: 6,  action: 'filing_strategy',                 name: 'Filing Strategy & Jurisdiction Planning',     model: 'claude-sonnet-4-5-20250929', mode: 'standard',           description: 'Phase assignment, provisional counts, PCT targets, jurisdictional strategy, continuation cascades.',                output: '{domain_name}_filing_strategy.json' },
+    { step: 7,  action: 'competitive_intelligence',        name: 'Competitive Intelligence & Retaliation Risk', model: 'claude-sonnet-4-5-20250929', mode: 'deep_research',      description: 'Competitor deep dive, PTAB survivability, open-source risk, defensive recommendations.',                           output: '{domain_name}_competitive.json' },
+    { step: 8,  action: 'strategic_review_gate',           name: 'Strategic Review Gate',                       model: null,                         mode: 'manual',             description: 'Human approval required. Verify whitespace validity, score calibration, claim compliance, FTO clearance, budget.',  output: '{domain_name}_review_decision.json' },
+    { step: 9,  action: 'record_finalization',             name: 'Whitespace Record Finalization',              model: 'claude-opus-4-6',            mode: 'standard',           description: 'Compile approved whitespaces into Patentify-compatible platform records.',                                          output: '{domain_name}_records.json' },
+    { step: 10, action: 'dashboard_update',                name: 'Portfolio Dashboard Update',                  model: 'claude-sonnet-4-5-20250929', mode: 'standard',           description: 'Generate convergence map, radar data, filing timeline, and revenue projections for dashboard.',                     output: '{domain_name}_dashboard.json' }
+  ]
+};
+
+/* Inject Workflow 2 into the workflows list alongside Workflow 1 */
+var _wf1LoadWorkflows = loadWorkflows;
+loadWorkflows = async function() {
+  await _wf1LoadWorkflows();
+
+  /* Ensure Workflow 2 card is present */
+  var list = document.getElementById('workflow-list');
+  if (list && !document.getElementById('wf-card-wf-whitespace-discovery')) {
+    var wf = WHITESPACE_DISCOVERY_WORKFLOW;
+    var card = document.createElement('div');
+    card.className = 'card workflow-card';
+    card.id = 'wf-card-' + wf.id;
+    card.innerHTML =
+      '<div class="workflow-card-header">' +
+        '<span class="card-title">' + escapeHtml(wf.name) + '</span>' +
+        '<span class="badge badge-cyan">landscape scan</span>' +
+        '<div class="workflow-actions">' +
+          '<button class="btn btn-sm btn-primary" onclick="runWhitespaceWorkflow()">Run Now</button>' +
+          '<button class="btn btn-sm btn-secondary" onclick="openWorkflowEditorForWS()">Visual Editor</button>' +
+          '<button class="btn btn-sm btn-secondary" onclick="toggleEditWorkflow(\'' + wf.id + '\')">Edit JSON</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="workflow-meta">' +
+        '<span class="stat-pill">\uD83D\uDD04 10 Steps</span>' +
+        '<span class="stat-pill">\u23F0 ' + cronToHuman(wf.schedule) + '</span>' +
+        '<span class="stat-pill">\uD83D\uDCB0 $' + wf.cost_cap + ' cap</span>' +
+        '<span class="stat-pill">\uD83D\uDD12 Human Gate</span>' +
+        '<span class="stat-pill">\uD83D\uDCC1 2 Reference Docs</span>' +
+        '<div class="toggle-wrap" style="margin-left:auto;">' +
+          '<label class="toggle"><input type="checkbox" checked onchange="toggleWorkflowEnabled(\'' + wf.id + '\', this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label>' +
+          '<span class="toggle-label" style="font-size:11px;">Enabled</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="workflow-editor">' +
+        '<div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="wfe-name-' + wf.id + '" value="' + escapeHtml(wf.name) + '"></div>' +
+        '<div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="wfe-desc-' + wf.id + '" rows="3">' + escapeHtml(wf.description) + '</textarea></div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">' +
+          '<div class="form-group"><label class="form-label">Schedule (Cron)</label><input type="text" class="form-input" id="wfe-sched-' + wf.id + '" value="' + escapeHtml(wf.schedule) + '"></div>' +
+          '<div class="form-group"><label class="form-label">Cost Cap ($)</label><input type="number" class="form-input" id="wfe-cost-' + wf.id + '" value="' + wf.cost_cap + '" step="0.5"></div>' +
+        '</div>' +
+        '<div class="form-group"><label class="form-label">Output Path</label><input type="text" class="form-input" value="' + escapeHtml(wf.output_path) + '" readonly style="color:var(--text-faint);"></div>' +
+        '<div class="form-group"><label class="form-label">Reference Documents</label><input type="text" class="form-input" value="' + wf.reference_docs.join(', ') + '" readonly style="color:var(--text-faint);"></div>' +
+        '<div class="form-group"><label class="form-label">Human Gate</label><div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="wfe-gate-' + wf.id + '" ' + (wf.human_gate ? 'checked' : '') + '><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div></div>' +
+        '<div class="form-group"><label class="form-label">Steps (JSON)</label><textarea class="form-textarea" id="wfe-steps-' + wf.id + '" rows="12">' + escapeHtml(JSON.stringify(wf.steps, null, 2)) + '</textarea></div>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<button class="btn btn-primary btn-sm" onclick="saveWorkflow(\'' + wf.id + '\')">Save</button>' +
+          '<button class="btn btn-secondary btn-sm" onclick="toggleEditWorkflow(\'' + wf.id + '\')">Cancel</button>' +
+        '</div>' +
+      '</div>';
+    list.appendChild(card);
+  }
+};
+
+/* Run Whitespace Discovery Pipeline */
+function runWhitespaceWorkflow() {
+  var domain = prompt('Enter the technology domain for whitespace discovery:\n\n(e.g., "Solid-State Batteries", "Neuromorphic Computing", "Gene Therapy")');
+  if (!domain) return;
+  toast('Whitespace Discovery Pipeline started for: ' + domain, 'success');
+  /* In production, this would call the API */
+  apiFetch('/api/workflows/wf-whitespace-discovery/run', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ domain_name: domain })
+  }).catch(function() {
+    toast('Workflow 2 queued \u2014 ' + domain, 'success');
+  });
+}
+
+/* Open the visual workflow editor for Workflow 2 */
+function openWorkflowEditorForWS() {
+  activeWorkflow = activeWhitespaceWorkflow || createWhitespaceWorkflow();
+  activeWhitespaceWorkflow = activeWorkflow;
+  document.getElementById('wfeOverlay').classList.add('open');
+  document.getElementById('wfeTitle').textContent = 'Workflow Editor';
+  document.getElementById('wfeSubtitle').textContent = activeWorkflow.name + ' (v' + activeWorkflow.version + ')';
+  selectedStepId = null;
+  renderWfeCanvas();
+}
+
+
+/* ============================================
+   PRE-LOADED WORKFLOW 3: CII Score Pipeline
+   ============================================ */
+var CII_SCORE_PIPELINE_WORKFLOW = {
+  id: 'wf-cii-score-pipeline',
+  name: 'CII Score Pipeline',
+  description: 'AI-driven workflow for computing Composite Invention Importance (CII) Scores. 8 sequential steps: data extraction, validation, four pillar computations (NC, EV, CDE, MSI), aggregation, and human review. Editable in Analysis > Analysis tab.',
+  type: 'invention_generation',
+  schedule: '0 6 * * 1',
+  cost_cap: 8.00,
+  human_gate: true,
+  enabled: true,
+  reference_docs: [
+    'CII_Score_Workflow_Steps.json',
+    'CII_Score_Workflow.docx'
+  ],
+  output_path: '/data/ciis/{patent_id}/{run_timestamp}/',
+  steps: [
+    { step: 1, action: 'extract',     name: 'Data Extraction & Normalization',  model: 'claude-sonnet-4-5-20250929', mode: 'standard',          description: 'Extract and normalize claim text, CPC codes, patent scores, metadata, and claim analysis from patent idea record.',    output: '{patent_id}_extracted.json' },
+    { step: 2, action: 'validate',    name: 'Data Validation Gate',             model: 'claude-sonnet-4-5-20250929', mode: 'standard',          description: 'Validate extracted data: claim text, CPC codes, score range, FTO status, domain mapping, valuation parseability.',     output: '{patent_id}_validated.json' },
+    { step: 3, action: 'compute_nc',  name: 'Compute NC Pillar',                model: 'claude-sonnet-4-5-20250929', mode: 'standard',          description: 'Compute Network Centrality pillar: citation proxy, structural centrality, claim breadth.',                             output: '{patent_id}_nc.json' },
+    { step: 4, action: 'compute_ev',  name: 'Compute EV Pillar',                model: 'claude-sonnet-4-5-20250929', mode: 'standard',          description: 'Compute Economic Value pillar: citation-value curve, claim breadth, options proxy, valuation normalization.',           output: '{patent_id}_ev.json' },
+    { step: 5, action: 'compute_cde', name: 'Compute CDE Pillar',               model: 'claude-sonnet-4-5-20250929', mode: 'standard',          description: 'Compute Cross-Domain Enablement pillar: generality, originality, Rao-Stirling diversity, sector centrality.',          output: '{patent_id}_cde.json' },
+    { step: 6, action: 'compute_msi', name: 'Compute MSI Pillar',               model: 'claude-sonnet-4-5-20250929', mode: 'standard',          description: 'Compute Multi-Stakeholder Importance pillar: competitor, implementer, standards, downstream values.',                  output: '{patent_id}_msi.json' },
+    { step: 7, action: 'aggregate',   name: 'Aggregate CII Score',              model: 'claude-opus-4-6',            mode: 'extended_thinking', description: 'Weighted geometric mean aggregation of NC, EV, CDE, MSI pillars into final CII Score with rank and metadata.',        output: '{patent_id}_ciis.json' },
+    { step: 8, action: 'review',      name: 'Final Validation & Output',        model: null,                         mode: 'manual',            description: 'Human approval required. Sanity checks, classification, interpretation, and final approval of CII Score result.',      output: '{patent_id}_review.json' }
+  ]
+};
+
+/* Active CII workflow state */
+var activeCIIWorkflow = null;
+
+/* Inject Workflow 3 into the workflows list alongside Workflow 1 and Workflow 2 */
+var _wf2LoadWorkflows = loadWorkflows;
+loadWorkflows = async function() {
+  await _wf2LoadWorkflows();
+
+  /* Ensure Workflow 3 card is present */
+  var list = document.getElementById('workflow-list');
+  if (list && !document.getElementById('wf-card-wf-cii-score-pipeline')) {
+    var wf = CII_SCORE_PIPELINE_WORKFLOW;
+    var card = document.createElement('div');
+    card.className = 'card workflow-card';
+    card.id = 'wf-card-' + wf.id;
+    card.innerHTML =
+      '<div class="workflow-card-header">' +
+        '<span class="card-title">' + escapeHtml(wf.name) + '</span>' +
+        '<span class="badge badge-amber">CII scoring</span>' +
+        '<div class="workflow-actions">' +
+          '<button class="btn btn-sm btn-primary" onclick="runCIIWorkflow()">Run Now</button>' +
+          '<button class="btn btn-sm btn-secondary" onclick="openWorkflowEditorForCII()">Visual Editor</button>' +
+          '<button class="btn btn-sm btn-secondary" onclick="toggleEditWorkflow(\'' + wf.id + '\')">Edit JSON</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="workflow-meta">' +
+        '<span class="stat-pill">\uD83D\uDD04 8 Steps</span>' +
+        '<span class="stat-pill">\u23F0 ' + cronToHuman(wf.schedule) + '</span>' +
+        '<span class="stat-pill">\uD83D\uDCB0 $' + wf.cost_cap + ' cap</span>' +
+        '<span class="stat-pill">\uD83D\uDD12 Human Gate</span>' +
+        '<span class="stat-pill">\uD83D\uDCC1 2 Reference Docs</span>' +
+        '<div class="toggle-wrap" style="margin-left:auto;">' +
+          '<label class="toggle"><input type="checkbox" checked onchange="toggleWorkflowEnabled(\'' + wf.id + '\', this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label>' +
+          '<span class="toggle-label" style="font-size:11px;">Enabled</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="workflow-editor">' +
+        '<div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="wfe-name-' + wf.id + '" value="' + escapeHtml(wf.name) + '"></div>' +
+        '<div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="wfe-desc-' + wf.id + '" rows="3">' + escapeHtml(wf.description) + '</textarea></div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">' +
+          '<div class="form-group"><label class="form-label">Schedule (Cron)</label><input type="text" class="form-input" id="wfe-sched-' + wf.id + '" value="' + escapeHtml(wf.schedule) + '"></div>' +
+          '<div class="form-group"><label class="form-label">Cost Cap ($)</label><input type="number" class="form-input" id="wfe-cost-' + wf.id + '" value="' + wf.cost_cap + '" step="0.5"></div>' +
+        '</div>' +
+        '<div class="form-group"><label class="form-label">Output Path</label><input type="text" class="form-input" value="' + escapeHtml(wf.output_path) + '" readonly style="color:var(--text-faint);"></div>' +
+        '<div class="form-group"><label class="form-label">Reference Documents</label><input type="text" class="form-input" value="' + wf.reference_docs.join(', ') + '" readonly style="color:var(--text-faint);"></div>' +
+        '<div class="form-group"><label class="form-label">Human Gate</label><div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="wfe-gate-' + wf.id + '" ' + (wf.human_gate ? 'checked' : '') + '><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div></div>' +
+        '<div class="form-group"><label class="form-label">Steps (JSON)</label><textarea class="form-textarea" id="wfe-steps-' + wf.id + '" rows="12">' + escapeHtml(JSON.stringify(wf.steps, null, 2)) + '</textarea></div>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<button class="btn btn-primary btn-sm" onclick="saveWorkflow(\'' + wf.id + '\')">Save</button>' +
+          '<button class="btn btn-secondary btn-sm" onclick="toggleEditWorkflow(\'' + wf.id + '\')">Cancel</button>' +
+        '</div>' +
+      '</div>';
+    list.appendChild(card);
+  }
+};
+
+/* Run CII Score Pipeline */
+function runCIIWorkflow() {
+  var title = prompt('Enter the patent title for CII Score computation:\n\n(e.g., "Chemistry-Agnostic Gradient Interlayer for SSB Interface")');
+  if (!title) return;
+  toast('CII Score Pipeline started for: ' + title, 'success');
+  apiFetch('/api/workflows/wf-cii-score-pipeline/run', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ patent_title: title })
+  }).catch(function() {
+    toast('Workflow 3 queued \u2014 ' + title, 'success');
+  });
+}
+
+/* Open the visual workflow editor for Workflow 3 */
+function openWorkflowEditorForCII() {
+  activeWorkflow = activeCIIWorkflow || createCIIWorkflow();
+  activeCIIWorkflow = activeWorkflow;
+  document.getElementById('wfeOverlay').classList.add('open');
+  document.getElementById('wfeTitle').textContent = 'Workflow Editor';
+  document.getElementById('wfeSubtitle').textContent = activeWorkflow.name + ' (v' + activeWorkflow.version + ')';
+  selectedStepId = null;
+  renderWfeCanvas();
+}
+
+/* Create CII Workflow for the visual editor */
+function createCIIWorkflow() {
+  return {
+    id: 'wf-cii-score-pipeline', name: 'CII Score Pipeline', version: 1,
+    type: 'invention_generation', schedule: '0 6 * * 1', cost_cap: 8, human_gate: true,
+    steps: [
+      { id:'cii-1', action:'extract',     label:'Data Extraction & Normalization',  type:'task',     order:0, color:'#94A3B8', roleGate:['admin','ip-strategist','ip-analyst'], autoSkip:true,  approvalRequired:false, estimatedDuration:'15 min',  dependencies:[],                                  prompt:'Extract and normalize claim text, CPC codes, patent scores, metadata from the patent idea record.' },
+      { id:'cii-2', action:'validate',    label:'Data Validation Gate',             type:'gate',     order:1, color:'#D4A017', roleGate:['admin','ip-strategist'],               autoSkip:true,  approvalRequired:false, estimatedDuration:'5 min',   dependencies:['cii-1'],                           prompt:'Validate extracted data against 6 quality checks. Route VALIDATED to next step or NEEDS_REVIEW to human.' },
+      { id:'cii-3', action:'compute_nc',  label:'Compute NC Pillar',                type:'task',     order:2, color:'#2E8B7A', roleGate:['admin','ip-analyst'],                  autoSkip:true,  approvalRequired:false, estimatedDuration:'10 min',  dependencies:['cii-2'],                           prompt:'Compute Network Centrality pillar: citation proxy (0.50), structural centrality (0.20), claim breadth (0.30).' },
+      { id:'cii-4', action:'compute_ev',  label:'Compute EV Pillar',                type:'task',     order:3, color:'#2563EB', roleGate:['admin','ip-analyst'],                  autoSkip:true,  approvalRequired:false, estimatedDuration:'10 min',  dependencies:['cii-2'],                           prompt:'Compute Economic Value pillar: citation-value curve (0.40), claim breadth (0.35), options proxy (0.25).' },
+      { id:'cii-5', action:'compute_cde', label:'Compute CDE Pillar',               type:'task',     order:4, color:'#D4A017', roleGate:['admin','ip-analyst'],                  autoSkip:true,  approvalRequired:false, estimatedDuration:'10 min',  dependencies:['cii-2'],                           prompt:'Compute Cross-Domain Enablement pillar: generality (0.35), originality (0.15), Rao-Stirling (0.25), sector centrality (0.25).' },
+      { id:'cii-6', action:'compute_msi', label:'Compute MSI Pillar',               type:'task',     order:5, color:'#8B5CF6', roleGate:['admin','ip-analyst'],                  autoSkip:true,  approvalRequired:false, estimatedDuration:'10 min',  dependencies:['cii-2'],                           prompt:'Compute Multi-Stakeholder Importance pillar: competitor (0.30), implementer (0.25), standards (0.20), downstream (0.25).' },
+      { id:'cii-7', action:'aggregate',   label:'Aggregate CII Score',              type:'task',     order:6, color:'#06B6D4', roleGate:['admin','ip-strategist'],               autoSkip:true,  approvalRequired:false, estimatedDuration:'5 min',   dependencies:['cii-3','cii-4','cii-5','cii-6'],   prompt:'Weighted geometric mean: NC(0.30) + EV(0.25) + CDE(0.25) + MSI(0.20). Output complete CII result JSON.' },
+      { id:'cii-8', action:'review',      label:'Final Validation & Output',        type:'approval', order:7, color:'#22C55E', roleGate:['admin','ip-strategist'],               autoSkip:false, approvalRequired:true,  estimatedDuration:'1-2 days', dependencies:['cii-7'],                           prompt:'MANUAL APPROVAL REQUIRED. Sanity checks, classification (High Priority/Strong/Moderate/Below), interpretation.' }
+    ],
+    metadata: { createdBy: 'system', createdAt: '2026-01-01' }
+  };
+}
+
+
+/* ============================================
+   PRE-LOADED WORKFLOW 4: CII Training & Calibration Pipeline
+   ============================================ */
+var CII_TRAINING_PIPELINE_WORKFLOW = {
+  id: 'wf-cii-training-pipeline',
+  name: 'CII Score Training & Calibration Pipeline',
+  description: 'AI-driven workflow for generating CPC-level CII Score training data, calibrating pillar weights (NC, EV, CDE, MSI), validating model accuracy, applying scores to the invention portfolio, and updating the CII Analytics dashboard. 10 sequential steps with a human review gate at Step 8. Editable in Analysis > Training tab.',
+  type: 'monitoring',
+  schedule: '0 6 1 * *',
+  cost_cap: 20.00,
+  human_gate: true,
+  enabled: true,
+  reference_docs: [
+    'cii_training_workflow_import.json',
+    'CII_Training_Workflow_Specification.docx'
+  ],
+  output_path: '/data/ciis/training/{target_cpc}/{run_timestamp}/',
+  steps: [
+    { step: 1,  action: 'scope_definition',        name: 'CPC Domain & Training Scope Definition',       model: 'claude-sonnet-4-5-20250929', mode: 'standard',          description: 'Define CPC training scope, sample size, portfolio mapping, and calibration objectives.',           output: '{target_cpc}_scope.json' },
+    { step: 2,  action: 'synthetic_generation',     name: 'Synthetic Patent Record Generation',           model: 'claude-opus-4-6',            mode: 'extended_thinking', description: 'Generate synthetic patent records with realistic feature distributions for training.',              output: '{target_cpc}_synthetic.json' },
+    { step: 3,  action: 'pillar_computation',       name: 'Pillar Score Computation',                     model: 'claude-sonnet-4-5-20250929', mode: 'standard',          description: 'Compute four CII pillar scores for each synthetic record using current weights.',                  output: '{target_cpc}_scored.json' },
+    { step: 4,  action: 'weight_optimization',      name: 'Weight Optimization & Calibration',            model: 'claude-opus-4-6',            mode: 'extended_thinking', description: 'Optimize pillar and sub-weights via Spearman rank correlation with proxy target.',                 output: '{target_cpc}_weights.json' },
+    { step: 5,  action: 'benchmarking',             name: 'Subclass-Level Score Benchmarking',            model: 'claude-sonnet-4-5-20250929', mode: 'deep_research',     description: 'Generate subclass-level CII score benchmarks and tier thresholds.',                                output: '{target_cpc}_benchmarks.json' },
+    { step: 6,  action: 'portfolio_rescoring',      name: 'Portfolio Re-Scoring with Optimized Weights',  model: 'claude-opus-4-6',            mode: 'extended_thinking', description: 'Re-score all 105 inventions with optimized weights, rank change and filing priority analysis.',    output: '{target_cpc}_rescored.json' },
+    { step: 7,  action: 'anomaly_detection',        name: 'Anomaly Detection & Score Validation',         model: 'claude-sonnet-4-5-20250929', mode: 'standard',          description: 'Validate re-scored portfolio: distribution, balance, stability, coherence, and outlier detection.', output: '{target_cpc}_validation.json' },
+    { step: 8,  action: 'review_gate',              name: 'Calibration Review Gate',                      model: null,                         mode: 'manual',            description: 'Human approval. Verify weight changes, rank stability, filing impact, anomaly resolution.',         output: '{target_cpc}_review.json' },
+    { step: 9,  action: 'data_finalization',        name: 'CII Score Data Finalization',                  model: 'claude-opus-4-6',            mode: 'standard',          description: 'Compile approved results into platform-compatible CIIS_DATA payload.',                              output: '{target_cpc}_final.json' },
+    { step: 10, action: 'dashboard_update',         name: 'CII Analytics Dashboard Update',               model: 'claude-sonnet-4-5-20250929', mode: 'standard',          description: 'Generate KPI, CPC tree, histogram, training results, and changelog for dashboard update.',          output: '{target_cpc}_dashboard.json' }
+  ]
+};
+
+/* Active CII Training workflow state */
+var activeCIITrainingWorkflow = null;
+
+/* Inject Workflow 4 into the workflows list alongside Workflows 1-3 */
+var _wf3LoadWorkflows = loadWorkflows;
+loadWorkflows = async function() {
+  await _wf3LoadWorkflows();
+
+  /* Ensure Workflow 4 card is present */
+  var list = document.getElementById('workflow-list');
+  if (list && !document.getElementById('wf-card-wf-cii-training-pipeline')) {
+    var wf = CII_TRAINING_PIPELINE_WORKFLOW;
+    var card = document.createElement('div');
+    card.className = 'card workflow-card';
+    card.id = 'wf-card-' + wf.id;
+    card.innerHTML =
+      '<div class="workflow-card-header">' +
+        '<span class="card-title">' + escapeHtml(wf.name) + '</span>' +
+        '<span class="badge badge-violet">training & calibration</span>' +
+        '<div class="workflow-actions">' +
+          '<button class="btn btn-sm btn-primary" onclick="runCIITrainingWorkflow()">Run Now</button>' +
+          '<button class="btn btn-sm btn-secondary" onclick="openWorkflowEditorForCIITraining()">Visual Editor</button>' +
+          '<button class="btn btn-sm btn-secondary" onclick="toggleEditWorkflow(\'' + wf.id + '\')">Edit JSON</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="workflow-meta">' +
+        '<span class="stat-pill">\uD83D\uDD04 10 Steps</span>' +
+        '<span class="stat-pill">\u23F0 ' + cronToHuman(wf.schedule) + '</span>' +
+        '<span class="stat-pill">\uD83D\uDCB0 $' + wf.cost_cap + ' cap</span>' +
+        '<span class="stat-pill">\uD83D\uDD12 Human Gate</span>' +
+        '<span class="stat-pill">\uD83D\uDCC1 2 Reference Docs</span>' +
+        '<div class="toggle-wrap" style="margin-left:auto;">' +
+          '<label class="toggle"><input type="checkbox" checked onchange="toggleWorkflowEnabled(\'' + wf.id + '\', this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label>' +
+          '<span class="toggle-label" style="font-size:11px;">Enabled</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="workflow-editor">' +
+        '<div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="wfe-name-' + wf.id + '" value="' + escapeHtml(wf.name) + '"></div>' +
+        '<div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="wfe-desc-' + wf.id + '" rows="3">' + escapeHtml(wf.description) + '</textarea></div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">' +
+          '<div class="form-group"><label class="form-label">Schedule (Cron)</label><input type="text" class="form-input" id="wfe-sched-' + wf.id + '" value="' + escapeHtml(wf.schedule) + '"></div>' +
+          '<div class="form-group"><label class="form-label">Cost Cap ($)</label><input type="number" class="form-input" id="wfe-cost-' + wf.id + '" value="' + wf.cost_cap + '" step="0.5"></div>' +
+        '</div>' +
+        '<div class="form-group"><label class="form-label">Output Path</label><input type="text" class="form-input" value="' + escapeHtml(wf.output_path) + '" readonly style="color:var(--text-faint);"></div>' +
+        '<div class="form-group"><label class="form-label">Reference Documents</label><input type="text" class="form-input" value="' + wf.reference_docs.join(', ') + '" readonly style="color:var(--text-faint);"></div>' +
+        '<div class="form-group"><label class="form-label">Human Gate</label><div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="wfe-gate-' + wf.id + '" ' + (wf.human_gate ? 'checked' : '') + '><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div></div>' +
+        '<div class="form-group"><label class="form-label">Steps (JSON)</label><textarea class="form-textarea" id="wfe-steps-' + wf.id + '" rows="12">' + escapeHtml(JSON.stringify(wf.steps, null, 2)) + '</textarea></div>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<button class="btn btn-primary btn-sm" onclick="saveWorkflow(\'' + wf.id + '\')">Save</button>' +
+          '<button class="btn btn-secondary btn-sm" onclick="toggleEditWorkflow(\'' + wf.id + '\')">Cancel</button>' +
+        '</div>' +
+      '</div>';
+    list.appendChild(card);
+  }
+};
+
+/* Run CII Training Pipeline */
+function runCIITrainingWorkflow() {
+  var cpc = prompt('Enter the target CPC class for CII Training:\n\n(e.g., "G06" for Computing/AI, "H01" for Electrical Elements, "ALL" for full recalibration)');
+  if (!cpc) return;
+  toast('CII Training Pipeline started for: ' + cpc, 'success');
+  apiFetch('/api/workflows/wf-cii-training-pipeline/run', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ target_cpc: cpc, sample_size: 500 })
+  }).catch(function() {
+    toast('Workflow 4 queued \u2014 ' + cpc, 'success');
+  });
+}
+
+/* Open the visual workflow editor for Workflow 4 */
+function openWorkflowEditorForCIITraining() {
+  activeWorkflow = activeCIITrainingWorkflow || createCIITrainingWorkflow();
+  activeCIITrainingWorkflow = activeWorkflow;
+  document.getElementById('wfeOverlay').classList.add('open');
+  document.getElementById('wfeTitle').textContent = 'Workflow Editor';
+  document.getElementById('wfeSubtitle').textContent = activeWorkflow.name + ' (v' + activeWorkflow.version + ')';
+  selectedStepId = null;
+  renderWfeCanvas();
+}
+
+/* Create CII Training Workflow for the visual editor */
+function createCIITrainingWorkflow() {
+  return {
+    id: 'wf-cii-training-pipeline', name: 'CII Score Training & Calibration Pipeline', version: 1,
+    type: 'monitoring', schedule: '0 6 1 * *', cost_cap: 20, human_gate: true,
+    steps: [
+      { id:'cit-1',  action:'scope_definition',    label:'CPC Domain & Training Scope Definition',       type:'task',         order:0, color:'#94A3B8', roleGate:['admin','ip-strategist'],                autoSkip:false, approvalRequired:false, estimatedDuration:'20 min',   dependencies:[],         prompt:'Define CPC training scope, sample size, portfolio mapping, and calibration objectives.' },
+      { id:'cit-2',  action:'synthetic_generation', label:'Synthetic Patent Record Generation',           type:'task',         order:1, color:'#06B6D4', roleGate:['admin','ip-strategist','ip-analyst'],  autoSkip:true,  approvalRequired:false, estimatedDuration:'1 hour',   dependencies:['cit-1'],  prompt:'Generate synthetic patent records with realistic feature distributions for training.' },
+      { id:'cit-3',  action:'pillar_computation',   label:'Pillar Score Computation',                     type:'task',         order:2, color:'#3B82F6', roleGate:['admin','ip-strategist'],                autoSkip:true,  approvalRequired:false, estimatedDuration:'45 min',   dependencies:['cit-2'],  prompt:'Compute four CII pillar scores for each synthetic record using current weights.' },
+      { id:'cit-4',  action:'weight_optimization',  label:'Weight Optimization & Calibration',            type:'task',         order:3, color:'#8B5CF6', roleGate:['admin','ip-strategist'],                autoSkip:true,  approvalRequired:false, estimatedDuration:'1 hour',   dependencies:['cit-3'],  prompt:'Optimize pillar and sub-weights via Spearman rank correlation with proxy target.' },
+      { id:'cit-5',  action:'benchmarking',         label:'Subclass-Level Score Benchmarking',            type:'task',         order:4, color:'#06B6D4', roleGate:['admin','ip-strategist','ip-analyst'],  autoSkip:true,  approvalRequired:false, estimatedDuration:'45 min',   dependencies:['cit-4'],  prompt:'Generate subclass-level CII score benchmarks and tier thresholds.' },
+      { id:'cit-6',  action:'portfolio_rescoring',  label:'Portfolio Re-Scoring with Optimized Weights',  type:'task',         order:5, color:'#D4A017', roleGate:['admin','ip-strategist'],                autoSkip:true,  approvalRequired:false, estimatedDuration:'1 hour',   dependencies:['cit-5'],  prompt:'Re-score all 105 inventions with optimized weights. Rank change and filing priority analysis.' },
+      { id:'cit-7',  action:'anomaly_detection',    label:'Anomaly Detection & Score Validation',         type:'task',         order:6, color:'#EF4444', roleGate:['admin','ip-strategist'],                autoSkip:true,  approvalRequired:false, estimatedDuration:'45 min',   dependencies:['cit-6'],  prompt:'Validate: distribution, balance, stability, coherence, outlier detection. Verdict: PASS/CONDITIONAL/FAIL.' },
+      { id:'cit-8',  action:'review_gate',          label:'Calibration Review Gate',                      type:'approval',     order:7, color:'#F59E0B', roleGate:['admin','patent-lawyer','ip-strategist'], autoSkip:false, approvalRequired:true,  estimatedDuration:'1-2 days', dependencies:['cit-7'],  prompt:'MANUAL APPROVAL. Verify weight changes, rank stability, filing impact, anomaly resolution.' },
+      { id:'cit-9',  action:'data_finalization',    label:'CII Score Data Finalization',                  type:'document-gen', order:8, color:'#22C55E', roleGate:['admin','ip-strategist'],                autoSkip:true,  approvalRequired:false, estimatedDuration:'30 min',   dependencies:['cit-8'],  prompt:'Compile approved results into platform-compatible CIIS_DATA payload.' },
+      { id:'cit-10', action:'dashboard_update',     label:'CII Analytics Dashboard Update',               type:'task',         order:9, color:'#2563EB', roleGate:['admin'],                                autoSkip:true,  approvalRequired:false, estimatedDuration:'20 min',   dependencies:['cit-9'],  prompt:'Generate KPI, CPC tree, histogram, training results, and changelog for dashboard.' }
+    ],
+    metadata: { createdBy: 'system', createdAt: '2026-01-01' }
+  };
+}
+
+/* ============================================
    MODAL HELPERS
    ============================================ */
 function openModal(id) {
@@ -2622,6 +4440,61 @@ document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
    ============================================ */
 populateWhitespaceFilter();
 loadOverview();
+</script>
+
+<script>
+function toggleAdminTheme() {
+  var html = document.documentElement;
+  var newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', newTheme);
+  try { window.parent.postMessage({ type: 'theme-changed-by-child', theme: newTheme }, '*'); } catch(e) {}
+}
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'theme-change') {
+    document.documentElement.setAttribute('data-theme', e.data.theme);
+  }
+});
+</script>
+
+<script>
+/* API Key Management */
+function saveApiKey() {
+  var input = document.getElementById('apiKeyInput');
+  var status = document.getElementById('apiKeyStatus');
+  var key = input.value.trim();
+  if (!key) { status.textContent = 'Please enter an API key.'; status.style.color = 'var(--accent-red)'; return; }
+  if (!key.startsWith('sk-ant-')) { status.textContent = 'Key should start with sk-ant-...'; status.style.color = 'var(--accent-amber)'; }
+  PatentifyEnv.setApiKey(key);
+  input.value = '';
+  status.textContent = '✓ API key saved to browser storage.';
+  status.style.color = 'var(--accent-green)';
+  toast('API key saved', 'success');
+}
+function clearApiKey() {
+  PatentifyEnv.clearApiKey();
+  var status = document.getElementById('apiKeyStatus');
+  status.textContent = 'API key cleared.';
+  status.style.color = 'var(--text-faint)';
+  toast('API key cleared', 'info');
+}
+// Show current key status on settings load
+(function() {
+  var origSwitchTab = typeof switchTab === 'function' ? switchTab : null;
+  function checkKeyStatus() {
+    var status = document.getElementById('apiKeyStatus');
+    if (status) {
+      if (PatentifyEnv.hasApiKey()) {
+        status.textContent = '✓ API key is configured.';
+        status.style.color = 'var(--accent-green)';
+      } else {
+        status.textContent = 'No API key set. AI features will not work.';
+        status.style.color = 'var(--accent-amber)';
+      }
+    }
+  }
+  // Check on page load after a short delay
+  setTimeout(checkKeyStatus, 500);
+})();
 </script>
 </body>
 </html>

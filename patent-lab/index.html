@@ -10,6 +10,7 @@
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:;">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Patentify Patent Ideation Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -591,7 +592,7 @@ html, body {
   top: 0;
   right: 0;
   bottom: 0;
-  width: min(680px, 90vw);
+  width: min(860px, 92vw);
   background: var(--drawer-bg);
   z-index: 950;
   transform: translateX(100%);
@@ -677,8 +678,8 @@ html, body {
 }
 
 .drawer-tab {
-  padding: 10px 16px;
-  font-size: 12px;
+  padding: 10px 12px;
+  font-size: 11.5px;
   font-weight: 500;
   color: var(--text-muted);
   background: transparent;
@@ -1199,7 +1200,184 @@ html, body {
   content-visibility: auto;
   contain-intrinsic-size: auto 140px;
 }
+
+/* ═══════════════════════════════════════════
+   WF1 — PATENT GENERATION PIPELINE EDITOR
+   ═══════════════════════════════════════════ */
+.wf1-editor-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin: 16px 16px 24px;
+}
+.wf1-editor-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.wf1-version-badge {
+  background: var(--teal);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.wf1-meta-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 0 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.wf1-meta-pill {
+  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 3px 10px;
+}
+.wf1-run-bar {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  padding: 10px 0;
+  margin-bottom: 10px;
+}
+.wf1-run-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+.wf1-run-field label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.wf1-run-field input {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--text);
+  transition: border-color 150ms;
+}
+.wf1-run-field input:focus { outline: none; border-color: var(--teal); }
+.wf1-canvas-wrap {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 10px 0;
+  position: relative;
+}
+.wf1-canvas {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-width: max-content;
+  padding: 8px 4px;
+}
+.wf1-step {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  min-width: 140px;
+  max-width: 180px;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 150ms ease;
+  position: relative;
+  flex-shrink: 0;
+}
+.wf1-step:hover { border-color: var(--teal); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.wf1-step.selected { border-color: var(--teal); box-shadow: 0 0 0 2px rgba(46,139,122,0.25); }
+.wf1-step.dragging { opacity: 0.4; }
+.wf1-step.drag-over { border-color: var(--teal); border-style: dashed; }
+.wf1-step-bar { width: 4px; border-radius: var(--radius) 0 0 var(--radius); flex-shrink: 0; }
+.wf1-step-info { padding: 8px 10px; flex: 1; min-width: 0; }
+.wf1-step-label { font-size: 11px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wf1-step-meta { display: flex; gap: 4px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
+.wf1-step-type { font-size: 9px; font-weight: 700; text-transform: uppercase; padding: 1px 5px; border-radius: 3px; background: rgba(148,163,184,0.15); color: var(--text-faint); }
+.wf1-step-dur { font-size: 9px; color: var(--text-faint); }
+.wf1-step-actions { display: flex; flex-direction: column; justify-content: center; padding: 0 6px; }
+.wf1-step-rm { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 12px; padding: 2px; border-radius: 3px; transition: all 100ms; }
+.wf1-step-rm:hover { color: var(--red); background: rgba(239,68,68,0.1); }
+.wf1-arrow { display: flex; align-items: center; justify-content: center; padding: 0 2px; color: var(--text-faint); flex-shrink: 0; }
+.wf1-arrow svg { width: 14px; height: 14px; }
+.wf1-step-number { position: absolute; top: -8px; left: -8px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: var(--text-faint); }
+/* Props panel */
+.wf1-props { display: none; margin-top: 12px; border-top: 1px solid var(--border); padding-top: 12px; animation: wf1FadeIn 0.2s ease; }
+.wf1-props.open { display: block; }
+@keyframes wf1FadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+.wf1-toast { position:fixed; bottom:20px; right:20px; padding:10px 18px; border-radius:8px; font-size:12px; font-weight:500; color:#fff; z-index:9999; animation:wf1FadeIn 0.2s ease,wf1FadeOut 0.3s ease 2.7s forwards; }
+.wf1-toast.success { background:#22C55E; }
+.wf1-toast.error { background:#EF4444; }
+.wf1-toast.info { background:#3B82F6; }
+@keyframes wf1FadeOut { to { opacity:0; transform:translateY(10px); } }
+.wf1-props-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.wf1-props-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.wf1-props-close { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 18px; padding: 0 4px; border-radius: 4px; transition: all 100ms; }
+.wf1-props-close:hover { color: var(--text); background: var(--bg-surface); }
+.wf1-props-section { margin-bottom: 14px; }
+.wf1-props-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-faint); margin-bottom: 6px; }
+.wf1-prompt-editor { width: 100%; min-height: 120px; resize: vertical; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; font-family: monospace; font-size: 11px; line-height: 1.6; color: var(--text); transition: border-color 150ms; }
+.wf1-prompt-editor:focus { outline: none; border-color: var(--teal); }
+.wf1-token-count { font-size: 10px; color: var(--text-faint); text-align: right; margin-top: 4px; }
+.wf1-role-check { display: flex; flex-wrap: wrap; gap: 8px; }
+.wf1-role-check label { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; cursor: pointer; }
+.wf1-role-check input { accent-color: var(--teal); }
+.wf1-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
+.wf1-toggle-label { font-size: 11px; color: var(--text-muted); }
+.wf1-dep-tag { display: inline-block; font-size: 9px; padding: 2px 6px; background: rgba(46,139,122,0.1); color: var(--teal); border-radius: 3px; margin-right: 4px; }
+/* JSON editor */
+.wf1-json-toggle { display: flex; gap: 4px; margin-bottom: 10px; }
+.wf1-json-toggle button {
+  padding: 4px 12px; font-size: 10px; font-weight: 600; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-muted); cursor: pointer; transition: all 150ms;
+}
+.wf1-json-toggle button.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+.wf1-json-wrap { display: none; }
+.wf1-json-wrap.open { display: block; }
+.wf1-json-editor {
+  width: 100%; min-height: 300px; resize: vertical; background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 11px; line-height: 1.5; color: var(--text);
+  tab-size: 2; transition: border-color 150ms;
+}
+.wf1-json-editor:focus { outline: none; border-color: var(--teal); }
+.wf1-json-status { font-size: 10px; margin-top: 4px; min-height: 16px; }
+.wf1-json-status.valid { color: var(--green); }
+.wf1-json-status.invalid { color: var(--red); }
+/* Btn helpers */
+.wf1-btn-primary {
+  background: var(--teal); color: #fff; border: none; border-radius: var(--radius-sm);
+  padding: 6px 14px; font-size: 11px; font-weight: 600; cursor: pointer; transition: opacity 150ms;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.wf1-btn-primary:hover { opacity: 0.85; }
+.wf1-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.wf1-btn-secondary {
+  background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 4px 10px; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 150ms;
+}
+.wf1-btn-secondary:hover { border-color: var(--teal); color: var(--text); }
+
 </style>
+<script src="../env.js"></script>
+<script>try{var s=document.createElement('script');s.src='../env.local.js';s.onerror=function(){};document.head.appendChild(s);}catch(e){}</script>
 </head>
 <body>
 <div class="app">
@@ -1274,7 +1452,7 @@ html, body {
         <button class="chip" data-filter="IMMEDIATE">Immediate</button>
         <button class="chip" data-filter="Q2 2026">Q2 2026</button>
         <button class="chip" data-filter="Q3-Q4 2026">Q3-Q4</button>
-        <button class="chip" data-filter="high-score">Score 8.5+</button>
+        <button class="chip" data-filter="high-score">Patentability 8.5+</button>
       </div>
       <span class="filter-count" id="filterCount">15 whitespaces · 105 ideas</span>
     </div>
@@ -1282,6 +1460,71 @@ html, body {
     <!-- WHITESPACE GRID -->
     <div class="ws-grid-section">
       <div class="ws-grid" id="wsGrid"></div>
+    </div>
+
+    <!-- ═══ Workflow 1 — Patent Generation Pipeline Editor ═══ -->
+    <div class="wf1-editor-card" id="wf1EditorCard">
+      <div class="wf1-editor-title">
+        <div style="display:flex;align-items:center;gap:8px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Workflow 1 &mdash; Patent Generation Pipeline
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="wf1-version-badge" id="wf1VersionBadge">v1</span>
+          <button class="wf1-btn-secondary" onclick="wf1Reset()">Reset</button>
+          <button class="wf1-btn-primary" style="padding:4px 12px;font-size:11px" onclick="wf1Save()">Save Workflow</button>
+        </div>
+      </div>
+      <div class="wf1-meta-strip">
+        <span class="wf1-meta-pill">&#128260; 10 Steps</span>
+        <span class="wf1-meta-pill">&#9200; On-demand per invention</span>
+        <span class="wf1-meta-pill">&#128274; Lawyer Review at Step 6</span>
+        <span class="wf1-meta-pill">&#128274; Admin Approval at Step 7</span>
+        <span style="margin-left:auto;font-size:10px;color:var(--text-faint)">Drag steps to reorder &middot; Click to edit</span>
+      </div>
+
+      <!-- View toggle: Visual / JSON -->
+      <div class="wf1-json-toggle" id="wf1ViewToggle">
+        <button class="active" onclick="wf1SwitchView('visual')">Visual Editor</button>
+        <button onclick="wf1SwitchView('json')">Edit JSON</button>
+      </div>
+
+      <!-- Run bar -->
+      <div class="wf1-run-bar" id="wf1RunBar">
+        <div class="wf1-run-field">
+          <label>Patent Title</label>
+          <input type="text" id="wf1PatentTitle" placeholder="e.g., Chemistry-Agnostic Gradient Interlayer for SSB Interface...">
+        </div>
+        <button class="wf1-btn-primary" id="btnRunWf1" onclick="wf1Run()">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polygon points="5,3 13,8 5,13"/></svg>
+          Run Pipeline
+        </button>
+      </div>
+      <div id="wf1RunStatus"></div>
+
+      <!-- Step canvas (visual view) -->
+      <div class="wf1-canvas-wrap" id="wf1CanvasWrap">
+        <div class="wf1-canvas" id="wf1Canvas"></div>
+      </div>
+
+      <!-- Properties panel -->
+      <div class="wf1-props" id="wf1Props">
+        <div class="wf1-props-header">
+          <span class="wf1-props-title" id="wf1PropTitle">Step Properties</span>
+          <button class="wf1-props-close" onclick="wf1CloseProps()">&times;</button>
+        </div>
+        <div class="wf1-props-body" id="wf1PropBody"></div>
+      </div>
+
+      <!-- JSON view -->
+      <div class="wf1-json-wrap" id="wf1JsonWrap">
+        <textarea class="wf1-json-editor" id="wf1JsonEditor" spellcheck="false"></textarea>
+        <div class="wf1-json-status" id="wf1JsonStatus"></div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button class="wf1-btn-primary" style="font-size:10px;padding:4px 12px" onclick="wf1ApplyJson()">Apply JSON</button>
+          <button class="wf1-btn-secondary" onclick="wf1PrettyPrint()">Format</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1313,7 +1556,8 @@ html, body {
     <button class="drawer-tab" data-tab="mindmap">Mindmap</button>
     <button class="drawer-tab" data-tab="prior-art">Prior Art</button>
     <button class="drawer-tab" data-tab="fto">FTO</button>
-    <button class="drawer-tab" data-tab="scoring">Scoring</button>
+    <button class="drawer-tab" data-tab="scoring">Patentability Score</button>
+    <button class="drawer-tab" data-tab="cii-score">CII Score</button>
     <button class="drawer-tab" data-tab="filing">Filing</button>
     <button class="drawer-tab" data-tab="notes">Notes</button>
   </div>
@@ -1655,7 +1899,7 @@ function renderWSGrid() {
         html += `<span class="idea-card-title">${idea.title}</span>`;
         html += '</div>';
         html += '<div class="idea-card-stats">';
-        html += `<span><span class="idea-stat-dot"></span>Score ${idea.ps.overall}</span>`;
+        html += `<span><span class="idea-stat-dot"></span>PS ${idea.ps.overall}</span>`;
         html += `<span>${idea.val}</span>`;
         html += `<span>${idea.filing}</span>`;
         html += '</div>';
@@ -1766,6 +2010,8 @@ function renderDrawerTab() {
   } else if (tab === 'scoring') {
     body.innerHTML = renderScoringTab(idea);
     setTimeout(() => { try { renderRadarChart(idea); } catch(e) { console.error('Radar error:', e); } }, 50);
+  } else if (tab === 'cii-score') {
+    body.innerHTML = renderCIIScoreTab(idea);
   } else if (tab === 'filing') {
     body.innerHTML = renderFilingTab(idea);
   } else if (tab === 'notes') {
@@ -2295,7 +2541,7 @@ function renderScoringTab(idea) {
   let html = '';
   
   html += '<div class="drawer-section">';
-  html += '<div class="drawer-section-title">Patentability Radar</div>';
+  html += '<div class="drawer-section-title">Patentability Score — Radar</div>';
   html += `<div style="text-align:center;font-size:28px;font-weight:700;color:var(--teal);margin-bottom:8px">${idea.ps.overall}<span style="font-size:14px;color:var(--text-muted);font-weight:400">/10</span></div>`;
   html += '<div class="radar-container" id="radarChart"></div>';
   html += '</div>';
@@ -2404,6 +2650,216 @@ function renderRadarChart(idea) {
       .attr('stroke-width', 1.5);
   });
 }
+
+
+// ═══════════════════════════════════════════
+// CII SCORE DATA LOOKUP (from CIIS module)
+// ═══════════════════════════════════════════
+const CIIS_LOOKUP = {"45":{"ciis":0.7605,"nc":0.8183,"ev":0.7538,"cde":0.7824,"msi":0.665,"rank":1,"cpcP":["B33Y50/00","B33Y50/02","G01N21/25 (spectrophotometry)"],"cpcS":["B22F10/28","G06V10/764 (ML image classification)","G01J3/28 (spectrometers)","B22F10/85 (monitoring in AM)","G05B19/418","H04N23/10 (hyperspectral imaging)"]},"28":{"ciis":0.7537,"nc":0.8615,"ev":0.8392,"cde":0.706,"msi":0.585,"rank":2,"cpcP":["C12M1/00","A61J3/07"],"cpcS":["C12P21/00","G16H20/10","H04L9/32","A61L2/00"]},"20":{"ciis":0.7441,"nc":0.8782,"ev":0.7807,"cde":0.7147,"msi":0.575,"rank":3,"cpcP":["H04L12/40 (bus networks)","G06N3/063 (hardware neural network implementations)"],"cpcS":["H01L25/065 (stacked semiconductor chips)","H04L47/50 (flow control)","G06F15/173 (interconnection architectures)","H04L69/22 (protocol design)"]},"56":{"ciis":0.7394,"nc":0.8288,"ev":0.7196,"cde":0.7001,"msi":0.69,"rank":4,"cpcP":["G06N3/098","G06F21/6254","G16H10/60"],"cpcS":["G06F21/62","H04L9/3236","G16H50/20","G06Q50/22"]},"51":{"ciis":0.7388,"nc":0.8847,"ev":0.7464,"cde":0.6527,"msi":0.65,"rank":5,"cpcP":["G06N3/098","H04L9/3218","G06F21/6254"],"cpcS":["H04L9/3252","G06N20/00","G06F16/23","H04L9/008"]},"15":{"ciis":0.7356,"nc":0.8676,"ev":0.7963,"cde":0.7247,"msi":0.53,"rank":6,"cpcP":["H10N70/20 (phase-change memory devices)","H10N70/861 (PCM compositions)"],"cpcS":["G11C13/00 (resistive change memory)","H01L45/06 (electrode materials for non-volatile memory)","G06N3/063 (hardware neural network implementations)","C22C28/00 (chalcogenide alloys)"]},"43":{"ciis":0.7333,"nc":0.808,"ev":0.7462,"cde":0.6733,"msi":0.69,"rank":7,"cpcP":["B22F10/28","B33Y10/00","B33Y50/02"],"cpcS":["B22F12/50","B33Y70/10","G01N21/71 (LIBS spectroscopy)","B22F2203/11 (composition control)","C22C1/04","G05B19/418"]},"70":{"ciis":0.7331,"nc":0.8413,"ev":0.6824,"cde":0.7218,"msi":0.665,"rank":8,"cpcP":["G06F21/62 (protection of private/personal data)","G06N20/00 (machine learning)","A61B5/369 (EEG)"],"cpcS":["H04L9/00 (cryptographic mechanisms)","G06F21/60 (security for data)","G06N3/08 (neural network training - federated)","A61B5/0022 (wearable body sensor)"]},"72":{"ciis":0.7321,"nc":0.8513,"ev":0.7116,"cde":0.6589,"msi":0.69,"rank":9,"cpcP":["B60W 50/02 (condition monitoring of AV operation)","G06F 11/07 (fault monitoring)","G05B 23/02 (testing/monitoring control systems)"],"cpcS":["B60W 60/00 (autonomous driving)","G06N 20/00 (machine learning safety)","G08G 1/16 (collision avoidance)"]},"95":{"ciis":0.724,"nc":0.8187,"ev":0.6925,"cde":0.6786,"msi":0.69,"rank":10,"cpcP":["G01M 11/00","H04B 10/071"],"cpcS":["G02B 6/42","H04B 10/07","G02B 6/293","H01L 31/02","H04B 10/2507"]},"71":{"ciis":0.7154,"nc":0.8393,"ev":0.7091,"cde":0.6433,"msi":0.65,"rank":11,"cpcP":["G06F 11/3604 (verification/validation of software systems)","G06N 3/08 (training neural networks)","B60W 60/00 (autonomous vehicle control)"],"cpcS":["G06F 21/64 (integrity verification)","G05D 1/00 (control of position/course)","G06N 20/00 (machine learning \u2014 safety)"]},"92":{"ciis":0.7148,"nc":0.8019,"ev":0.6891,"cde":0.6969,"msi":0.65,"rank":12,"cpcP":["H04B 10/40","H04J 14/02"],"cpcS":["G02B 6/42","H04L 69/30","H04B 10/2507","H04J 14/0221","G06F 13/38"]},"50":{"ciis":0.7133,"nc":0.8226,"ev":0.6878,"cde":0.6714,"msi":0.65,"rank":13,"cpcP":["G06N3/098","G06F21/60","G06F21/72"],"cpcS":["H04L9/3268","G06F21/57","G06N20/00","H04W12/08"]},"102":{"ciis":0.7061,"nc":0.8583,"ev":0.6937,"cde":0.6499,"msi":0.5975,"rank":14,"cpcP":["H04L9/08","G09C1/00"],"cpcS":["H04L9/32","G06F21/73","H04L9/30","G06F21/72"]},"2":{"ciis":0.7042,"nc":0.7048,"ev":0.8017,"cde":0.6244,"msi":0.695,"rank":15,"cpcP":["H01M4/1391 (electrode treatment for solid-state batteries), B02C17/00 (grinding/mixing processes)"],"cpcS":["H01M10/0562, H01M4/625, H01M4/136, B01J19/18 (mechanochemical reactions), C01D15/00 (lithium compounds)"]},"17":{"ciis":0.7003,"nc":0.8347,"ev":0.758,"cde":0.629,"msi":0.5575,"rank":16,"cpcP":["G06N3/063 (hardware neural network implementations)","G11C11/54 (biologically-inspired storage elements)"],"cpcS":["G06N3/08 (learning methods)","H10N70/20 (PCM devices)","H10B51/00 (FeRAM)","G11C13/00 (resistive memory)"]},"32":{"ciis":0.699,"nc":0.823,"ev":0.714,"cde":0.6742,"msi":0.5575,"rank":17,"cpcP":["H01L23/373","C09K5/00","B82Y30/00"],"cpcS":["H01L23/3735","H01L25/18","C23C16/455","C01B32/00","H01L21/48"]},"75":{"ciis":0.6989,"nc":0.8005,"ev":0.6164,"cde":0.7342,"msi":0.6275,"rank":18,"cpcP":["B60W 60/00 (autonomous vehicle control)","B60W 50/08 (AV system conditions monitoring)","G05D 1/02 (position/course control \u2014 land vehicles)"],"cpcS":["G06N 7/00 (knowledge-based probabilistic methods)","G08G 1/16 (collision avoidance)","H04W 4/40 (V2X communications)"]},"59":{"ciis":0.6987,"nc":0.8169,"ev":0.706,"cde":0.7941,"msi":0.465,"rank":19,"cpcP":["G02F1/01","H04J14/02","G06N10/40"],"cpcS":["H01S5/0683","G02B6/42","H04B10/25","H01L31/0232"]},"58":{"ciis":0.6971,"nc":0.8219,"ev":0.6749,"cde":0.6798,"msi":0.585,"rank":20,"cpcP":["G06F30/398","H01L21/82","G06F30/392"],"cpcS":["G06N10/40","H01L23/367","G06F30/3312","H03K19/003"]},"6":{"ciis":0.6968,"nc":0.8281,"ev":0.6493,"cde":0.7266,"msi":0.5575,"rank":21,"cpcP":["H01M10/0562, G06N20/00 (machine learning), G06N3/08 (neural networks for physical systems)"],"cpcS":["H01M4/1391, G01N27/00 (electrochemical sensing and characterization), C23C14/34 (sputtering for combinatorial synthesis), G16C20/70 (informatics for materials science)"]},"21":{"ciis":0.6949,"nc":0.8829,"ev":0.7285,"cde":0.6858,"msi":0.465,"rank":22,"cpcP":["H01L27/0248 (radiation-hardened circuits)","G06N3/063 (hardware neural implementations)"],"cpcS":["H10B51/00 (FeRAM)","H10N70/20 (HfO2 devices)","G06F11/10 (error correction)","H01L29/788 (radiation-hardened FETs)"]},"41":{"ciis":0.6949,"nc":0.813,"ev":0.6949,"cde":0.7433,"msi":0.505,"rank":23,"cpcP":["G06N10/40","H01L39/22"],"cpcS":["G06N10/70","H03K19/195","H01P1/10","G01R33/035"]},"99":{"ciis":0.6947,"nc":0.7785,"ev":0.6327,"cde":0.6689,"msi":0.69,"rank":24,"cpcP":["H04L9/06","H04L9/003"],"cpcS":["G06F7/72","H04L9/30","G06F21/75","H03M13/00"]},"53":{"ciis":0.6912,"nc":0.8806,"ev":0.7007,"cde":0.6527,"msi":0.5075,"rank":25,"cpcP":["G06N3/098","G06N3/04","G06N3/08"],"cpcS":["G06N20/00","G06F9/50","H04L67/104","G06N3/02"]},"39":{"ciis":0.6891,"nc":0.6836,"ev":0.7255,"cde":0.7286,"msi":0.61,"rank":26,"cpcP":["G06N10/40","H01L25/065"],"cpcS":["G06N10/70","H01L39/00","G11C11/44","H04B10/25"]},"101":{"ciis":0.6887,"nc":0.816,"ev":0.6643,"cde":0.6527,"msi":0.5975,"rank":27,"cpcP":["H04L9/06","G06F1/3231"],"cpcS":["H04L9/30","H04W12/04","G06F21/72","H04L9/08"]},"77":{"ciis":0.6883,"nc":0.7765,"ev":0.6058,"cde":0.753,"msi":0.6025,"rank":28,"cpcP":["H04W 4/46 (V2V communications)","G05D 1/02 (vehicle position/course control)","H04L 9/32 (cryptographic protocols)"],"cpcS":["B60W 60/00 (autonomous driving)","G06F 21/64 (data integrity verification)","G08G 1/09 (traffic control systems)"]},"73":{"ciis":0.6876,"nc":0.8036,"ev":0.6584,"cde":0.643,"msi":0.625,"rank":29,"cpcP":["G06N 5/04 (reasoning/inference in expert systems)","G06F 11/3604 (verification/testing)","B60W 50/04 (indication/warning of AV malfunctions)"],"cpcS":["G06N 20/00 (machine learning)","G06V 20/58 (scene understanding for AV)","G07C 5/08 (vehicle data recorder)"]},"9":{"ciis":0.6867,"nc":0.6946,"ev":0.806,"cde":0.6363,"msi":0.6075,"rank":30,"cpcP":["H01F1/032 (hard magnetic inorganic materials)","H01F1/04 (hard magnetic metals/alloys)"],"cpcS":["H01F41/0253 (manufacturing permanent magnets)","H02K1/276 (permanent magnet rotors)","C22C28/00 (alloys based on Mn)","B22F1/102 (powder coating)"]},"25":{"ciis":0.6847,"nc":0.7456,"ev":0.8126,"cde":0.6139,"msi":0.5575,"rank":31,"cpcP":["C12M3/04","C12P21/00"],"cpcS":["B01D63/02","C12M1/12","G01N30/00","C12M3/06"]},"85":{"ciis":0.6846,"nc":0.8067,"ev":0.69,"cde":0.6845,"msi":0.53,"rank":32,"cpcP":["G16B40/20 (Machine learning applied to molecular biology)","G16B15/00 (Protein structure prediction)","C12N15/10 (Recombinant DNA technology)"],"cpcS":["G06N3/08 (Neural networks - supervised learning)","C08H1/00 (Macromolecular products derived from proteins)","G16B5/30 (Sequence-activity relationships)"]},"65":{"ciis":0.6845,"nc":0.8457,"ev":0.7227,"cde":0.6417,"msi":0.505,"rank":33,"cpcP":["G06N3/04 (neural networks)","A61B5/369 (EEG)","G06F3/015 (eye/body activity input)"],"cpcS":["G16H50/20 (ICT for diagnosis using machine learning)","A61B5/7267 (non-linear analysis of brain signals)","G06N20/00 (machine learning general)","A61B5/48 (BCI applications)"]},"55":{"ciis":0.6844,"nc":0.849,"ev":0.6505,"cde":0.7064,"msi":0.5075,"rank":34,"cpcP":["G06N3/098","H04L69/04","H03M7/30"],"cpcS":["H04W28/06","G06N20/00","H04L67/104","H04B7/0413"]},"19":{"ciis":0.6822,"nc":0.8419,"ev":0.7017,"cde":0.6714,"msi":0.49,"rank":35,"cpcP":["H04N25/47 (event-based image sensors)","G06N3/063 (hardware neural network implementations)"],"cpcS":["G06T1/20 (special purpose image processing)","G06N3/04 (neural architectures)","H04N25/75 (pixel circuits)","G06V10/25 (image analysis \u2014 event cameras)"]},"44":{"ciis":0.6818,"nc":0.7278,"ev":0.6939,"cde":0.7002,"msi":0.585,"rank":36,"cpcP":["B22F10/28","B33Y50/02","C04B35/628 (ceramic processing)"],"cpcS":["B33Y70/10","C22C1/04","G05B19/418","G01J5/00 (pyrometry)","B22F10/366 (DED)","C04B37/02 (metal-ceramic bonding)"]},"88":{"ciis":0.6815,"nc":0.8304,"ev":0.6287,"cde":0.7377,"msi":0.5075,"rank":37,"cpcP":["G16B40/00 (Bioinformatics/computational biology tools)","C12M1/36 (Fermentation apparatus with automatic control)","C12N15/10 (DNA engineering)"],"cpcS":["G06N7/01 (Probabilistic graphical models)","B01L3/00 (Laboratory vessels/handling equipment)","G05B19/042 (Programmable logic controllers)"]},"36":{"ciis":0.6805,"nc":0.812,"ev":0.713,"cde":0.6417,"msi":0.53,"rank":38,"cpcP":["G06N10/70","H03M13/00"],"cpcS":["G06F7/544","G11C11/44","G06N3/063","H03M13/37"]},"22":{"ciis":0.6799,"nc":0.7621,"ev":0.7757,"cde":0.6593,"msi":0.505,"rank":39,"cpcP":["C12P21/00","C12M1/42"],"cpcS":["C12N9/1229","H01M8/10","C12M3/00","B01J19/00","C12Q1/00"]},"27":{"ciis":0.6798,"nc":0.8053,"ev":0.7161,"cde":0.7263,"msi":0.455,"rank":40,"cpcP":["G16B20/00","C12N15/10"],"cpcS":["C12P21/00","G06N20/00","B01L3/00","C40B30/08"]},"74":{"ciis":0.6782,"nc":0.7834,"ev":0.6085,"cde":0.7546,"msi":0.5475,"rank":41,"cpcP":["G06F 21/57 (assessing security vulnerabilities)","G06V 10/82 (neural networks for image recognition)","B60W 60/00 (autonomous driving)"],"cpcS":["G06N 3/08 (NN training)","G06T 7/00 (image analysis)","H04L 9/32 (cryptographic authentication)"]},"38":{"ciis":0.6776,"nc":0.7797,"ev":0.6714,"cde":0.6877,"msi":0.545,"rank":42,"cpcP":["G06N10/40","G06N10/70"],"cpcS":["H04L13/00","G06F9/44","G06F13/40","H03M13/00"]},"31":{"ciis":0.6753,"nc":0.7914,"ev":0.6956,"cde":0.6838,"msi":0.505,"rank":43,"cpcP":["H01L23/373","H01L23/34","H05K7/20"],"cpcS":["C04B35/495","H01L23/42","H01L25/065","G05D23/19","C09K5/00"]},"54":{"ciis":0.6748,"nc":0.8349,"ev":0.655,"cde":0.6902,"msi":0.495,"rank":44,"cpcP":["G06N3/098","H04N1/32149","G06F21/10"],"cpcS":["H04L9/3247","G06N20/00","G06F21/16","G06T1/0028"]},"100":{"ciis":0.6747,"nc":0.7722,"ev":0.6491,"cde":0.6339,"msi":0.625,"rank":45,"cpcP":["H04L9/08","G06F21/72"],"cpcS":["H04L9/30","H04L9/32","G06F9/455","H04L63/06"]},"12":{"ciis":0.6732,"nc":0.665,"ev":0.8039,"cde":0.5451,"msi":0.715,"rank":46,"cpcP":["H01M10/54 (secondary cells \u2014 recovery of active material)","C22B26/12 (recovery of Li)"],"cpcS":["C25B3/00 (electrolytic processes)","H01M4/58 (polyanion cathode active materials)","C22B7/00 (working-up of residues from metallurgical processes)"]},"30":{"ciis":0.673,"nc":0.8401,"ev":0.7007,"cde":0.6518,"msi":0.4775,"rank":47,"cpcP":["H01L21/02","H01L23/373","B82Y30/00"],"cpcS":["B82Y40/00","C09K5/00","H01L25/065","C08K3/38","H01L21/48"]},"57":{"ciis":0.67,"nc":0.7722,"ev":0.6649,"cde":0.7312,"msi":0.49,"rank":48,"cpcP":["H03K19/1958","G06N10/40","H04L27/26"],"cpcS":["H03H11/04","H01P1/203","G06N10/20","H03F3/193"]},"48":{"ciis":0.6693,"nc":0.7572,"ev":0.7642,"cde":0.5747,"msi":0.57,"rank":49,"cpcP":["B22F10/28","B33Y10/00","B23K26/06 (laser beam control)"],"cpcS":["B22F10/366 (DED)","B33Y70/10","B23K26/0007 (beam properties)","B23K26/342 (multiple beams)","C22C9/00 (copper alloys)","C22C14/00 (titanium alloys)"]},"69":{"ciis":0.6686,"nc":0.8413,"ev":0.6375,"cde":0.7406,"msi":0.4425,"rank":50,"cpcP":["A61N1/3603 (neurostimulation control systems)","G06F3/016 (haptic user interface)","A61B5/369 (EEG)"],"cpcS":["A61H23/02 (vibration therapy)","G06F3/015 (body motion input)","A61N1/36031 (physiological parameter control)","H04R1/00 (transducer/acoustic device)"]},"37":{"ciis":0.6664,"nc":0.7671,"ev":0.6576,"cde":0.6003,"msi":0.625,"rank":51,"cpcP":["G06N10/70","G06F11/07"],"cpcS":["G06N10/40","G06F11/20","H03M13/35"]},"52":{"ciis":0.6654,"nc":0.6747,"ev":0.6797,"cde":0.6527,"msi":0.65,"rank":52,"cpcP":["G06N3/098","H04L9/3236","G06F11/07"],"cpcS":["H04L9/3239","G06F21/57","G06N20/00","H04L67/104"]},"103":{"ciis":0.663,"nc":0.7534,"ev":0.6237,"cde":0.6339,"msi":0.625,"rank":53,"cpcP":["H04L9/30","H04L9/0816"],"cpcS":["H04L9/08","H04L63/06","G06F21/72","H04L9/003"]},"89":{"ciis":0.6604,"nc":0.695,"ev":0.6688,"cde":0.6408,"msi":0.625,"rank":54,"cpcP":["C12N1/20 (Bacteria - Komagataeibacter)","C08B11/00 (Cellulose derivatives)","C12N15/63 (Genetic engineering of bacteria)"],"cpcS":["D21H11/20 (Non-fibrous material added to fibrous raw material)","B32B5/02 (Layered composite)","C12P19/04 (Cellulose production)"]},"86":{"ciis":0.6591,"nc":0.7559,"ev":0.6997,"cde":0.6815,"msi":0.4775,"rank":55,"cpcP":["C12P21/00 (Preparation of peptides or proteins by fermentation)","C12M1/00 (Apparatus for enzymology or microbiology)","C08H1/00 (Macromolecular products from proteins)"],"cpcS":["B29C48/00 (Extrusion moulding)","G05B19/00 (Process control)","D01F4/02 (Artificial filaments from proteins)"]},"33":{"ciis":0.6573,"nc":0.8458,"ev":0.6522,"cde":0.6717,"msi":0.4425,"rank":56,"cpcP":["H01L23/34","G01R31/28","G01N29/04"],"cpcS":["H05K1/02","G01N29/44","H01L23/373","H01L25/18","B81B3/00"]},"46":{"ciis":0.6561,"nc":0.729,"ev":0.6812,"cde":0.6682,"msi":0.5225,"rank":57,"cpcP":["B33Y80/00","B33Y10/00","G01D21/02 (embedded sensing)"],"cpcS":["B22F10/28","B33Y70/10","H01Q1/40 (antennas in conducting materials)","G01L1/22 (strain measurement)","B22F7/08 (bonded metal structures with inserts)"]},"64":{"ciis":0.6559,"nc":0.8599,"ev":0.7259,"cde":0.5077,"msi":0.53,"rank":58,"cpcP":["A61B5/291 (EEG electrodes)","A61B5/263 (electrode materials)","A61B5/302 (capacitive/MOSFET input circuits)"],"cpcS":["A61B5/268 (conductive polymer electrodes)","H01L27/146 (CMOS image sensors - analogous ASIC architecture)","A61B5/31 (EEG input circuits)","A61B2562/0209 (special electrode features)"]},"47":{"ciis":0.6554,"nc":0.6533,"ev":0.6314,"cde":0.7306,"msi":0.6025,"rank":59,"cpcP":["B33Y50/00","B33Y50/02","G06N3/04 (neural networks)"],"cpcS":["G06F30/23 (FEA-based design)","G05B23/02 (monitoring/diagnosis)","B22F10/28","G01N33/20 (material property measurement)","G06N20/00 (machine learning)"]},"62":{"ciis":0.6554,"nc":0.65,"ev":0.6727,"cde":0.7211,"msi":0.57,"rank":60,"cpcP":["H03M1/66","G06N10/40","H01L27/07845"],"cpcS":["H03M3/02","H01L29/786","H03F3/193","G11C27/02"]},"94":{"ciis":0.6544,"nc":0.7844,"ev":0.6598,"cde":0.5006,"msi":0.69,"rank":61,"cpcP":["G02B 6/4201","G02B 6/30"],"cpcS":["G02B 6/4204","G02B 27/44","H01L 31/0232","G02B 5/18","G02B 6/122"]},"18":{"ciis":0.6525,"nc":0.6481,"ev":0.7204,"cde":0.7116,"msi":0.5225,"rank":62,"cpcP":["H10B51/30 (FeRAM with FTJ)","H10N70/20 (HfO2-based devices)"],"cpcS":["H01L21/28 (BEOL processing)","G11C11/56 (ferroelectric memory)","G06N3/063 (hardware neural networks)","H10B51/00 (ferroelectric memory devices)"]},"49":{"ciis":0.6488,"nc":0.6786,"ev":0.6162,"cde":0.6867,"msi":0.6025,"rank":63,"cpcP":["B33Y40/20","C21D9/00 (heat treatment of fabricated articles)","B22F3/24 (HIP)"],"cpcS":["B33Y80/00","G01L5/00 (residual stress measurement)","C21D10/00 (heat treatment with irradiation)","B23K26/356 (laser shock processing)","C04B41/80 (surface treatment of ceramic-metal)","B22F2998/10 (heat treatment of AM parts)"]},"60":{"ciis":0.648,"nc":0.77,"ev":0.62,"cde":0.697,"msi":0.4825,"rank":64,"cpcP":["H02J50/10","H02J50/90","G06N10/40"],"cpcS":["H02J7/00","H01F38/14","H02M3/00","H01L39/00"]},"84":{"ciis":0.6431,"nc":0.805,"ev":0.6056,"cde":0.7036,"msi":0.4425,"rank":65,"cpcP":["G01N29/04","H01L23/58"],"cpcS":["G06N3/084","G01N29/11","H01L25/07","G01N2291/02","H02M1/32"]},"96":{"ciis":0.6412,"nc":0.7617,"ev":0.553,"cde":0.6714,"msi":0.5625,"rank":66,"cpcP":["G06F 13/38","H04B 10/07"],"cpcS":["G06F 9/455","H04L 41/0896","H04B 10/40","H04J 14/02","G06F 13/42"]},"1":{"ciis":0.6411,"nc":0.6505,"ev":0.753,"cde":0.4744,"msi":0.7475,"rank":67,"cpcP":["H01M10/0562 (solid-state electrolyte), H01M4/1391 (treatment of electrodes for solid-state batteries)"],"cpcS":["H01M50/46 (separators with surface coatings), C23C16/455 (ALD processes), H01M10/0585 (flat construction elements), H01M4/625 (coating of electrode materials)"]},"63":{"ciis":0.6411,"nc":0.7794,"ev":0.5976,"cde":0.7896,"msi":0.4025,"rank":68,"cpcP":["H01P5/00","B81B3/00","G06N10/40"],"cpcS":["H01L39/02","F17C13/00","H04Q3/52","G06F1/20"]},"68":{"ciis":0.6402,"nc":0.7075,"ev":0.7678,"cde":0.5384,"msi":0.545,"rank":69,"cpcP":["A61B8/0808 (ultrasound imaging brain)","A61N7/02 (therapeutic ultrasound brain)","A61B8/12 (blood flow Doppler)"],"cpcS":["A61B5/369 (EEG - for hybrid hybrid system claims)","A61B8/4455 (phased array transducers)","H04R17/00 (piezoelectric transducers)","A61N7/00 (ultrasonic neuromodulation)"]},"83":{"ciis":0.6397,"nc":0.8208,"ev":0.639,"cde":0.5951,"msi":0.4825,"rank":70,"cpcP":["H01L23/473","H01L23/36"],"cpcS":["H01L23/14","H01L21/48","B81B1/00","H01L23/34","F28F13/00"]},"10":{"ciis":0.6378,"nc":0.6394,"ev":0.7171,"cde":0.5729,"msi":0.6275,"rank":71,"cpcP":["H05K1/03 (insulating substrates for PCBs)","C08G59/18 (epoxy resins with curing)"],"cpcS":["H05K3/00 (manufacturing PCBs)","C08G2650/00 (covalent adaptable networks)","B32B27/38 (epoxy resin layers)","H05K2203/175 (substrate recovery)"]},"42":{"ciis":0.6359,"nc":0.6673,"ev":0.7166,"cde":0.6003,"msi":0.5475,"rank":72,"cpcP":["G06N10/70","G06N10/40"],"cpcS":["G06F9/38","H03M13/37","G06F15/78","G06F9/50"]},"23":{"ciis":0.6354,"nc":0.6758,"ev":0.7072,"cde":0.6247,"msi":0.5175,"rank":73,"cpcP":["A61K9/50","C12P21/00"],"cpcS":["A61K9/19","C12M1/00","B01J13/04","C12N1/08"]},"78":{"ciis":0.6341,"nc":0.7569,"ev":0.6223,"cde":0.5689,"msi":0.57,"rank":74,"cpcP":["H01L23/498","H01L23/373"],"cpcS":["H01L23/14","H05K1/0293","C04B35/587","H01L21/48","H01L23/36"]},"29":{"ciis":0.6283,"nc":0.6415,"ev":0.6776,"cde":0.7077,"msi":0.4775,"rank":75,"cpcP":["H01L23/373","H01L25/065","H01L25/18"],"cpcS":["B82Y30/00","H01L23/42","C09K5/00","H01L21/48","G06F30/23"]},"13":{"ciis":0.6282,"nc":0.6369,"ev":0.6707,"cde":0.6321,"msi":0.5625,"rank":76,"cpcP":["G16C20/70 (machine learning in materials informatics)","G06N3/04 (neural networks)"],"cpcS":["C01G (inorganic compounds \u2014 discovery context)","G06F30/17 (computer-aided materials design)","G06N3/08 (neural network training methods)"]},"104":{"ciis":0.6257,"nc":0.6037,"ev":0.6141,"cde":0.6339,"msi":0.665,"rank":77,"cpcP":["G06F21/72","H04L9/08"],"cpcS":["G06F21/57","H04L9/32","G06F21/73","H04L9/30"]},"35":{"ciis":0.6255,"nc":0.6767,"ev":0.6125,"cde":0.7496,"msi":0.455,"rank":78,"cpcP":["G06F30/20","H01L23/34","G05D23/19"],"cpcS":["G06N20/00","H01L25/18","G06F119/08","H05K7/20","G01R31/28"]},"11":{"ciis":0.6215,"nc":0.6928,"ev":0.6751,"cde":0.6149,"msi":0.4825,"rank":79,"cpcP":["H10N10/17 (thermoelectric module fabrication)","H10N10/85 (thermoelectric active materials)"],"cpcS":["H10N10/80 (thermoelectric module constructional details)","C22C23/00 (Mg alloys)","B22F3/14 (spark plasma sintering)","F28F21/06 (waste heat recovery surfaces)"]},"5":{"ciis":0.6196,"nc":0.5606,"ev":0.6685,"cde":0.5824,"msi":0.7075,"rank":80,"cpcP":["C23C16/455 (MLD/ALD processes), H01M4/625 (coating for battery electrodes), H01M10/0562"],"cpcS":["C23C16/40 (ALD metal oxide), H01M4/1391, H01M50/46, B05D1/00 (roll-to-roll coating processes)"]},"82":{"ciis":0.6191,"nc":0.8231,"ev":0.6284,"cde":0.5289,"msi":0.4825,"rank":81,"cpcP":["H01L23/29","C08K3/38"],"cpcS":["H01L23/31","C08L27/18","C08K9/06","H01L21/56","C08K3/04"]},"40":{"ciis":0.6184,"nc":0.6493,"ev":0.6323,"cde":0.6527,"msi":0.5225,"rank":82,"cpcP":["G06N10/40","G06F9/38"],"cpcS":["G06N10/70","G06F9/50","H04L45/00","G06F13/14"]},"90":{"ciis":0.6175,"nc":0.7102,"ev":0.649,"cde":0.6232,"msi":0.465,"rank":83,"cpcP":["C04B28/02 (Compositions using Portland cement)","C12N1/20 (Bacteria)","E04G21/02 (Concrete laying)"],"cpcS":["C12N15/63 (Genetic engineering)","B33Y70/00 (3D printing with biological material)","C04B18/00 (Inorganic additives for hydraulic binders)"]},"3":{"ciis":0.6093,"nc":0.681,"ev":0.6307,"cde":0.5146,"msi":0.61,"rank":84,"cpcP":["H01M10/48 (accumulators with condition-monitoring arrangements), H01M10/4257 (battery with incorporated microchip/electronic circuit)"],"cpcS":["G01R31/389 (EIS battery testing), H01M10/0562, H01M50/569 (sensors inside battery), G01N27/02 (electrochemical sensing)"]},"81":{"ciis":0.6068,"nc":0.7651,"ev":0.6671,"cde":0.4658,"msi":0.53,"rank":85,"cpcP":["H03K17/0412","H01L27/0617"],"cpcS":["H01L23/498","H01L25/07","H02M1/08","H03K17/16","H01L21/8258"]},"61":{"ciis":0.602,"nc":0.5976,"ev":0.588,"cde":0.6964,"msi":0.5225,"rank":86,"cpcP":["H01L27/18","G06N10/40","H01L39/22"],"cpcS":["H03K19/195","H01L23/12","G10K11/22","H01L39/025"]},"67":{"ciis":0.6016,"nc":0.6989,"ev":0.6624,"cde":0.5999,"msi":0.4275,"rank":87,"cpcP":["A61B5/7207 (motion artifact cancellation)","A61B5/7214 (noise cancellation using dual sensor)","A61B5/291 (EEG)"],"cpcS":["A61B5/6804 (ambulatory monitoring)","G01C21/16 (inertial navigation/MEMS)","H03H21/00 (adaptive digital filters)","A61B5/31 (EEG input circuits)"]},"105":{"ciis":0.6005,"nc":0.6129,"ev":0.625,"cde":0.6339,"msi":0.5175,"rank":88,"cpcP":["H04L9/08","H04L63/16"],"cpcS":["H04L9/30","H04L63/06","G06F21/72","H04L67/141"]},"66":{"ciis":0.5966,"nc":0.6825,"ev":0.7271,"cde":0.4577,"msi":0.53,"rank":89,"cpcP":["A61B5/14532 (measuring blood oxygen, fNIRS)","A61B5/369 (EEG)","A61B5/0022 (wearable body sensor)"],"cpcS":["A61B5/291 (EEG electrodes)","A61B5/7267 (non-linear signal analysis)","G16H50/20 (healthcare ML)","A61B5/048 (EEG for BCI applications)"]},"76":{"ciis":0.5949,"nc":0.6125,"ev":0.54,"cde":0.662,"msi":0.5625,"rank":90,"cpcP":["G06F 11/3604 (verification/validation)","B60W 60/00 (autonomous driving)","G06T 17/00 (3D modeling/simulation)"],"cpcS":["G06N 20/00 (machine learning)","G05D 1/00 (vehicle control)","G06F 30/20 (simulation/CAD)"]},"91":{"ciis":0.5946,"nc":0.6335,"ev":0.6427,"cde":0.5811,"msi":0.505,"rank":91,"cpcP":["C08H1/00 (Macromolecular products from proteins)","C12N15/62 (DNA sequences encoding fusion proteins)","C12P21/02 (Preparation of peptides)"],"cpcS":["D01F4/02 (Artificial filaments from proteins)","C12N9/00 (Enzymes)","C08L89/00 (Compositions based on proteins)"]},"98":{"ciis":0.5936,"nc":0.6895,"ev":0.4575,"cde":0.658,"msi":0.5775,"rank":92,"cpcP":["G03F 1/68","G06F 30/392"],"cpcS":["G02B 6/122","G02B 6/1228","H01L 21/027","G06F 30/20","G06F 30/398"]},"8":{"ciis":0.5915,"nc":0.6191,"ev":0.7799,"cde":0.4744,"msi":0.515,"rank":93,"cpcP":["H01M4/36 (electrodes, active material preparation)","H01M4/58 (inorganic active materials with polyanion structures)"],"cpcS":["H01M4/131 (olivine-type active materials)","C23C16/44 (ALD process)","H01M4/62 (binders and inactive ingredients)","H01M10/0525 (lithium-ion cells)"]},"24":{"ciis":0.5863,"nc":0.6767,"ev":0.6473,"cde":0.5731,"msi":0.43,"rank":94,"cpcP":["C12P1/00","C12N11/04"],"cpcS":["C12M1/00","B82Y5/00","C12P21/00","C07H21/00"]},"34":{"ciis":0.5862,"nc":0.6276,"ev":0.6119,"cde":0.6482,"msi":0.4425,"rank":95,"cpcP":["H01L23/373","H01L23/3736","C09K5/00"],"cpcS":["H01L23/42","B32B5/00","C08G75/14","H01L21/48","H01L25/065"]},"93":{"ciis":0.586,"nc":0.5249,"ev":0.626,"cde":0.6634,"msi":0.545,"rank":96,"cpcP":["H04J 14/02","H04B 10/2507"],"cpcS":["G02B 6/293","H01S 5/024","H05K 7/20","G02F 1/0147","H04J 14/0221"]},"16":{"ciis":0.5823,"nc":0.8197,"ev":0.8015,"cde":0.2875,"msi":0.565,"rank":97,"cpcP":["G06F8/41 (compilers)","G06N3/04 (neural network architectures)"],"cpcS":["G06F9/30 (instruction sets)","G06N3/063 (hardware neural network implementations)","G06F15/80 (special purpose computers)","G06N3/08 (learning methods)"]},"14":{"ciis":0.5799,"nc":0.5967,"ev":0.7165,"cde":0.4696,"msi":0.555,"rank":98,"cpcP":["H01M4/131 (alkali metal cathode active materials)","H01M10/054 (sodium-ion cells)"],"cpcS":["C01G45/00 (Mn compounds)","H01M4/136 (layered oxide active materials)","C01G29/00 (Bi compounds)","H01M4/485 (mixed oxide/hydroxide active materials)"]},"26":{"ciis":0.5782,"nc":0.5327,"ev":0.6903,"cde":0.5795,"msi":0.5225,"rank":99,"cpcP":["C12P21/00","C07K1/107"],"cpcS":["C12N9/10","C12P19/18","C12M1/00","A61K38/00"]},"87":{"ciis":0.5704,"nc":0.5428,"ev":0.6402,"cde":0.583,"msi":0.5175,"rank":100,"cpcP":["C12N1/14 (Fungi)","C12N1/20 (Bacteria)","E04C2/00 (Structural elements)"],"cpcS":["C04B28/00 (Mortars/plasters/concretes)","C12N15/63 (Genetic engineering of microorganisms)","C08L99/00 (Compositions based on natural macromolecular compounds)"]},"80":{"ciis":0.5662,"nc":0.5998,"ev":0.6387,"cde":0.4562,"msi":0.585,"rank":101,"cpcP":["H01L23/473","H01L23/467"],"cpcS":["H01L23/36","H01L23/498","H02M7/003","H01L21/48","H05K7/20"]},"7":{"ciis":0.5651,"nc":0.4816,"ev":0.5604,"cde":0.6714,"msi":0.585,"rank":102,"cpcP":["H01M4/1391, C08G77/04 (organosilicon compounds for bonding), B82B3/00 (nanotechnology fabrication including SAMs)"],"cpcS":["H01M10/0562, H01M4/625, C09J11/00 (surface adhesion chemistry), C23C16/04 (chemical vapor deposition of adhesion layers)"]},"97":{"ciis":0.5524,"nc":0.5035,"ev":0.56,"cde":0.6366,"msi":0.5225,"rank":103,"cpcP":["H01S 5/024","G02B 6/122"],"cpcS":["G02F 1/0147","H04J 14/02","G02B 6/293","H04B 10/2507","G02B 6/12"]},"4":{"ciis":0.5482,"nc":0.5065,"ev":0.5867,"cde":0.6399,"msi":0.4675,"rank":104,"cpcP":["H01M10/0562, H01M4/625 (coating electrode materials), C08F2/50 (photopolymerization)"],"cpcS":["H01M10/0585, H01M4/1391, C09D183/04 (silicone coatings), B82Y30/00 (nanoscale material applications)"]},"79":{"ciis":0.4858,"nc":0.8305,"ev":0.6997,"cde":0.1616,"msi":0.545,"rank":105,"cpcP":["H01L24/29","H01L21/603"],"cpcS":["H01L23/10","H01L24/83","H01L21/48","H01L23/058","H01L24/27"]}};
+
+function ciisScoreColor(v) {
+  if (v >= 0.72) return 'var(--green)';
+  if (v >= 0.65) return 'var(--teal)';
+  if (v >= 0.58) return 'var(--amber)';
+  return 'var(--red)';
+}
+
+function pillarColor(pillar) {
+  const map = { nc: 'var(--teal)', ev: 'var(--blue)', cde: 'var(--amber)', msi: 'var(--violet)' };
+  return map[pillar] || 'var(--text)';
+}
+
+function pillarLabel(pillar) {
+  const map = { nc: 'Network Centrality', ev: 'Economic Value', cde: 'Cross-Domain Enablement', msi: 'Multi-Stakeholder Importance' };
+  return map[pillar] || pillar;
+}
+
+function pillarAbbr(pillar) {
+  return pillar.toUpperCase();
+}
+
+function pillarWeight(pillar) {
+  const map = { nc: 0.30, ev: 0.25, cde: 0.25, msi: 0.20 };
+  return map[pillar] || 0;
+}
+
+function generatePillarReasoning(idea, pillar, score) {
+  const title = idea.title || '';
+  const desc = idea.desc || '';
+  const cpcPrimary = (idea.cpcP || []).join(', ');
+  const cpcSecondary = (idea.cpcS || []).join(', ');
+  const fto = idea.fto || '';
+  const val = idea.val || '';
+  const filing = idea.filing || '';
+  
+  const isHigh = score >= 0.75;
+  const isMid = score >= 0.55 && score < 0.75;
+  
+  if (pillar === 'nc') {
+    const cpcCount = ((idea.cpcP || []).length + (idea.cpcS || []).length);
+    const reasons = [];
+    if (isHigh) {
+      reasons.push('This invention sits at a high-connectivity node in the patent citation network, bridging multiple CPC technology clusters.');
+      if (cpcCount >= 4) reasons.push('With ' + cpcCount + ' classified CPC codes spanning primary (' + cpcPrimary + ') and secondary (' + cpcSecondary + ') classes, it links diverse technology domains — a hallmark of structurally important innovations.');
+      reasons.push('Inventions with NC scores above 0.75 typically occupy bridging positions between otherwise disconnected patent families, making them strategic chokepoints in licensing negotiations.');
+    } else if (isMid) {
+      reasons.push('This invention demonstrates moderate network connectivity, positioned within a recognized technology cluster but not yet a dominant bridge between fields.');
+      if (cpcCount >= 3) reasons.push('The ' + cpcCount + ' CPC classifications (' + cpcPrimary + ') indicate connections across several technical areas, but the citation network shows limited cross-domain linkages at present.');
+      reasons.push('Its NC score reflects solid positioning within its primary technology area, with growth potential as the field matures and more cross-references develop.');
+    } else {
+      reasons.push('This invention currently occupies a peripheral position in the broader citation network, with limited connections to adjacent technology clusters.');
+      reasons.push('The CPC classifications (' + cpcPrimary + ') place it in a relatively narrow technical domain, which may limit its role as a network bridge — though this can evolve as the technology gains adoption.');
+    }
+    return reasons;
+  }
+  
+  if (pillar === 'ev') {
+    const reasons = [];
+    if (isHigh) {
+      reasons.push('Strong economic indicators with an estimated portfolio value of ' + val + ', reflecting high market demand and clear commercialization pathways.');
+      reasons.push('The technology addresses a proven market need with identifiable licensees and established revenue models, supporting above-average economic value scoring.');
+      if (filing === 'IMMEDIATE') reasons.push('IMMEDIATE filing priority further underscores the time-sensitive economic opportunity — competitors are likely pursuing similar claims.');
+    } else if (isMid) {
+      reasons.push('Moderate economic value with estimated portfolio contribution of ' + val + '. The market opportunity is identifiable but may face competition or longer commercialization timelines.');
+      reasons.push('While the underlying technology has clear applications, the economic value is tempered by the current maturity of the target market or the availability of substitute technologies.');
+    } else {
+      reasons.push('Below-average economic value estimate of ' + val + ', potentially reflecting a nascent market, long development timeline, or significant competition in the space.');
+      reasons.push('The economic score may improve as the technology matures or as market conditions evolve, but current indicators suggest limited near-term licensing revenue potential.');
+    }
+    return reasons;
+  }
+  
+  if (pillar === 'cde') {
+    const reasons = [];
+    const secondaryCount = (idea.cpcS || []).length;
+    if (isHigh) {
+      reasons.push('Exceptional cross-domain applicability. The core innovation enables technology transfer across ' + secondaryCount + ' secondary CPC classifications, from ' + cpcSecondary.split(',').slice(0,2).join(' to ') + '.');
+      reasons.push('Platform technologies with high CDE scores like this tend to generate derivative inventions across multiple application domains, creating a multiplier effect on portfolio value.');
+    } else if (isMid) {
+      reasons.push('Moderate cross-domain enablement. The invention has applications beyond its primary domain (' + cpcPrimary + '), with ' + secondaryCount + ' secondary classifications indicating some technology transfer potential.');
+      reasons.push('The core innovation could be adapted to adjacent fields, but the current claim structure may limit broad applicability without additional continuation filings.');
+    } else {
+      reasons.push('Limited cross-domain applicability, with the invention primarily confined to its core CPC classification (' + cpcPrimary + ').');
+      reasons.push('The specialized nature of this technology reduces its potential as a platform enabler across multiple industries, though it may hold strong domain-specific value.');
+    }
+    return reasons;
+  }
+  
+  if (pillar === 'msi') {
+    const reasons = [];
+    if (isHigh) {
+      reasons.push('High multi-stakeholder relevance. This invention impacts a broad range of stakeholders including manufacturers, end-users, regulators, and standards bodies — increasing its strategic importance.');
+      if (fto === 'GREEN') reasons.push('The GREEN FTO rating combined with high MSI suggests this technology can be deployed across multiple stakeholder ecosystems without significant freedom-to-operate constraints.');
+      reasons.push('Technologies with MSI scores above 0.65 often become essential to industry standards or regulatory frameworks, creating strong defensive and offensive IP positioning.');
+    } else if (isMid) {
+      reasons.push('Moderate stakeholder relevance. The invention affects a defined set of stakeholders — primarily within the direct supply chain and immediate application domain.');
+      reasons.push('While not universally impactful, the technology addresses needs relevant to multiple industry participants, supporting moderate strategic value.');
+    } else {
+      reasons.push('Narrow stakeholder impact, primarily relevant to a specialized segment of the target industry.');
+      reasons.push('The limited breadth of stakeholder interest may reduce the invention\'s value in cross-licensing negotiations, though it could serve as a focused competitive tool within its niche.');
+    }
+    return reasons;
+  }
+  
+  return ['Score data available — detailed reasoning for this pillar is being developed.'];
+}
+
+function renderCIIScoreTab(idea) {
+  const ciisData = CIIS_LOOKUP[idea.id];
+  
+  if (!ciisData) {
+    return '<div class="drawer-section"><div class="drawer-section-title">CII Score</div><div class="drawer-text" style="color:var(--text-faint);font-style:italic"><p>CII Score data is not available for this invention.</p></div></div>';
+  }
+  
+  let html = '';
+  
+  // Overall CII Score header
+  const ciis = ciisData.ciis;
+  const rank = ciisData.rank;
+  html += '<div class="drawer-section">';
+  html += '<div class="drawer-section-title">Composite Invention Importance (CII)</div>';
+  html += '<div style="text-align:center;margin-bottom:16px">';
+  html += '<div style="font-size:36px;font-weight:700;color:' + ciisScoreColor(ciis) + ';letter-spacing:-0.02em">' + ciis.toFixed(4) + '</div>';
+  html += '<div style="font-size:12px;color:var(--text-muted);margin-top:2px">Rank #' + rank + ' of 105 inventions</div>';
+  html += '</div>';
+  
+  // Formula explanation
+  html += '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--text-muted);line-height:1.6">';
+  html += '<span style="font-weight:600;color:var(--text-secondary)">Formula:</span> CII = ';
+  html += '<span style="color:var(--teal)">0.30</span>·NC + ';
+  html += '<span style="color:var(--blue)">0.25</span>·EV + ';
+  html += '<span style="color:var(--amber)">0.25</span>·CDE + ';
+  html += '<span style="color:var(--violet)">0.20</span>·MSI';
+  html += '</div>';
+  html += '</div>';
+  
+  // Pillar breakdown with bars
+  html += '<div class="drawer-section">';
+  html += '<div class="drawer-section-title">Pillar Breakdown</div>';
+  
+  const pillars = ['nc', 'ev', 'cde', 'msi'];
+  pillars.forEach(function(p) {
+    const score = ciisData[p];
+    const pct = (score * 100).toFixed(0);
+    const weight = pillarWeight(p);
+    const weighted = (score * weight).toFixed(4);
+    const color = pillarColor(p);
+    
+    html += '<div style="margin-bottom:14px">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">';
+    html += '<span style="font-size:13px;font-weight:600;color:' + color + '">' + pillarAbbr(p) + ' — ' + pillarLabel(p) + '</span>';
+    html += '<span style="font-size:13px;font-weight:700;color:' + color + '">' + score.toFixed(4) + '</span>';
+    html += '</div>';
+    html += '<div style="height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden;margin-bottom:4px"><div style="height:100%;width:' + pct + '%;background:' + color + ';border-radius:3px;transition:width 0.8s cubic-bezier(0.22,1,0.36,1)"></div></div>';
+    html += '<div style="font-size:10px;color:var(--text-faint)">Weight: ' + (weight * 100).toFixed(0) + '% · Contribution: ' + weighted + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  
+  // Detailed reasoning per pillar
+  pillars.forEach(function(p) {
+    const score = ciisData[p];
+    const color = pillarColor(p);
+    const reasons = generatePillarReasoning(idea, p, score);
+    
+    html += '<div class="drawer-section">';
+    html += '<div class="drawer-section-title" style="display:flex;align-items:center;gap:8px">';
+    html += '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + color + ';flex-shrink:0"></span>';
+    html += pillarAbbr(p) + ' Analysis — ' + pillarLabel(p);
+    html += '</div>';
+    
+    html += '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:14px 16px">';
+    reasons.forEach(function(r) {
+      html += '<p style="font-size:12px;color:var(--text-secondary);line-height:1.65;margin-bottom:8px">' + escapeHtml(r) + '</p>';
+    });
+    
+    // Score badge
+    const levelLabel = score >= 0.75 ? 'HIGH' : score >= 0.55 ? 'MODERATE' : 'LOW';
+    const levelColor = score >= 0.75 ? 'var(--green)' : score >= 0.55 ? 'var(--amber)' : 'var(--red)';
+    html += '<div style="margin-top:8px;display:flex;align-items:center;gap:8px">';
+    html += '<span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:' + color + '18;color:' + color + ';border:1px solid ' + color + '30">' + pillarAbbr(p) + ': ' + score.toFixed(4) + '</span>';
+    html += '<span style="font-size:10px;font-weight:600;color:' + levelColor + '">' + levelLabel + '</span>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+  });
+  
+  // CPC context
+  if (ciisData.cpcP && ciisData.cpcP.length > 0) {
+    html += '<div class="drawer-section">';
+    html += '<div class="drawer-section-title">CPC Classification Context</div>';
+    html += '<div style="font-size:12px;color:var(--text-secondary);line-height:1.6">';
+    html += '<div style="margin-bottom:8px"><span style="font-weight:600;color:var(--text)">Primary:</span> ' + escapeHtml(ciisData.cpcP.join(', ')) + '</div>';
+    if (ciisData.cpcS && ciisData.cpcS.length > 0) {
+      html += '<div><span style="font-weight:600;color:var(--text)">Secondary:</span> ' + escapeHtml(ciisData.cpcS.join(', ')) + '</div>';
+    }
+    html += '</div>';
+    html += '</div>';
+  }
+  
+  return html;
+}
+
 
 function renderFilingTab(idea) {
   let html = '';
@@ -2551,6 +3007,379 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+
+
+/* ─── Toast helper ─── */
+function showToast(msg, type) {
+  type = type || 'info';
+  const t = document.createElement('div');
+  t.className = 'wf1-toast ' + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   WORKFLOW 1 — PATENT GENERATION PIPELINE EDITOR
+   ═══════════════════════════════════════════════════════════════ */
+
+const WF1_ROLES = {
+  'admin':           { label: 'Admin' },
+  'ip-strategist':   { label: 'IP Strategist' },
+  'ip-analyst':      { label: 'IP Analyst' },
+  'patent-engineer': { label: 'Patent Engineer' },
+  'patent-lawyer':   { label: 'Patent Lawyer' },
+  'inventor':        { label: 'Inventor' }
+};
+
+/* Default 10-step patent generation pipeline */
+function wf1CreateDefault() {
+  return {
+    id: 'wf-patent-pipeline', name: 'Patent Generation Pipeline', version: 1,
+    type: 'patent_generation', schedule: 'on-demand', cost_cap: null, human_gate: true,
+    steps: [
+      { id:'ws-1',  label:'Idea / Disclosure',  type:'task',         order:0, color:'#94A3B8', roleGate:['admin','ip-strategist','inventor'],       autoSkip:true,  approvalRequired:false, estimatedDuration:'1 hour',   dependencies:[],       prompt:'Review and formalize the invention disclosure for {{patent_title}} in the {{whitespace_name}} domain. Identify the core technical contribution, potential claims scope, and initial prior art landscape.' },
+      { id:'ws-2',  label:'FTO / Prior Art',     type:'task',         order:1, color:'#06B6D4', roleGate:['admin','ip-strategist','ip-analyst'],     autoSkip:true,  approvalRequired:false, estimatedDuration:'2 hours',  dependencies:['ws-1'], prompt:'Conduct a freedom-to-operate analysis for {{patent_title}} in the {{whitespace_name}} domain. Search for blocking patents, identify design-around opportunities, and rate FTO risk as GREEN/YELLOW/RED.' },
+      { id:'ws-3',  label:'Draft Claims',        type:'task',         order:2, color:'#3B82F6', roleGate:['admin','patent-engineer'],                autoSkip:true,  approvalRequired:false, estimatedDuration:'3 hours',  dependencies:['ws-2'], prompt:'Draft 3 independent claims and 8-12 dependent claims for {{patent_title}}. Follow USPTO 35 USC 112 enablement requirements. Structure: broadest system claim, autonomous control claim, method claim.' },
+      { id:'ws-4',  label:'Generate Figures',    type:'task',         order:3, color:'#8B5CF6', roleGate:['admin','patent-engineer'],                autoSkip:true,  approvalRequired:false, estimatedDuration:'2 hours',  dependencies:['ws-3'], prompt:'Generate 5 patent figures per 37 CFR 1.84 standards for {{patent_title}}: (1) System block diagram, (2) Cross-sectional view, (3) Method flowchart, (4) Control system diagram, (5) Performance comparison.' },
+      { id:'ws-5',  label:'Draft USPTO Filing',   type:'document-gen', order:4, color:'#D4A017', roleGate:['admin','patent-engineer'],                autoSkip:true,  approvalRequired:false, estimatedDuration:'4 hours',  dependencies:['ws-4'], prompt:'Draft a complete USPTO patent specification for {{patent_title}}.\n\n═══ DOCUMENT FORMAT (37 CFR §1.52) ═══\nAll text must be in English. Use sequential paragraph numbering ([0001], [0002], etc.) in continuous prose. No bullet points, parenthetical shorthand, or abbreviated data tables in the specification body. Each claim begins with a capital letter and ends with a period. Claims commence on a separate sheet.\n\n═══ SPECIFICATION STRUCTURE (37 CFR §1.71, §1.77) ═══\nProduce the following sections in this exact order with UPPERCASE headings (no underlining or bold):\n1. TITLE OF THE INVENTION — short, specific, ≤500 characters\n2. CROSS-REFERENCE TO RELATED APPLICATIONS\n3. STATEMENT REGARDING FEDERALLY SPONSORED RESEARCH (if applicable)\n4. BACKGROUND OF THE INVENTION — Technical Field + Related Art. Limit to 3–4 paragraphs: field context → technical problem → why existing approaches are incomplete (generically) → transition to invention. Never cite specific authors, academic papers, publication years, or competitors by name. Use "known methods," "traditional composites," "conventional approaches." Reserve strongest differentiation for prosecution.\n5. BRIEF SUMMARY OF THE INVENTION\n6. BRIEF DESCRIPTION OF THE DRAWINGS — Reference FIG. 1, FIG. 2, etc. with consecutive Arabic numerals.\n7. DETAILED DESCRIPTION OF THE INVENTION — Exhaustive narrative prose with [0001]+ paragraph numbering. Describe preferred embodiments in sufficient detail to enable any person skilled in the art (35 U.S.C. 112 Enablement). Reference numerals must correspond to drawing figures. Disclose best mode.\n8. CLAIM(S) — On a separate sheet. Number consecutively in Arabic numerals. Each element/step separated by line indentation.\n9. ABSTRACT OF THE DISCLOSURE — On a separate sheet, max 150 words.\n\n═══ FOUR PARALLEL DELIVERABLES ═══\nProduce four separate outputs (never combine into one document):\n(a) Claims Set — Independent + dependent claims\n(b) Specification — Full narrative detailed description\n(c) Abstract — ≤150 words\n(d) Figures Description — Brief Description of Drawings\n\n═══ CLAIM DRAFTING RULES (37 CFR §1.75) ═══\n• Claims must particularly point out and distinctly claim the subject matter (35 U.S.C. 112(b))\n• Claims must differ substantially from each other and not be unduly multiplied\n• All claim terms must find clear support/antecedent basis in the description\n• Structure: broadest system claim → autonomous control claim → method claim\n• Independent claims: self-contained, no reference to other claims\n• Dependent claims: reference a single prior claim, further limit that claim\n• Improvement claims: preamble (conventional elements) → "wherein the improvement comprises" → improvement elements\n\n═══ AI PATENT LANGUAGE RULES (NON-NEGOTIABLE) ═══\n\nPROHIBITED TERMS (replace immediately):\n- "superior" → "improved" or "enhanced relative to"\n- "critical" → "in some embodiments" or "in certain configurations"\n- "must" → "in some embodiments" or "may be configured to"\n- "our" / "we" → "the present invention" or "the disclosed embodiment"\n- "solves" → "addresses" or "provides [quantified] improvement in"\n- "completely eliminates" → "reduces or substantially eliminates"\n- "fails to" → neutral factual characterization\n- "unique" / "novel" (in specification) → "in accordance with aspects of the disclosure"\n- "best" / "optimal" → "in some embodiments" with hedged alternatives\n- "always" / "never" → qualified temporal/conditional language\n\nAPPROVED PATENT-NATIVE PHRASES (prioritize):\n- "in accordance with an embodiment" / "in some embodiments" / "configured to" / "operatively coupled to" / "at least one of" / "substantially" / "approximately" / "a plurality of" / "wherein" / "the method further comprising"\n\n═══ QUANTITATIVE LANGUAGE ═══\n- Use "from about X to about Y" or "in a range of approximately X to Y"\n- Include "approximately" before specific numerical values\n- Express tolerances as "within ±X% of the nominal value"\n\n═══ PROPHETIC vs. WORKING EXAMPLES ═══\n- Prophetic (not yet performed): future/subjunctive tense ("would be expected to")\n- Working (actually performed): past tense with measured values\n\n═══ NEGATIVE LIMITATIONS ═══\n- "free of" / "substantially free of" / "devoid of" / "without the need for"\n\n═══ COINED TERMS ═══\nWhen coining a term: explicitly define it, specify measurement method (ASTM/ISO), add worked examples, include terminology glossary.\n\n═══ DRAWING STANDARDS (37 CFR §1.84) ═══\n- FIG. 1, FIG. 2, etc.; partial views as FIG. 1A, FIG. 1B\n- Same reference character for same part across all figures\n- Reference characters ≥0.32 cm height\n\n═══ PRE-FILING CHECKLIST ═══\n□ No prohibited terms remain\n□ All claims have antecedent basis in specification\n□ Four deliverables are separate documents\n□ Background contains no specific author/paper citations\n□ All numerical values use "approximately" or range language\n□ Coined terms defined with measurement methods\n□ Drawing references match between specification and figures\n□ Abstract ≤150 words\n\nReference Documents: AI_Patent_Language_Guide.docx, USPTO_Patent_Drafting_Guidelines-2.docx, Patent_generation_prompt_V2.docx, USPTO_Patent_Drafting_Guidelines.docx, USPTO_Patent_Figures_Guide.docx' },
+      { id:'ws-6',  label:'Lawyer Review',       type:'approval',     order:5, color:'#F59E0B', roleGate:['admin','patent-lawyer'],                  autoSkip:false, approvalRequired:true,  estimatedDuration:'1-2 days', dependencies:['ws-5'], prompt:'Review the draft patent for {{patent_title}} for: (1) Claim scope adequacy, (2) 35 USC 101/102/103/112 compliance, (3) Prior art differentiation, (4) Prosecution risk. Provide approve/reject with notes.' },
+      { id:'ws-7',  label:'Admin Approval',      type:'approval',     order:6, color:'#22C55E', roleGate:['admin'],                                  autoSkip:false, approvalRequired:true,  estimatedDuration:'1 day',    dependencies:['ws-6'], prompt:'Final administrative review before filing. Verify: budget allocation, jurisdiction selection, inventor declarations, assignment documents complete.' },
+      { id:'ws-8',  label:'Filed (USPTO)',       type:'task',         order:7, color:'#2563EB', roleGate:['admin'],                                  autoSkip:false, approvalRequired:false, estimatedDuration:'1 hour',   dependencies:['ws-7'], prompt:'File the patent application with USPTO. Record filing date, application number, and confirmation receipt.' },
+      { id:'ws-9',  label:'Under Examination',   type:'task',         order:8, color:'#A855F7', roleGate:['admin','patent-lawyer'],                  autoSkip:false, approvalRequired:false, estimatedDuration:'6-18 months', dependencies:['ws-8'], prompt:'Track examination status. Monitor office actions, respond to examiner rejections within statutory deadlines.' },
+      { id:'ws-10', label:'Awarded',             type:'task',         order:9, color:'#10B981', roleGate:['admin','patent-lawyer'],                  autoSkip:false, approvalRequired:false, estimatedDuration:'—',        dependencies:['ws-9'], prompt:'Patent granted. Record grant date, patent number. Initiate licensing strategy and maintenance fee schedule.' }
+    ],
+    metadata: { createdBy: 'system', createdAt: '2026-01-01', sourceDocument: null }
+  };
+}
+
+/* WF1 state */
+let wf1 = wf1CreateDefault();
+let wf1SelectedStepId = null;
+let wf1DragSrcIdx = null;
+let wf1CurrentView = 'visual'; // 'visual' or 'json'
+
+/* Escape utility */
+function wf1Esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+/* ─── View toggle ─── */
+function wf1SwitchView(view) {
+  wf1CurrentView = view;
+  const btns = document.querySelectorAll('#wf1ViewToggle button');
+  btns.forEach(b => b.classList.remove('active'));
+  if (view === 'visual') {
+    btns[0].classList.add('active');
+    document.getElementById('wf1CanvasWrap').style.display = '';
+    document.getElementById('wf1Props').style.display === 'block' ? null : null; // keep as-is
+    document.getElementById('wf1RunBar').style.display = '';
+    document.getElementById('wf1RunStatus').style.display = '';
+    document.getElementById('wf1JsonWrap').classList.remove('open');
+    wf1RenderCanvas();
+  } else {
+    btns[1].classList.add('active');
+    document.getElementById('wf1CanvasWrap').style.display = 'none';
+    document.getElementById('wf1Props').classList.remove('open');
+    document.getElementById('wf1RunBar').style.display = 'none';
+    document.getElementById('wf1RunStatus').style.display = 'none';
+    document.getElementById('wf1JsonWrap').classList.add('open');
+    wf1SyncToJson();
+  }
+}
+
+function wf1SyncToJson() {
+  const editor = document.getElementById('wf1JsonEditor');
+  const exportObj = JSON.parse(JSON.stringify(wf1));
+  editor.value = JSON.stringify(exportObj, null, 2);
+  document.getElementById('wf1JsonStatus').textContent = '';
+}
+
+function wf1ApplyJson() {
+  const editor = document.getElementById('wf1JsonEditor');
+  const statusEl = document.getElementById('wf1JsonStatus');
+  try {
+    const parsed = JSON.parse(editor.value);
+    if (!parsed.steps || !Array.isArray(parsed.steps)) throw new Error('Missing "steps" array');
+    wf1 = parsed;
+    statusEl.className = 'wf1-json-status valid';
+    statusEl.textContent = '\u2713 JSON applied — ' + wf1.steps.length + ' steps loaded';
+    showToast('Workflow updated from JSON', 'success');
+  } catch (e) {
+    statusEl.className = 'wf1-json-status invalid';
+    statusEl.textContent = '\u2717 Invalid JSON: ' + e.message;
+  }
+}
+
+function wf1PrettyPrint() {
+  const editor = document.getElementById('wf1JsonEditor');
+  try {
+    const parsed = JSON.parse(editor.value);
+    editor.value = JSON.stringify(parsed, null, 2);
+    document.getElementById('wf1JsonStatus').className = 'wf1-json-status valid';
+    document.getElementById('wf1JsonStatus').textContent = '\u2713 Formatted';
+  } catch (e) {
+    document.getElementById('wf1JsonStatus').className = 'wf1-json-status invalid';
+    document.getElementById('wf1JsonStatus').textContent = '\u2717 Cannot format: ' + e.message;
+  }
+}
+
+/* ─── Render canvas ─── */
+function wf1RenderCanvas() {
+  const canvas = document.getElementById('wf1Canvas');
+  if (!wf1 || !canvas) return;
+  const steps = wf1.steps.sort((a, b) => a.order - b.order);
+  let html = '';
+
+  steps.forEach((step, idx) => {
+    const sel = wf1SelectedStepId === step.id ? ' selected' : '';
+    const typeLabel = step.type === 'approval' ? 'APPROVAL' : step.type === 'document-gen' ? 'DOC-GEN' : 'TASK';
+
+    html += `<div class="wf1-step${sel}" draggable="true" data-step-id="${step.id}" data-step-idx="${idx}">`;
+    html += `<span class="wf1-step-number">${idx + 1}</span>`;
+    html += `<div class="wf1-step-bar" style="background:${step.color || '#64748B'}"></div>`;
+    html += `<div class="wf1-step-info">`;
+    html += `<div class="wf1-step-label" title="${wf1Esc(step.label)}">${wf1Esc(step.label)}</div>`;
+    html += `<div class="wf1-step-meta">`;
+    html += `<span class="wf1-step-type">${typeLabel}</span>`;
+    if (step.estimatedDuration) html += `<span class="wf1-step-dur">${wf1Esc(step.estimatedDuration)}</span>`;
+    if (step.approvalRequired) html += `<span style="color:#F59E0B;font-size:10px">&#9888;</span>`;
+    html += `</div></div>`;
+    html += `<div class="wf1-step-actions"><button class="wf1-step-rm" onclick="event.stopPropagation();wf1RemoveStep('${step.id}')" title="Remove">&#10005;</button></div>`;
+    html += `</div>`;
+
+    if (idx < steps.length - 1) {
+      html += `<div class="wf1-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h8M9 4l4 4-4 4"/></svg></div>`;
+    }
+  });
+
+  canvas.innerHTML = html;
+
+  /* Wire events */
+  canvas.querySelectorAll('.wf1-step').forEach(el => {
+    el.addEventListener('dragstart', e => {
+      wf1DragSrcIdx = parseInt(el.dataset.stepIdx);
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', el.dataset.stepId);
+    });
+    el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      const targetIdx = parseInt(el.dataset.stepIdx);
+      if (wf1DragSrcIdx === null || wf1DragSrcIdx === targetIdx) return;
+      const moved = wf1.steps.splice(wf1DragSrcIdx, 1)[0];
+      wf1.steps.splice(targetIdx, 0, moved);
+      wf1.steps.forEach((s, i) => { s.order = i; });
+      wf1RenderCanvas();
+      showToast('Step reordered', 'success');
+    });
+    el.addEventListener('dragend', () => { el.classList.remove('dragging'); wf1DragSrcIdx = null; });
+    el.addEventListener('click', e => {
+      if (e.target.closest('.wf1-step-rm')) return;
+      wf1SelectStep(el.dataset.stepId);
+    });
+  });
+}
+
+/* ─── Select step → Properties panel ─── */
+function wf1SelectStep(stepId) {
+  wf1SelectedStepId = stepId;
+  const step = wf1.steps.find(s => s.id === stepId);
+  if (!step) return;
+  wf1RenderCanvas();
+  wf1RenderProps(step);
+}
+
+function wf1CloseProps() {
+  document.getElementById('wf1Props').classList.remove('open');
+  wf1SelectedStepId = null;
+  wf1RenderCanvas();
+}
+
+function wf1RenderProps(step) {
+  const panel = document.getElementById('wf1Props');
+  const title = document.getElementById('wf1PropTitle');
+  const body = document.getElementById('wf1PropBody');
+  panel.classList.add('open');
+  title.textContent = step.label;
+
+  let html = '';
+
+  /* Label */
+  html += `<div class="wf1-props-section"><div class="wf1-props-section-title">Step Label</div>`;
+  html += `<input style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;color:var(--text)" value="${wf1Esc(step.label)}" onchange="wf1UpdateField('${step.id}','label',this.value)">`;
+  html += `</div>`;
+
+  /* Type */
+  html += `<div class="wf1-props-section"><div class="wf1-props-section-title">Step Type</div>`;
+  html += `<select style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;color:var(--text)" onchange="wf1UpdateField('${step.id}','type',this.value)">`;
+  ['task','approval','gate','document-gen'].forEach(t => {
+    html += `<option value="${t}"${step.type === t ? ' selected' : ''}>${t}</option>`;
+  });
+  html += `</select></div>`;
+
+  /* Prompt */
+  html += `<div class="wf1-props-section"><div class="wf1-props-section-title">AI Prompt</div>`;
+  html += `<textarea class="wf1-prompt-editor" onchange="wf1UpdateField('${step.id}','prompt',this.value)" oninput="this.nextElementSibling.textContent='~'+Math.ceil(this.value.length/4)+' tokens'">${wf1Esc(step.prompt || '')}</textarea>`;
+  html += `<div class="wf1-token-count">~${Math.ceil((step.prompt||'').length/4)} tokens</div>`;
+  html += `<div style="margin-top:6px"><button class="wf1-btn-secondary" onclick="showToast('Test prompt sent (mock)','success')">&#9654; Test Prompt</button></div>`;
+  html += `</div>`;
+
+  /* Role Gates */
+  html += `<div class="wf1-props-section"><div class="wf1-props-section-title">Role Gates</div>`;
+  html += `<div class="wf1-role-check">`;
+  Object.keys(WF1_ROLES).forEach(rk => {
+    const checked = (step.roleGate || []).includes(rk) ? ' checked' : '';
+    html += `<label><input type="checkbox"${checked} onchange="wf1ToggleRole('${step.id}','${rk}',this.checked)"> ${WF1_ROLES[rk].label}</label>`;
+  });
+  html += `</div></div>`;
+
+  /* Execution settings */
+  html += `<div class="wf1-props-section"><div class="wf1-props-section-title">Execution Settings</div>`;
+  html += `<div class="wf1-toggle-row"><span class="wf1-toggle-label">Auto-skip (in auto mode)</span><input type="checkbox"${step.autoSkip ? ' checked' : ''} onchange="wf1UpdateField('${step.id}','autoSkip',this.checked)" style="accent-color:var(--teal)"></div>`;
+  html += `<div class="wf1-toggle-row"><span class="wf1-toggle-label">Approval required</span><input type="checkbox"${step.approvalRequired ? ' checked' : ''} onchange="wf1UpdateField('${step.id}','approvalRequired',this.checked)" style="accent-color:var(--teal)"></div>`;
+  html += `<div class="wf1-toggle-row"><span class="wf1-toggle-label">Duration estimate</span><input style="width:120px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;font-size:11px;color:var(--text)" value="${wf1Esc(step.estimatedDuration||'')}" onchange="wf1UpdateField('${step.id}','estimatedDuration',this.value)" placeholder="e.g. 2 hours"></div>`;
+  html += `</div>`;
+
+  /* Dependencies */
+  html += `<div class="wf1-props-section"><div class="wf1-props-section-title">Dependencies</div>`;
+  if (step.dependencies && step.dependencies.length) {
+    step.dependencies.forEach(dep => {
+      const depStep = wf1.steps.find(s => s.id === dep);
+      html += `<span class="wf1-dep-tag">${depStep ? depStep.label : dep}</span>`;
+    });
+  } else {
+    html += `<span style="font-size:11px;color:var(--text-faint)">None (first step)</span>`;
+  }
+  html += `</div>`;
+
+  /* Color */
+  html += `<div class="wf1-props-section"><div class="wf1-props-section-title">Step Color</div>`;
+  html += `<input type="color" value="${step.color||'#64748B'}" onchange="wf1UpdateField('${step.id}','color',this.value)" style="width:40px;height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer">`;
+  html += `</div>`;
+
+  body.innerHTML = html;
+}
+
+/* ─── Field updates ─── */
+function wf1UpdateField(stepId, field, value) {
+  const step = wf1.steps.find(s => s.id === stepId);
+  if (!step) return;
+  step[field] = value;
+  if (field === 'label' || field === 'type' || field === 'color') wf1RenderCanvas();
+}
+
+function wf1ToggleRole(stepId, role, checked) {
+  const step = wf1.steps.find(s => s.id === stepId);
+  if (!step) return;
+  if (checked && !step.roleGate.includes(role)) step.roleGate.push(role);
+  if (!checked) step.roleGate = step.roleGate.filter(r => r !== role);
+}
+
+/* ─── Remove step ─── */
+function wf1RemoveStep(stepId) {
+  const step = wf1.steps.find(s => s.id === stepId);
+  if (!step) return;
+  if (step.approvalRequired && !confirm(`Remove approval gate "${step.label}"?`)) return;
+  wf1.steps = wf1.steps.filter(s => s.id !== stepId);
+  wf1.steps.forEach((s, i) => { s.order = i; });
+  if (wf1SelectedStepId === stepId) { wf1SelectedStepId = null; wf1CloseProps(); }
+  wf1RenderCanvas();
+  showToast('Step removed: ' + step.label, 'success');
+}
+
+/* ─── Save / Reset ─── */
+function wf1Save() {
+  wf1.version++;
+  document.getElementById('wf1VersionBadge').textContent = 'v' + wf1.version;
+  showToast('Workflow 1 saved \u2014 v' + wf1.version, 'success');
+}
+
+function wf1Reset() {
+  if (!confirm('Reset Workflow 1 to default 10-step pipeline? All customizations will be lost.')) return;
+  wf1 = wf1CreateDefault();
+  wf1SelectedStepId = null;
+  wf1CloseProps();
+  wf1RenderCanvas();
+  document.getElementById('wf1VersionBadge').textContent = 'v' + wf1.version;
+  showToast('Workflow 1 reset to default', 'success');
+}
+
+/* ─── Run pipeline ─── */
+async function wf1Run() {
+  const title = document.getElementById('wf1PatentTitle').value.trim();
+  if (!title) { showToast('Enter a patent title to process', 'error'); return; }
+
+  const btn = document.getElementById('btnRunWf1');
+  const status = document.getElementById('wf1RunStatus');
+  btn.disabled = true;
+
+  const steps = wf1.steps.sort((a, b) => a.order - b.order);
+  status.innerHTML = '';
+
+  for (let i = 0; i < steps.length; i++) {
+    const step = steps[i];
+    const stepEl = document.querySelector(`.wf1-step[data-step-id="${step.id}"]`);
+    if (stepEl) stepEl.style.borderColor = step.color;
+
+    status.innerHTML = `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;font-size:12px;color:var(--text-muted)">`
+      + `<div style="width:14px;height:14px;border:2px solid var(--teal);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite"></div>`
+      + `Step ${i+1}/${steps.length}: ${wf1Esc(step.label)}`
+      + `<span style="margin-left:auto;font-size:10px;color:var(--text-faint)">${step.estimatedDuration || ''}</span>`
+      + `</div>`;
+
+    await new Promise(r => setTimeout(r, 800 + Math.random() * 600));
+
+    if (stepEl) {
+      stepEl.style.borderColor = '#22C55E';
+      stepEl.querySelector('.wf1-step-bar').style.background = '#22C55E';
+    }
+
+    if (step.approvalRequired) {
+      status.innerHTML = `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;font-size:12px;color:#F59E0B">`
+        + `&#9888; Step ${i+1}: ${wf1Esc(step.label)} \u2014 Awaiting manual approval...`
+        + `<button class="wf1-btn-primary" style="padding:3px 10px;font-size:10px;margin-left:8px" onclick="this.closest('div').remove();document.getElementById('wf1GateResolved').value='1'">Approve</button>`
+        + `</div><input type="hidden" id="wf1GateResolved" value="0">`;
+      await new Promise(r => {
+        const check = setInterval(() => {
+          const inp = document.getElementById('wf1GateResolved');
+          if (!inp || inp.value === '1') { clearInterval(check); r(); }
+        }, 300);
+      });
+    }
+  }
+
+  status.innerHTML = `<div style="padding:10px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);border-radius:var(--radius-sm);color:var(--green);font-size:12px;margin-top:4px">`
+    + `\u2713 Patent Generation Pipeline complete for <strong>${wf1Esc(title)}</strong>. ${steps.length} steps executed.`
+    + `</div>`;
+  showToast(`Workflow 1 complete for ${title}`, 'success');
+  btn.disabled = false;
+
+  setTimeout(() => wf1RenderCanvas(), 3000);
+}
+
+/* ─── Init on DOMContentLoaded ─── */
+const _origDCL = document.addEventListener;
+(function() {
+  const existingInit = document.readyState === 'loading' ? null : true;
+  function initWf1() { wf1RenderCanvas(); }
+  if (existingInit) {
+    /* DOM already loaded, just run */
+    setTimeout(initWf1, 100);
+  } else {
+    document.addEventListener('DOMContentLoaded', initWf1);
+  }
+})();
+
+</script>
+
+<script>
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'theme-change') {
+    document.documentElement.setAttribute('data-theme', e.data.theme);
+  }
+});
 </script>
 </body>
 </html>

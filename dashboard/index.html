@@ -11,6 +11,7 @@
 <head>
 
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:;">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IP Whitespace Strategy Dashboard</title>
 <meta name="description" content="Interactive IP Whitespace Strategy visualization dashboard — convergence zones, opportunities, drivers, and filing timelines.">
@@ -238,7 +239,17 @@ svg{font-family:var(--font)}
 /* ─── RESPONSIVE ─────────────────────────────────────────────────────── */
 @media(max-width:1100px){.panel-grid.two-col,.panel-grid.heavy-left,.panel-grid.heavy-right{grid-template-columns:1fr}}
 @media(max-width:800px){.panel-grid.three-col{grid-template-columns:1fr}.kpi-row{grid-template-columns:repeat(2,1fr)}}
+
+/* Reconciliation dual-metric bar */
+.recon-bar { display:flex; gap:8px; margin:8px 0; align-items:center; }
+.recon-metric { flex:1; background:var(--surface-alt,rgba(255,255,255,0.04)); border-radius:6px; padding:8px 10px; text-align:center; }
+.recon-metric-label { font-size:9px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted,#94A3B8); margin-bottom:4px; }
+.recon-metric-value { font-size:18px; font-weight:700; line-height:1.2; }
+.recon-metric-scale { font-size:9px; color:var(--text-faint,#64748B); }
+.recon-note { font-size:10px; color:var(--text-muted,#94A3B8); margin-top:6px; padding:6px 8px; background:rgba(139,92,246,0.06); border-radius:4px; border-left:2px solid rgba(139,92,246,0.3); line-height:1.4; }
 </style>
+<script src="../env.js"></script>
+<script>try{var s=document.createElement('script');s.src='../env.local.js';s.onerror=function(){};document.head.appendChild(s);}catch(e){}</script>
 </head>
 <body>
 
@@ -594,6 +605,24 @@ svg{font-family:var(--font)}
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════════
+   CIIS-to-Patentability Reconciliation Helper
+═══════════════════════════════════════════════════════════════════════ */
+function getReconciliationHTML(ws) {
+  if (!ws || ws.ciisMean === undefined) return '';
+  var patColor = ws.score >= 8.5 ? '#22C55E' : ws.score >= 7.5 ? '#3B82F6' : '#F59E0B';
+  var ciisColor = ws.ciisMean >= 0.68 ? '#22C55E' : ws.ciisMean >= 0.64 ? '#3B82F6' : '#F59E0B';
+  var wsSorted = DATA.whitespaces.slice().sort(function(a,b){return b.score-a.score});
+  var patRank = wsSorted.findIndex(function(w){return w.rank===ws.rank})+1;
+  var ciisSorted = DATA.whitespaces.slice().sort(function(a,b){return (b.ciisMean||0)-(a.ciisMean||0)});
+  var ciisRank = ciisSorted.findIndex(function(w){return w.rank===ws.rank})+1;
+  return '<div class="recon-bar">' +
+    '<div class="recon-metric"><div class="recon-metric-label">Patentability</div><div class="recon-metric-value" style="color:' + patColor + '">' + ws.score.toFixed(1) + '</div><div class="recon-metric-scale">#' + patRank + ' of 15 \u00b7 Patent Lab</div></div>' +
+    '<div class="recon-metric"><div class="recon-metric-label">CIIS Strategic</div><div class="recon-metric-value" style="color:' + ciisColor + '">' + ws.ciisMean.toFixed(3) + '</div><div class="recon-metric-scale">#' + ciisRank + ' of 15 \u00b7 CIIS Engine</div></div>' +
+    '</div>' +
+    '<div class="recon-note">Patentability measures IP defensibility (novelty, prior art distance). CIIS measures strategic value (network centrality, economic capture, cross-industry fit). Divergent rankings indicate complementary strengths.</div>';
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
    DATA — embedded from JSON files
 ═══════════════════════════════════════════════════════════════════════ */
 const DATA = {
@@ -620,21 +649,21 @@ const DATA = {
     {id:"CZ-10",name:"Autonomous Micro-Robotics & MEMS",domains:["MD-4","MD-2","MD-3","MD-1"],tam:60000,density:"low",cidm:0.72,trl:3.0}
   ],
   whitespaces: [
-    {rank:1,name:"Universal Solid-State Electrolyte Interface",short:"SSE Interface",cz:"CZ-1",cidm:0.82,tam:180000,score:9.2,ftoRisk:"moderate",window:3,density:"low",industries:["EV","Grid Storage","Aerospace","Medical","Consumer Electronics","Defense"]},
-    {rank:2,name:"Circular & Earth-Abundant Electronic Materials",short:"Circular Materials",cz:"CZ-9",cidm:0.88,tam:300000,score:9.0,ftoRisk:"low",window:4,density:"very_low",industries:["Semiconductor","Battery Mfg","Motor/Actuator","Consumer Electronics","Automotive"]},
-    {rank:3,name:"Neuromorphic Computing Substrate & Architecture",short:"Neuromorphic",cz:"CZ-3",cidm:0.85,tam:200000,score:8.8,ftoRisk:"low_moderate",window:4,density:"low",industries:["Edge Computing","Autonomous Vehicles","Robotics","IoT","Aerospace"]},
-    {rank:4,name:"Cell-Free Biomanufacturing Process Platforms",short:"Cell-Free Biomanuf.",cz:"CZ-4",cidm:0.80,tam:120000,score:8.6,ftoRisk:"low",window:5,density:"very_low",industries:["Pharma","Chemical Mfg","Agriculture","Food & Beverage","Defense"]},
-    {rank:5,name:"Universal Thermal Interface Materials",short:"Thermal Interface",cz:"CZ-5",cidm:0.78,tam:250000,score:8.5,ftoRisk:"moderate",window:3,density:"low",industries:["Semiconductor","EV Battery","Power Electronics","Data Centers","Quantum"]},
-    {rank:6,name:"Quantum Error Correction Hardware Primitives",short:"QEC Hardware",cz:"CZ-6",cidm:0.77,tam:97000,score:8.4,ftoRisk:"moderate",window:4,density:"low",industries:["Quantum Computing","Cloud","Pharma R&D","Financial","Defense"]},
-    {rank:7,name:"Multi-Material Additive Manufacturing Process Control",short:"Multi-Mat. AM",cz:"CZ-7",cidm:0.76,tam:180000,score:8.3,ftoRisk:"low_moderate",window:4,density:"low",industries:["Aerospace","Medical Devices","Automotive","Energy","Defense"]},
-    {rank:8,name:"Federated Learning & Privacy-Preserving Edge AI",short:"Federated Edge AI",cz:"CZ-3",cidm:0.74,tam:168000,score:8.1,ftoRisk:"low",window:3,density:"low",industries:["Healthcare","Autonomous Vehicles","Industrial Mfg","Smart Cities"]},
-    {rank:9,name:"Cryogenic Control Electronics for Quantum Processors",short:"Cryo Control",cz:"CZ-6",cidm:0.72,tam:97000,score:8.0,ftoRisk:"low",window:5,density:"very_low",industries:["Quantum Computing","Cryogenic Instruments","Aerospace","Particle Physics"]},
-    {rank:10,name:"Bio-Electronic Neural Interfaces (Non-Implantable)",short:"Neural Interface",cz:"CZ-8",cidm:0.79,tam:90000,score:7.9,ftoRisk:"low",window:4,density:"low",industries:["Consumer Electronics/VR","Medical Devices","Defense","Gaming"]},
-    {rank:11,name:"Autonomous System Safety Verification",short:"Safety Verification",cz:"CZ-7",cidm:0.75,tam:180000,score:7.8,ftoRisk:"low",window:4,density:"very_low",industries:["Autonomous Vehicles","Drones","Surgical Robotics","Defense"]},
-    {rank:12,name:"Wide-Bandgap Semiconductor Packaging",short:"WBG Packaging",cz:"CZ-5",cidm:0.73,tam:250000,score:7.7,ftoRisk:"low",window:3,density:"low",industries:["EV","Renewable Energy","Industrial Motors","Grid Infrastructure"]},
-    {rank:13,name:"Synthetic Biology Materials Discovery Pipeline",short:"SynBio Materials",cz:"CZ-4",cidm:0.72,tam:120000,score:7.6,ftoRisk:"low",window:5,density:"very_low",industries:["Construction","Textiles","Packaging","Automotive","Aerospace"]},
-    {rank:14,name:"Photonic Interconnect Standards & Interoperability",short:"Photonic Interconnect",cz:"CZ-2",cidm:0.74,tam:150000,score:7.5,ftoRisk:"moderate",window:3,density:"medium",industries:["Data Centers","HPC","Telecom","AI/ML Infrastructure"]},
-    {rank:15,name:"Quantum-Safe Cryptographic Hardware Accelerators",short:"PQC Hardware",cz:"CZ-6",cidm:0.70,tam:97000,score:7.4,ftoRisk:"low",window:5,density:"very_low",industries:["Cybersecurity","Financial","Government","Healthcare","IoT"]}
+    {rank:1,name:"Universal Solid-State Electrolyte Interface",short:"SSE Interface",cz:"CZ-1",cidm:0.82,tam:180000,score:9.2,ciisMean:0.626,ftoRisk:"moderate",window:3,density:"low",industries:["EV","Grid Storage","Aerospace","Medical","Consumer Electronics","Defense"]},
+    {rank:2,name:"Circular & Earth-Abundant Electronic Materials",short:"Circular Materials",cz:"CZ-9",cidm:0.88,tam:300000,score:9.0,ciisMean:0.631,ftoRisk:"low",window:4,density:"very_low",industries:["Semiconductor","Battery Mfg","Motor/Actuator","Consumer Electronics","Automotive"]},
+    {rank:3,name:"Neuromorphic Computing Substrate & Architecture",short:"Neuromorphic",cz:"CZ-3",cidm:0.85,tam:200000,score:8.8,ciisMean:0.685,ftoRisk:"low_moderate",window:4,density:"low",industries:["Edge Computing","Autonomous Vehicles","Robotics","IoT","Aerospace"]},
+    {rank:4,name:"Cell-Free Biomanufacturing Process Platforms",short:"Cell-Free Biomanuf.",cz:"CZ-4",cidm:0.80,tam:120000,score:8.6,ciisMean:0.657,ftoRisk:"low",window:5,density:"very_low",industries:["Pharma","Chemical Mfg","Agriculture","Food & Beverage","Defense"]},
+    {rank:5,name:"Universal Thermal Interface Materials",short:"Thermal Interface",cz:"CZ-5",cidm:0.78,tam:250000,score:8.5,ciisMean:0.649,ftoRisk:"moderate",window:3,density:"low",industries:["Semiconductor","EV Battery","Power Electronics","Data Centers","Quantum"]},
+    {rank:6,name:"Quantum Error Correction Hardware Primitives",short:"QEC Hardware",cz:"CZ-6",cidm:0.77,tam:97000,score:8.4,ciisMean:0.666,ftoRisk:"moderate",window:4,density:"low",industries:["Quantum Computing","Cloud","Pharma R&D","Financial","Defense"]},
+    {rank:7,name:"Multi-Material Additive Manufacturing Process Control",short:"Multi-Mat. AM",cz:"CZ-7",cidm:0.76,tam:180000,score:8.3,ciisMean:0.687,ftoRisk:"low_moderate",window:4,density:"low",industries:["Aerospace","Medical Devices","Automotive","Energy","Defense"]},
+    {rank:8,name:"Federated Learning & Privacy-Preserving Edge AI",short:"Federated Edge AI",cz:"CZ-3",cidm:0.74,tam:168000,score:8.1,ciisMean:0.701,ftoRisk:"low",window:3,density:"low",industries:["Healthcare","Autonomous Vehicles","Industrial Mfg","Smart Cities"]},
+    {rank:9,name:"Cryogenic Control Electronics for Quantum Processors",short:"Cryo Control",cz:"CZ-6",cidm:0.72,tam:97000,score:8.0,ciisMean:0.659,ftoRisk:"low",window:5,density:"very_low",industries:["Quantum Computing","Cryogenic Instruments","Aerospace","Particle Physics"]},
+    {rank:10,name:"Bio-Electronic Neural Interfaces (Non-Implantable)",short:"Neural Interface",cz:"CZ-8",cidm:0.79,tam:90000,score:7.9,ciisMean:0.654,ftoRisk:"low",window:4,density:"low",industries:["Consumer Electronics/VR","Medical Devices","Defense","Gaming"]},
+    {rank:11,name:"Autonomous System Safety Verification",short:"Safety Verification",cz:"CZ-7",cidm:0.75,tam:180000,score:7.8,ciisMean:0.685,ftoRisk:"low",window:4,density:"very_low",industries:["Autonomous Vehicles","Drones","Surgical Robotics","Defense"]},
+    {rank:12,name:"Wide-Bandgap Semiconductor Packaging",short:"WBG Packaging",cz:"CZ-5",cidm:0.73,tam:250000,score:7.7,ciisMean:0.599,ftoRisk:"low",window:3,density:"low",industries:["EV","Renewable Energy","Industrial Motors","Grid Infrastructure"]},
+    {rank:13,name:"Synthetic Biology Materials Discovery Pipeline",short:"SynBio Materials",cz:"CZ-4",cidm:0.72,tam:120000,score:7.6,ciisMean:0.638,ftoRisk:"low",window:5,density:"very_low",industries:["Construction","Textiles","Packaging","Automotive","Aerospace"]},
+    {rank:14,name:"Photonic Interconnect Standards & Interoperability",short:"Photonic Interconnect",cz:"CZ-2",cidm:0.74,tam:150000,score:7.5,ciisMean:0.638,ftoRisk:"moderate",window:3,density:"medium",industries:["Data Centers","HPC","Telecom","AI/ML Infrastructure"]},
+    {rank:15,name:"Quantum-Safe Cryptographic Hardware Accelerators",short:"PQC Hardware",cz:"CZ-6",cidm:0.70,tam:97000,score:7.4,ciisMean:0.665,ftoRisk:"low",window:5,density:"very_low",industries:["Cybersecurity","Financial","Government","Healthcare","IoT"]}
   ],
   drivers: [
     {id:"TD-1",name:"Moore's Law Physical Limits",type:"technology",domains:["MD-2","MD-8","MD-6"],wsImpact:[3,6,14]},
@@ -774,28 +803,23 @@ function buildForceGraph() {
     nodes.push({id:d.id, label:d.short, type:'macro', tam:d.tam, color:d.color, data:d});
   });
 
-  // Sub-industry nodes (sampled 2-3 per domain)
+  // Whitespace nodes mapped to macro-domains (canonical 15-domain taxonomy)
   const subIndustries = [
-    {id:"SI-1-1",parent:"MD-1",label:"Plastics/Resins",tam:80000,color:"#4A90D9"},
-    {id:"SI-1-2",parent:"MD-1",label:"Nanotechnology",tam:60000,color:"#4A90D9"},
-    {id:"SI-2-1",parent:"MD-2",label:"Semiconductor Mfg",tam:150000,color:"#7B68EE"},
-    {id:"SI-2-2",parent:"MD-2",label:"Silicon Photonics",tam:50000,color:"#7B68EE"},
-    {id:"SI-2-3",parent:"MD-2",label:"Optical Instruments",tam:40000,color:"#7B68EE"},
-    {id:"SI-3-1",parent:"MD-3",label:"Synthetic Biology",tam:80000,color:"#27AE60"},
-    {id:"SI-3-2",parent:"MD-3",label:"Gene Editing",tam:60000,color:"#27AE60"},
-    {id:"SI-4-1",parent:"MD-4",label:"Industrial Robots",tam:90000,color:"#E67E22"},
-    {id:"SI-4-2",parent:"MD-4",label:"UAVs",tam:50000,color:"#E67E22"},
-    {id:"SI-4-3",parent:"MD-4",label:"Sensor Fusion",tam:40000,color:"#E67E22"},
-    {id:"SI-5-1",parent:"MD-5",label:"Li-Ion Batteries",tam:120000,color:"#F1C40F"},
-    {id:"SI-5-2",parent:"MD-5",label:"Solid-State Batteries",tam:80000,color:"#F1C40F"},
-    {id:"SI-5-3",parent:"MD-5",label:"Hydrogen/Fuel Cell",tam:60000,color:"#F1C40F"},
-    {id:"SI-6-1",parent:"MD-6",label:"Quantum Processors",tam:40000,color:"#1ABC9C"},
-    {id:"SI-6-2",parent:"MD-6",label:"QEC Systems",tam:30000,color:"#1ABC9C"},
-    {id:"SI-7-1",parent:"MD-7",label:"Metal AM",tam:10000,color:"#E74C3C"},
-    {id:"SI-7-2",parent:"MD-7",label:"Polymer AM",tam:8000,color:"#E74C3C"},
-    {id:"SI-8-1",parent:"MD-8",label:"Edge AI Hardware",tam:60000,color:"#9B59B6"},
-    {id:"SI-8-2",parent:"MD-8",label:"5G/MEC",tam:50000,color:"#9B59B6"},
-    {id:"SI-8-3",parent:"MD-8",label:"Edge Security",tam:30000,color:"#9B59B6"}
+    {id:"SI-1-1",parent:"MD-1",label:"SSE Interface",tam:180000,color:"#4A90D9",wsRank:1,wsId:"WS-1"},
+    {id:"SI-1-2",parent:"MD-1",label:"Circular Materials",tam:300000,color:"#4A90D9",wsRank:2,wsId:"WS-2"},
+    {id:"SI-2-1",parent:"MD-2",label:"WBG Packaging",tam:250000,color:"#7B68EE",wsRank:12,wsId:"WS-12"},
+    {id:"SI-2-2",parent:"MD-2",label:"Photonic Interconnect",tam:150000,color:"#7B68EE",wsRank:14,wsId:"WS-14"},
+    {id:"SI-3-1",parent:"MD-3",label:"Cell-Free Biomanuf.",tam:120000,color:"#27AE60",wsRank:4,wsId:"WS-4"},
+    {id:"SI-3-2",parent:"MD-3",label:"SynBio Materials",tam:120000,color:"#27AE60",wsRank:13,wsId:"WS-13"},
+    {id:"SI-3-3",parent:"MD-3",label:"Neural Interfaces",tam:90000,color:"#27AE60",wsRank:10,wsId:"WS-10"},
+    {id:"SI-4-1",parent:"MD-4",label:"Safety Verification",tam:180000,color:"#E67E22",wsRank:11,wsId:"WS-11"},
+    {id:"SI-5-1",parent:"MD-5",label:"Universal TIMs",tam:250000,color:"#F1C40F",wsRank:5,wsId:"WS-5"},
+    {id:"SI-6-1",parent:"MD-6",label:"QEC Hardware",tam:97000,color:"#1ABC9C",wsRank:6,wsId:"WS-6"},
+    {id:"SI-6-2",parent:"MD-6",label:"Cryo Control",tam:97000,color:"#1ABC9C",wsRank:9,wsId:"WS-9"},
+    {id:"SI-6-3",parent:"MD-6",label:"PQC Hardware",tam:97000,color:"#1ABC9C",wsRank:15,wsId:"WS-15"},
+    {id:"SI-7-1",parent:"MD-7",label:"Multi-Mat. AM",tam:180000,color:"#E74C3C",wsRank:7,wsId:"WS-7"},
+    {id:"SI-8-1",parent:"MD-8",label:"Neuromorphic",tam:200000,color:"#9B59B6",wsRank:3,wsId:"WS-3"},
+    {id:"SI-8-2",parent:"MD-8",label:"Federated Edge AI",tam:168000,color:"#9B59B6",wsRank:8,wsId:"WS-8"}
   ];
   subIndustries.forEach(s => nodes.push({id:s.id, label:s.label, type:'sub', tam:s.tam, color:s.color, parent:s.parent}));
 
@@ -897,7 +921,7 @@ function buildForceGraph() {
         openGuidePanel('Macro-Domain', d.id, GUIDE_DATA.macroDomains[d.id]);
       }
     } else if (d.type === 'sub') {
-      // Sub-industry node - show parent domain guide
+      // Whitespace node - show guide and enable navigation to whitespace detail
       if (d.parent && GUIDE_DATA.macroDomains[d.parent]) {
         openGuidePanel('Macro-Domain', d.parent, GUIDE_DATA.macroDomains[d.parent]);
       }
@@ -1748,6 +1772,15 @@ function showWSDetailCard(ws) {
     <div class="detail-cell-label">${c.label}</div>
     <div class="detail-cell-val">${c.val}</div>
   </div>`).join('');
+  // Add CIIS-to-Patentability reconciliation bar
+  let reconContainer = document.getElementById('ws-reconciliation');
+  if (!reconContainer) {
+    reconContainer = document.createElement('div');
+    reconContainer.id = 'ws-reconciliation';
+    const grid = $('wsDetailGrid');
+    if (grid) grid.parentNode.insertBefore(reconContainer, grid.nextSibling);
+  }
+  reconContainer.innerHTML = getReconciliationHTML(ws);
 }
 
 function crossHighlight(domainId) {
@@ -1791,8 +1824,10 @@ $('radarWS').addEventListener('change', function() {
 ═══════════════════════════════════════════════════════════════════════ */
 $('btnTheme').addEventListener('click', () => {
   state.darkMode = !state.darkMode;
-  document.documentElement.setAttribute('data-theme', state.darkMode ? 'dark' : 'light');
+  var newTheme = state.darkMode ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', newTheme);
   $('btnTheme').textContent = state.darkMode ? '◐ Light Mode' : '◑ Dark Mode';
+  try { window.parent.postMessage({ type: 'theme-changed-by-child', theme: newTheme }, '*'); } catch(e) {}
 });
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1897,6 +1932,7 @@ const GUIDE_DATA = {
       accent: 'var(--accent-blue)',
       basicIdea: 'The dashboard identifies 15 distinct whitespace opportunities across 8 macro-domains. Each opportunity represents a technology gap where patent protection can be established before competitors. Opportunities are scored using a composite of CIDM, TAM, patent density, and first-mover window metrics.',
       strategy: 'The 15 whitespaces were selected from an initial pool of 40+ candidates using a multi-criteria scoring model. A qualifying opportunity must have a CIDM score above 0.65, addressable market exceeding $50B, patent density rated low or very low, and a first-mover window of at least 3 years. The scoring methodology weights cross-industry applicability (30%), market size (25%), competitive openness (25%), and technical readiness (20%).',
+      scoringReconciliation: 'The platform uses two complementary scoring systems. The Patent Lab Patentability Score (7.4-9.2 scale) evaluates pure patentability based on novelty, non-obviousness, enablement sufficiency, and prior art distance. The CIIS Composite Score (0.599-0.701 scale) evaluates strategic value using network centrality, economic capture potential, legal feasibility, and cross-industry fit. These systems intentionally produce different whitespace rankings: WS-1 (SSE Interface) scores highest on patentability (9.2) due to sparse direct prior art, while WS-8 (Federated Learning) scores highest on CIIS (0.701) due to broad cross-industry applicability. WS-12 (WBG Packaging) ranks lowest on CIIS (0.599) due to concentrated industry application, while WS-15 (PQC Hardware) ranks lowest on patentability (7.4) due to denser prior art. This divergence is expected and valuable: it enables portfolio construction that balances pure IP defensibility with commercial strategic impact.',
       benefits: ['Systematic coverage of 8 macro-domains reduces portfolio blind spots', 'Composite scoring ensures objective prioritization across disparate technology areas', 'Whitespace mapping reveals non-obvious cross-domain opportunities', 'Structured pipeline enables phased filing strategy with clear milestones'],
       financials: {year1Cost:{low:633,high:1562},fiveYearTotal:{low:4265,high:10402},portfolioValuation:{low:50000,high:200000},licensingRevenue:{annual:5000,atMaturity:25000}},
       factors: {cidm:{value:0.78,signal:'high'},tam:{value:1300000,growth:'8-18% CAGR across domains'},patentDensity:{level:'Mostly low/very low',signal:'Open field'},ftoRisk:{level:'Low to moderate',mitigation:'FTO analysis planned Q3 2026'},window:{years:3.8,urgency:'moderate'},trl:{level:4.8,implication:'Early enough for foundational claims'},regulatoryTailwind:{direction:'positive',detail:'Global push for tech sovereignty and sustainability'}},
@@ -2434,6 +2470,18 @@ window.addEventListener('resize', () => {
       layerBuilt[state.activeLayer] = true;
     }
   }, 300);
+});
+</script>
+
+<script>
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'theme-change') {
+    document.documentElement.setAttribute('data-theme', e.data.theme);
+    var themeBtn = document.getElementById('btnTheme');
+    if (themeBtn) {
+      themeBtn.textContent = e.data.theme === 'dark' ? '◐ Light Mode' : '◑ Dark Mode';
+    }
+  }
 });
 </script>
 </body>

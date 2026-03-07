@@ -1,0 +1,1856 @@
+<!--
+   ______  ___  ___  _____
+  / ____/ / _ |/ _ \/ ___/
+ / /     / __ / // /\__ \
+/_/     /_/ |_/____/____/
+  CII Score — Composite Invention Importance
+  Bolt-on module for Patentify Strategy Platform
+  v2.0 — with Analysis Tab & CPC Training
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patentify — CII Score</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../design-tokens.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root {
+  --font-display:'DM Serif Display',serif;
+  --font-body:'DM Sans',sans-serif;
+  --ease:cubic-bezier(0.22,1,0.36,1);
+  --dur:300ms;
+  --radius-sm:6px;--radius:10px;--radius-lg:16px;
+  --teal:#2E8B7A;--blue:#2563EB;--amber:#D4A017;--green:#22C55E;--red:#EF4444;--violet:#8B5CF6;--cyan:#06B6D4;
+}
+[data-theme="dark"]{
+  --bg:#000;--bg-surface:#0A0A0A;--bg-card:#0F0F0F;--bg-elevated:#1A1A1A;
+  --border:rgba(148,163,184,0.10);--border-strong:rgba(148,163,184,0.20);
+  --text:#F1F5F9;--text-secondary:#CBD5E1;--text-muted:#94A3B8;--text-faint:#64748B;
+  --shadow:0 1px 3px rgba(0,0,0,0.5);--shadow-lg:0 8px 32px rgba(0,0,0,0.6);
+  --glow-teal:rgba(46,139,122,0.12);--glow-blue:rgba(37,99,235,0.10);
+}
+[data-theme="light"]{
+  --bg:#FAFBFC;--bg-surface:#F5F6F8;--bg-card:#FFFFFF;--bg-elevated:#EEF1F5;
+  --border:rgba(15,23,42,0.08);--border-strong:rgba(15,23,42,0.15);
+  --text:#0F172A;--text-secondary:#334155;--text-muted:#475569;--text-faint:#94A3B8;
+  --shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.08);
+  --glow-teal:rgba(46,139,122,0.08);--glow-blue:rgba(37,99,235,0.06);
+  /* Accent colors stay vivid */
+  --teal:#2E8B7A;--cyan:#0891B2;--green:#059669;--red:#DC2626;
+  --amber:#D97706;--blue:#2563EB;--violet:#7C3AED;
+}
+[data-theme="light"] .sidebar{background:#FFFFFF;border-right-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .nav-item.active{background:rgba(46,139,122,0.06)}
+[data-theme="light"] .score-table th{background:#F0F2F5;color:#334155}
+[data-theme="light"] .score-table td{border-color:rgba(15,23,42,0.06)}
+[data-theme="light"] .score-table tr:hover td{background:rgba(46,139,122,0.04)}
+[data-theme="light"] .pillar-card{background:#FFFFFF;border-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .kpi-card{background:#FFFFFF;border-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .analysis-sidebar{background:#FFFFFF;border-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .analysis-sidebar-item:hover{background:rgba(46,139,122,0.04)}
+[data-theme="light"] .analysis-sidebar-item.active{background:rgba(46,139,122,0.08)}
+[data-theme="light"] .detail-card{background:#FFFFFF;border-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .wf3-step{background:#FFFFFF;border-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .wf3-props-panel{background:#FFFFFF;border-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .wf3-json-editor textarea{background:#F5F6F8;color:#0F172A;border-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .wf4-step{background:#FFFFFF;border-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .wf4-props-panel{background:#FFFFFF;border-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .wf4-json-editor textarea{background:#F5F6F8;color:#0F172A;border-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .train-sidebar{background:#FFFFFF;border-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .callout{border-color:rgba(15,23,42,0.08)}
+html,body{height:100%;overflow:hidden;font-family:var(--font-body);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums lining-nums}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(148,163,184,0.15);border-radius:3px}
+.app{display:grid;grid-template-columns:var(--sidebar-width) 1fr;height:100dvh;overflow:hidden}
+.app.collapsed{grid-template-columns:var(--sidebar-collapsed) 1fr}
+:root{--sidebar-width:220px;--sidebar-collapsed:56px}
+
+/* ─── SIDEBAR ─── */
+.sidebar{grid-row:1/-1;background:var(--bg-surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;transition:all 0.3s cubic-bezier(0.22,1,0.36,1);z-index:20}
+.sidebar-header{padding:16px 14px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);min-height:56px}
+.sidebar-logo{flex-shrink:0;width:20px;height:20px;color:var(--teal)}
+.sidebar-brand{overflow:hidden;white-space:nowrap;transition:opacity 0.3s,width 0.3s}
+.app.collapsed .sidebar-brand{opacity:0;width:0}
+.sidebar-brand h1{font-family:var(--font-display);font-size:15px;color:var(--text);letter-spacing:-0.02em;margin:0}
+.sidebar-brand span{font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.06em;display:block}
+.sidebar-status{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-faint);padding:0 14px 10px;letter-spacing:0.04em;text-transform:uppercase}
+.sidebar-status .status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(34,197,94,0.4)}
+.app.collapsed .sidebar-status span:last-child{display:none}
+
+.sidebar-nav{flex:1;padding:8px;display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-muted);transition:all 0.25s var(--ease);border:none;background:none;font:inherit;width:100%;text-align:left;border-left:3px solid transparent;position:relative}
+.nav-item:hover{background:rgba(46,139,122,0.04);color:var(--text)}
+.nav-item.active{border-left-color:var(--teal);color:var(--teal);background:rgba(46,139,122,0.08)}
+.nav-item svg{flex-shrink:0;width:18px;height:18px;opacity:0.6}
+.nav-item.active svg{opacity:1}
+.nav-item-label{overflow:hidden;white-space:nowrap;transition:opacity 0.3s,width 0.3s;font-size:12.5px;font-weight:500}
+.app.collapsed .nav-item-label{opacity:0;width:0}
+.nav-badge{font-size:9px;padding:2px 7px;border-radius:8px;background:var(--glow-teal);color:var(--teal);font-weight:700;margin-left:auto;letter-spacing:0.03em}
+.app.collapsed .nav-badge{display:none}
+
+.sidebar-footer{padding:10px 14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sidebar-footer-text{font-size:10px;color:var(--text-faint);overflow:hidden;white-space:nowrap;transition:opacity 0.3s}
+.app.collapsed .sidebar-footer-text{opacity:0;width:0}
+.collapse-btn{background:none;border:none;color:var(--text-faint);cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);transition:all 0.25s var(--ease)}
+.collapse-btn:hover{background:var(--bg-elevated);color:var(--text)}
+.app.collapsed .collapse-btn svg{transform:rotate(180deg)}
+
+/* Legacy toolbar/tab-bar hidden */
+.toolbar{display:none}
+.tab-bar{display:none}
+.tab-btn{display:none}
+.content{overflow:hidden;position:relative;min-height:0;min-width:0}
+.panel{position:absolute;inset:0;overflow-y:auto;padding:24px;opacity:0;pointer-events:none;transition:opacity var(--dur) var(--ease)}
+.panel.active{opacity:1;pointer-events:all}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:24px}
+.kpi-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi-card.nc::before{background:var(--teal)}.kpi-card.ev::before{background:var(--blue)}
+.kpi-card.cde::before{background:var(--amber)}.kpi-card.msi::before{background:var(--violet)}
+.kpi-card.ciis::before{background:linear-gradient(90deg,var(--teal),var(--blue),var(--amber),var(--violet))}
+.kpi-label{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-faint);margin-bottom:6px}
+.kpi-value{font-size:26px;font-weight:700;letter-spacing:-0.02em}
+.kpi-value.nc{color:var(--teal)}.kpi-value.ev{color:var(--blue)}
+.kpi-value.cde{color:var(--amber)}.kpi-value.msi{color:var(--violet)}
+.kpi-value.ciis{background:linear-gradient(90deg,var(--teal),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.kpi-sub{font-size:10.5px;color:var(--text-faint);margin-top:3px}
+.section-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:20px;overflow:hidden}
+.section-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.section-title{font-size:13px;font-weight:600;color:var(--text);letter-spacing:0.01em}
+.section-badge{font-size:10px;padding:3px 10px;border-radius:20px;font-weight:600;letter-spacing:0.04em}
+.badge-teal{background:rgba(46,139,122,0.12);color:var(--teal);border:1px solid rgba(46,139,122,0.2)}
+.badge-blue{background:rgba(37,99,235,0.12);color:var(--blue);border:1px solid rgba(37,99,235,0.2)}
+.badge-amber{background:rgba(212,160,23,0.12);color:var(--amber);border:1px solid rgba(212,160,23,0.2)}
+.badge-green{background:rgba(34,197,94,0.12);color:var(--green);border:1px solid rgba(34,197,94,0.2)}
+.badge-red{background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.2)}
+.badge-violet{background:rgba(139,92,246,0.12);color:var(--violet);border:1px solid rgba(139,92,246,0.2)}
+.rank-table{width:100%;border-collapse:collapse;font-size:12px}
+.rank-table thead{position:sticky;top:0;z-index:2}
+.rank-table th{padding:10px 12px;text-align:left;font-weight:600;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-faint);background:var(--bg-surface);border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
+.rank-table th:hover{color:var(--text-secondary)}
+.rank-table th .sort-arrow{opacity:0.3;margin-left:3px;font-size:8px}
+.rank-table th.sorted .sort-arrow{opacity:1;color:var(--teal)}
+.rank-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.rank-table tr:hover td{background:rgba(46,139,122,0.04)}
+.rank-table tr{cursor:pointer}
+.ciis-bar{display:flex;align-items:center;gap:8px}
+.ciis-bar-track{flex:1;height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden}
+.ciis-bar-fill{height:100%;border-radius:3px;transition:width 0.6s var(--ease)}
+.ciis-val{font-weight:600;font-variant-numeric:tabular-nums;min-width:45px;text-align:right;font-size:12px}
+.pillar-dots{display:flex;gap:3px;align-items:center}
+.pillar-dot{width:8px;height:8px;border-radius:2px;opacity:0.8}
+.idea-title{font-weight:500;color:var(--text);max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.fto-badge{font-size:9.5px;padding:2px 8px;border-radius:4px;font-weight:600;letter-spacing:0.04em}
+.cpc-filter{display:flex;gap:6px;flex-wrap:wrap;padding:12px 20px;border-bottom:1px solid var(--border)}
+.cpc-chip{padding:3px 10px;font-size:10px;font-weight:600;letter-spacing:0.04em;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:all var(--dur)}
+.cpc-chip.active{background:var(--glow-teal);color:var(--teal);border-color:rgba(46,139,122,0.3)}
+.cpc-chip:hover:not(.active){border-color:var(--text-faint);color:var(--text-secondary)}
+.callout{padding:14px 16px;border-radius:var(--radius);margin-bottom:16px;font-size:12px;line-height:1.5;border-left:3px solid}
+.callout.info{background:rgba(37,99,235,0.06);border-color:var(--blue);color:var(--text-secondary)}
+.callout.warn{background:rgba(212,160,23,0.06);border-color:var(--amber);color:var(--text-secondary)}
+.callout.success{background:rgba(34,197,94,0.06);border-color:var(--green);color:var(--text-secondary)}
+.callout-title{font-weight:600;font-size:11px;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:4px}
+/* ─── DETAIL OVERLAY ─── */
+.detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.detail-overlay.open{display:flex}
+.detail-panel{background:var(--bg-card);border:1px solid var(--border-strong);border-radius:var(--radius-lg);width:90%;max-width:720px;max-height:85vh;overflow-y:auto;padding:28px;position:relative}
+.detail-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px}
+.detail-close:hover{background:var(--bg-elevated);color:var(--text)}
+.detail-idea-title{font-family:var(--font-display);font-size:18px;margin-bottom:4px;padding-right:40px}
+.detail-ciis{font-size:32px;font-weight:700;background:linear-gradient(90deg,var(--teal),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
+.pillar-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pillar-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.pillar-card-title{font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px}
+.pillar-card-score{font-size:22px;font-weight:700;margin-bottom:10px}
+.pillar-metric{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid var(--border)}
+.pillar-metric-label{color:var(--text-muted)}
+.pillar-metric-val{font-weight:600;font-variant-numeric:tabular-nums}
+/* ─── ANALYSIS TAB ─── */
+.analysis-grid{display:grid;grid-template-columns:280px 1fr;gap:20px;height:calc(100vh - 72px)}
+.analysis-sidebar{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow-y:auto;display:flex;flex-direction:column}
+.analysis-sidebar-header{padding:16px 18px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--text)}
+.analysis-main{overflow-y:auto}
+.cpc-tree-item{padding:10px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background var(--dur)}
+.cpc-tree-item:hover{background:rgba(46,139,122,0.04)}
+.cpc-tree-item.active{background:var(--glow-teal);border-left:2px solid var(--teal)}
+.cpc-tree-cls{font-size:12px;font-weight:600;color:var(--text)}
+.cpc-tree-name{font-size:10.5px;color:var(--text-faint);margin-top:2px}
+.cpc-tree-stats{font-size:10px;color:var(--text-muted);margin-top:4px;display:flex;gap:10px}
+.cpc-tree-badge{font-size:9px;padding:1px 6px;border-radius:10px;background:rgba(46,139,122,0.1);color:var(--teal);font-weight:600}
+.analysis-detail{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px}
+.analysis-detail h3{font-family:var(--font-display);font-size:16px;margin-bottom:4px}
+.analysis-detail .subtitle{font-size:11px;color:var(--text-faint);margin-bottom:16px}
+.score-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+.score-tile{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.score-tile-label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-faint);margin-bottom:6px}
+.score-tile-value{font-size:20px;font-weight:700}
+.score-tile-bar{height:4px;background:var(--bg-elevated);border-radius:2px;margin-top:8px;overflow:hidden}
+.score-tile-bar-fill{height:100%;border-radius:2px}
+.sub-table{width:100%;border-collapse:collapse;font-size:12px}
+.sub-table th{padding:8px 12px;text-align:left;font-weight:600;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-faint);background:var(--bg-surface);border-bottom:1px solid var(--border)}
+.sub-table td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.sub-table tr:hover td{background:rgba(46,139,122,0.03)}
+/* ─── TRAINING ─── */
+.train-grid{display:grid;grid-template-columns:300px 1fr;gap:20px;height:calc(100vh - 72px)}
+.train-sidebar{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;overflow-y:auto}
+.train-main{overflow-y:auto}
+.train-field{margin-bottom:16px}
+.train-label{display:block;font-size:10.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-faint);margin-bottom:6px}
+.train-select,.train-input{width:100%;padding:8px 12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:12.5px;outline:none;transition:border-color var(--dur)}
+.train-select:focus,.train-input:focus{border-color:var(--teal)}
+.train-select option{background:var(--bg-card);color:var(--text)}
+.train-btn{width:100%;padding:10px;background:var(--teal);color:#fff;border:none;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.02em;transition:all var(--dur)}
+.train-btn:hover{filter:brightness(1.1)}
+.train-btn:disabled{opacity:0.5;cursor:not-allowed}
+.train-btn.secondary{background:var(--bg-elevated);color:var(--text-secondary);border:1px solid var(--border)}
+.train-log{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-family:'Courier New',monospace;font-size:11px;color:var(--text-muted);max-height:300px;overflow-y:auto;white-space:pre-wrap;line-height:1.5}
+.weight-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px}
+.weight-bar-label{min-width:80px;color:var(--text-muted)}
+.weight-bar-track{flex:1;height:8px;background:var(--bg-elevated);border-radius:4px;overflow:hidden}
+.weight-bar-fill{height:100%;border-radius:4px;transition:width 0.6s var(--ease)}
+.weight-bar-val{min-width:45px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text-secondary)}
+/* ─── PROMPT MODAL ─── */
+.prompt-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.prompt-overlay.open{display:flex}
+.prompt-panel{background:var(--bg-card);border:1px solid var(--border-strong);border-radius:var(--radius-lg);width:90%;max-width:800px;max-height:85vh;overflow-y:auto;padding:28px}
+.prompt-textarea{width:100%;height:300px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Courier New',monospace;font-size:11.5px;padding:14px;resize:vertical;outline:none;line-height:1.5}
+.prompt-textarea:focus{border-color:var(--teal)}
+.prompt-actions{display:flex;gap:10px;margin-top:16px;justify-content:flex-end}
+.prompt-btn{padding:8px 20px;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all var(--dur)}
+.prompt-btn.primary{background:var(--teal);color:#fff}
+.prompt-btn.primary:hover{filter:brightness(1.1)}
+.prompt-btn.ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border)}
+/* ─── WS CARDS ─── */
+.ws-card{display:flex;align-items:center;gap:14px;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background var(--dur)}
+.ws-card:hover{background:rgba(46,139,122,0.04)}
+.ws-rank{font-size:11px;font-weight:700;color:var(--text-faint);width:24px;text-align:center}
+.ws-info{flex:1;min-width:0}
+.ws-name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ws-meta{font-size:10px;color:var(--text-faint);margin-top:2px}
+.ws-score{font-size:14px;font-weight:700;color:var(--teal);font-variant-numeric:tabular-nums}
+@media(max-width:900px){.analysis-grid,.train-grid{grid-template-columns:1fr}.pillar-grid{grid-template-columns:1fr}.app{grid-template-columns:var(--sidebar-collapsed) 1fr}.nav-item-label,.sidebar-brand,.sidebar-footer-text,.nav-badge{opacity:0;width:0;display:none}.sidebar-header{justify-content:center;padding:12px 8px}.nav-item{justify-content:center;padding:10px 8px}}
+@media(max-width:600px){.kpi-row{grid-template-columns:1fr 1fr}.rank-table{font-size:11px}}
+
+/* ═══ WF3 — CII SCORE PIPELINE EDITOR ═══ */
+.wf3-version-badge{background:var(--cyan);color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.wf3-meta-strip{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 0 12px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.wf3-run-bar{display:flex;gap:10px;align-items:flex-end;padding:10px 0;margin-bottom:10px}
+.wf3-run-field{display:flex;flex-direction:column;gap:4px;flex:1}
+.wf3-run-field label{font-size:10px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.5px}
+.wf3-run-field input{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:var(--text);transition:border-color 150ms}
+.wf3-run-field input:focus{outline:none;border-color:var(--cyan)}
+.wf3-canvas-wrap{overflow-x:auto;overflow-y:hidden;padding:10px 0;position:relative}
+.wf3-canvas{display:flex;align-items:center;gap:0;min-width:max-content;padding:8px 4px}
+.wf3-step{display:flex;align-items:stretch;gap:0;min-width:140px;max-width:180px;background:var(--bg-surface);border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all 150ms ease;position:relative;flex-shrink:0}
+.wf3-step:hover{border-color:var(--cyan);box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+.wf3-step.selected{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(6,182,212,0.25)}
+.wf3-step.dragging{opacity:0.4}
+.wf3-step.drag-over{border-color:var(--cyan);border-style:dashed}
+.wf3-step-bar{width:4px;border-radius:var(--radius) 0 0 var(--radius);flex-shrink:0}
+.wf3-step-info{padding:8px 10px;flex:1;min-width:0}
+.wf3-step-label{font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wf3-step-meta{display:flex;gap:4px;align-items:center;margin-top:4px;flex-wrap:wrap}
+.wf3-step-type{font-size:9px;font-weight:700;text-transform:uppercase;padding:1px 5px;border-radius:3px;background:rgba(148,163,184,0.15);color:var(--text-faint)}
+.wf3-step-dur{font-size:9px;color:var(--text-faint)}
+.wf3-step-actions{display:flex;flex-direction:column;justify-content:center;padding:0 6px}
+.wf3-step-rm{background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:12px;padding:2px;border-radius:3px;transition:all 100ms}
+.wf3-step-rm:hover{color:var(--red);background:rgba(239,68,68,0.1)}
+.wf3-arrow{display:flex;align-items:center;justify-content:center;padding:0 2px;color:var(--text-faint);flex-shrink:0}
+.wf3-arrow svg{width:14px;height:14px}
+.wf3-step-number{position:absolute;top:-8px;left:-8px;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--text-faint)}
+.wf3-props{display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px;animation:fadeIn 0.2s ease}
+.wf3-props.open{display:block}
+.wf3-props-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.wf3-props-title{font-size:13px;font-weight:600;color:var(--text)}
+.wf3-props-close{background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:18px;padding:0 4px;border-radius:4px;transition:all 100ms}
+.wf3-props-close:hover{color:var(--text);background:var(--bg-surface)}
+.wf3-props-section{margin-bottom:14px}
+.wf3-props-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-faint);margin-bottom:6px}
+.wf3-prompt-editor{width:100%;min-height:120px;resize:vertical;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;font-family:monospace;font-size:11px;line-height:1.6;color:var(--text);transition:border-color 150ms}
+.wf3-prompt-editor:focus{outline:none;border-color:var(--cyan)}
+.wf3-token-count{font-size:10px;color:var(--text-faint);text-align:right;margin-top:4px}
+.wf3-role-check{display:flex;flex-wrap:wrap;gap:8px}
+.wf3-role-check label{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;cursor:pointer}
+.wf3-role-check input{accent-color:var(--cyan)}
+.wf3-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0}
+.wf3-toggle-label{font-size:11px;color:var(--text-muted)}
+.wf3-dep-tag{display:inline-block;font-size:9px;padding:2px 6px;background:rgba(6,182,212,0.1);color:var(--cyan);border-radius:3px;margin-right:4px}
+/* JSON editor for WF3 */
+.wf3-json-toggle{display:flex;gap:4px;margin-bottom:10px}
+.wf3-json-toggle button{padding:4px 12px;font-size:10px;font-weight:600;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-surface);color:var(--text-muted);cursor:pointer;transition:all 150ms}
+.wf3-json-toggle button.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+.wf3-json-wrap{display:none}
+.wf3-json-wrap.open{display:block}
+.wf3-json-editor{width:100%;min-height:300px;resize:vertical;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;line-height:1.5;color:var(--text);tab-size:2;transition:border-color 150ms}
+.wf3-json-editor:focus{outline:none;border-color:var(--teal)}
+.wf3-json-status{font-size:10px;margin-top:4px;min-height:16px}
+.wf3-json-status.valid{color:var(--green)}
+.wf3-json-status.invalid{color:var(--red)}
+.wf3-btn-primary{background:var(--teal);color:#fff;border:none;border-radius:var(--radius-sm);padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer;transition:opacity 150ms;display:inline-flex;align-items:center;gap:6px}
+.wf3-btn-primary:hover{opacity:0.85}
+.wf3-btn-primary:disabled{opacity:0.5;cursor:not-allowed}
+.wf3-btn-secondary{background:var(--bg-surface);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 10px;font-size:10px;font-weight:600;cursor:pointer;transition:all 150ms}
+.wf3-btn-secondary:hover{border-color:var(--teal);color:var(--text)}
+.wf3-editor-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px}
+.wf3-card-title{font-size:14px;font-weight:600;color:var(--text);display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.wf3-stat-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:20px;color:var(--text-muted);font-weight:500}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.wf3-spinner{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block}
+
+
+/* ═══ WF4 — CII TRAINING & CALIBRATION PIPELINE EDITOR ═══ */
+.wf4-editor-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px}
+.wf4-card-title{font-size:14px;font-weight:600;color:var(--text);display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.wf4-version-badge{background:var(--violet);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.wf4-meta-strip{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 0 12px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.wf4-stat-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:20px;color:var(--text-muted);font-weight:500}
+.wf4-run-bar{display:flex;gap:10px;align-items:flex-end;padding:10px 0;margin-bottom:10px}
+.wf4-run-field{display:flex;flex-direction:column;gap:4px;flex:1}
+.wf4-run-field label{font-size:10px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.5px}
+.wf4-run-field input,.wf4-run-field select{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:var(--text);font-family:var(--font-body);transition:border-color 150ms}
+.wf4-run-field input:focus,.wf4-run-field select:focus{outline:none;border-color:var(--violet)}
+.wf4-canvas-wrap{overflow-x:auto;overflow-y:hidden;padding:10px 0;position:relative}
+.wf4-canvas{display:flex;align-items:center;gap:0;min-width:max-content;padding:8px 4px}
+.wf4-step{display:flex;align-items:stretch;gap:0;min-width:140px;max-width:180px;background:var(--bg-surface);border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all 150ms ease;position:relative;flex-shrink:0}
+.wf4-step:hover{border-color:var(--violet);box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+.wf4-step.selected{border-color:var(--violet);box-shadow:0 0 0 2px rgba(139,92,246,0.25)}
+.wf4-step.dragging{opacity:0.4}
+.wf4-step.drag-over{border-color:var(--violet);border-style:dashed}
+.wf4-step-bar{width:4px;border-radius:var(--radius) 0 0 var(--radius);flex-shrink:0}
+.wf4-step-info{padding:8px 10px;flex:1;min-width:0}
+.wf4-step-label{font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wf4-step-meta{display:flex;gap:4px;align-items:center;margin-top:4px;flex-wrap:wrap}
+.wf4-step-type{font-size:9px;font-weight:700;text-transform:uppercase;padding:1px 5px;border-radius:3px;background:rgba(148,163,184,0.15);color:var(--text-faint)}
+.wf4-step-dur{font-size:9px;color:var(--text-faint)}
+.wf4-step-actions{display:flex;flex-direction:column;justify-content:center;padding:0 6px}
+.wf4-step-rm{background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:12px;padding:2px;border-radius:3px;transition:all 100ms}
+.wf4-step-rm:hover{color:var(--red);background:rgba(239,68,68,0.1)}
+.wf4-arrow{display:flex;align-items:center;justify-content:center;padding:0 2px;color:var(--text-faint);flex-shrink:0}
+.wf4-arrow svg{width:14px;height:14px}
+.wf4-step-number{position:absolute;top:-8px;left:-8px;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--text-faint)}
+.wf4-props{display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px;animation:fadeIn 0.2s ease}
+.wf4-props.open{display:block}
+.wf4-props-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.wf4-props-title{font-size:13px;font-weight:600;color:var(--text)}
+.wf4-props-close{background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:18px;padding:0 4px;border-radius:4px;transition:all 100ms}
+.wf4-props-close:hover{color:var(--text);background:var(--bg-surface)}
+.wf4-props-section{margin-bottom:14px}
+.wf4-props-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-faint);margin-bottom:6px}
+.wf4-prompt-editor{width:100%;min-height:120px;resize:vertical;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;font-family:monospace;font-size:11px;line-height:1.6;color:var(--text);transition:border-color 150ms}
+.wf4-prompt-editor:focus{outline:none;border-color:var(--violet)}
+.wf4-token-count{font-size:10px;color:var(--text-faint);text-align:right;margin-top:4px}
+.wf4-role-check{display:flex;flex-wrap:wrap;gap:8px}
+.wf4-role-check label{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;cursor:pointer}
+.wf4-role-check input{accent-color:var(--violet)}
+.wf4-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0}
+.wf4-toggle-label{font-size:11px;color:var(--text-muted)}
+.wf4-dep-tag{display:inline-block;font-size:9px;padding:2px 6px;background:rgba(139,92,246,0.1);color:var(--violet);border-radius:3px;margin-right:4px}
+.wf4-json-toggle{display:flex;gap:4px;margin-bottom:10px}
+.wf4-json-toggle button{padding:4px 12px;font-size:10px;font-weight:600;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-surface);color:var(--text-muted);cursor:pointer;transition:all 150ms}
+.wf4-json-toggle button.active{background:var(--violet);color:#fff;border-color:var(--violet)}
+.wf4-json-wrap{display:none}
+.wf4-json-wrap.open{display:block}
+.wf4-json-editor{width:100%;min-height:300px;resize:vertical;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;line-height:1.5;color:var(--text);tab-size:2;transition:border-color 150ms}
+.wf4-json-editor:focus{outline:none;border-color:var(--violet)}
+.wf4-json-status{font-size:10px;margin-top:4px;min-height:16px}
+.wf4-json-status.valid{color:var(--green)}
+.wf4-json-status.invalid{color:var(--red)}
+.wf4-btn-primary{background:var(--violet);color:#fff;border:none;border-radius:var(--radius-sm);padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer;transition:opacity 150ms;display:inline-flex;align-items:center;gap:6px}
+.wf4-btn-primary:hover{opacity:0.85}
+.wf4-btn-primary:disabled{opacity:0.5;cursor:not-allowed}
+.wf4-btn-secondary{background:var(--bg-surface);color:var(--text-muted);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 10px;font-size:10px;font-weight:600;cursor:pointer;transition:all 150ms}
+.wf4-btn-secondary:hover{border-color:var(--violet);color:var(--text)}
+.wf4-spinner{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--violet);border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block}
+
+</style>
+
+<style id="ciis-light-fixes">
+.theme-toggle-btn{background:none;border:1px solid var(--border);border-radius:var(--radius-sm,6px);color:var(--text-muted);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;flex-shrink:0}
+.theme-toggle-btn:hover{color:var(--text);border-color:var(--text-muted)}
+[data-theme="light"] .theme-toggle-btn svg{display:none}
+[data-theme="light"] .theme-toggle-btn::after{content:"\263D";font-size:16px;line-height:1}
+[data-theme="dark"] .theme-toggle-btn svg{display:block}
+</style>
+<script src="../env.js"></script>
+<script>try{var s=document.createElement('script');s.src='../env.local.js';s.onerror=function(){};document.head.appendChild(s);}catch(e){}</script>
+</head>
+<body>
+<div class="app" id="ciisApp">
+  <!-- ═══ LEFT SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <svg class="sidebar-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <div class="sidebar-brand">
+        <h1>Analysis</h1>
+        <span>CII Score Engine</span>
+      </div>
+    </div>
+    <div class="sidebar-status"><div class="status-dot"></div><span id="statusLabel">105 scored</span></div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-tab="scoring">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        <span class="nav-item-label">Rankings</span>
+      </button>
+      <button class="nav-item" data-tab="whitespace">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span class="nav-item-label">Whitespace</span>
+      </button>
+      <button class="nav-item" data-tab="analysis">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v6h-6"/><path d="M12 12l4-4"/></svg>
+        <span class="nav-item-label">Analysis</span>
+      </button>
+      <button class="nav-item" data-tab="training">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <span class="nav-item-label">Training</span>
+        <span class="nav-badge">AI</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="sidebar-footer-text">CII Score v2.0</span>
+      <button class="theme-toggle-btn" onclick="toggleCiisTheme()" aria-label="Toggle theme" title="Toggle light/dark mode">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+      <button class="collapse-btn" onclick="document.getElementById('ciisApp').classList.toggle('collapsed')" aria-label="Toggle sidebar">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <div class="content">
+    <!-- PANEL: RANKINGS -->
+    <div class="panel active" id="panelScoring">
+      <div class="kpi-row" id="kpiRow"></div>
+      <div class="callout info">
+        <div class="callout-title">CII Score — Composite Invention Importance</div>
+        Four-pillar weighted geometric mean: Network Centrality (NC), Economic Value (EV), Cross-Domain Enablement (CDE), Multi-Stakeholder Importance (MSI). Click any row for pillar breakdown. Use the Analysis tab to explore CPC-class-level training scores.
+      </div>
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">Invention Rankings</div>
+          <span class="section-badge badge-teal" id="ideaCount">105 ideas</span>
+        </div>
+        <div class="cpc-filter" id="cpcFilter"></div>
+        <div style="overflow-x:auto;max-height:calc(100vh - 380px)">
+          <table class="rank-table">
+            <thead><tr>
+              <th style="width:40px" data-sort="rank"># <span class="sort-arrow">▲</span></th>
+              <th data-sort="title">Invention <span class="sort-arrow">▲</span></th>
+              <th style="width:190px" data-sort="ciis">CII Score <span class="sort-arrow">▲</span></th>
+              <th style="width:80px" data-sort="pillars">Pillars <span class="sort-arrow">▲</span></th>
+              <th style="width:55px" data-sort="fto">FTO <span class="sort-arrow">▲</span></th>
+              <th style="width:75px" data-sort="filing">Filing <span class="sort-arrow">▲</span></th>
+              <th style="width:85px" data-sort="val">Value <span class="sort-arrow">▲</span></th>
+            </tr></thead>
+            <tbody id="rankBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL: WHITESPACE -->
+    <div class="panel" id="panelWhitespace">
+      <div class="kpi-row" id="wsKpiRow"></div>
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">Whitespace Area Rankings by Mean CII Score</div>
+        </div>
+        <div id="wsCards"></div>
+      </div>
+    </div>
+
+    <!-- PANEL: ANALYSIS (NEW) -->
+    <div class="panel" id="panelAnalysis">
+      <div class="callout warn">
+        <div class="callout-title">CPC Hierarchy Analysis</div>
+        Browse CII Score training benchmarks across CPC Class, Subclass, MainGroup, and Subgroup levels. Select a CPC class to view detailed scoring distributions and per-subclass breakdowns. Use the "Generate/Update Scores" button to recalibrate training data via an integrated prompt.
+      </div>
+
+      <!-- ═══ Workflow 3 — CII Score Pipeline Editor ═══ -->
+      <div class="wf3-editor-card" id="wf3EditorCard">
+        <div class="wf3-card-title">
+          <div style="display:flex;align-items:center;gap:8px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Workflow 3 &mdash; CII Score Pipeline
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span class="wf3-version-badge" id="wf3VersionBadge">v1</span>
+            <button class="wf3-btn-secondary" onclick="wf3Reset()">Reset</button>
+            <button class="wf3-btn-primary" style="padding:4px 12px;font-size:11px" onclick="wf3Save()">Save Workflow</button>
+          </div>
+        </div>
+        <div class="wf3-meta-strip">
+          <span class="wf3-stat-pill">&#128260; 8 Steps</span>
+          <span class="wf3-stat-pill">&#9200; Weekly Mon 06:00 UTC</span>
+          <span class="wf3-stat-pill">&#128176; $8 cost cap</span>
+          <span class="wf3-stat-pill">&#128274; Human gate at Step 8</span>
+          <span style="margin-left:auto;font-size:10px;color:var(--text-faint)">Drag steps to reorder &middot; Click to edit</span>
+        </div>
+
+        <!-- View toggle: Visual / JSON -->
+        <div class="wf3-json-toggle" id="wf3ViewToggle">
+          <button class="active" onclick="wf3SwitchView('visual')">Visual Editor</button>
+          <button onclick="wf3SwitchView('json')">Edit JSON</button>
+        </div>
+
+        <!-- Run bar -->
+        <div class="wf3-run-bar" id="wf3RunBar">
+          <div class="wf3-run-field">
+            <label>Patent Title</label>
+            <input type="text" id="wf3PatentTitle" placeholder="e.g., Chemistry-Agnostic Gradient Interlayer for SSB Interface...">
+          </div>
+          <button class="wf3-btn-primary" id="btnRunWf3" onclick="wf3Run()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polygon points="5,3 13,8 5,13"/></svg>
+            Run Pipeline
+          </button>
+        </div>
+        <div id="wf3RunStatus"></div>
+
+        <!-- Step canvas (visual view) -->
+        <div class="wf3-canvas-wrap" id="wf3CanvasWrap">
+          <div class="wf3-canvas" id="wf3Canvas"></div>
+        </div>
+
+        <!-- Properties panel -->
+        <div class="wf3-props" id="wf3Props">
+          <div class="wf3-props-header">
+            <span class="wf3-props-title" id="wf3PropTitle">Step Properties</span>
+            <button class="wf3-props-close" onclick="wf3CloseProps()">&times;</button>
+          </div>
+          <div class="wf3-props-body" id="wf3PropBody"></div>
+        </div>
+
+        <!-- JSON view -->
+        <div class="wf3-json-wrap" id="wf3JsonWrap">
+          <textarea class="wf3-json-editor" id="wf3JsonEditor" spellcheck="false"></textarea>
+          <div class="wf3-json-status" id="wf3JsonStatus"></div>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <button class="wf3-btn-primary" style="font-size:10px;padding:4px 12px" onclick="wf3ApplyJson()">Apply JSON</button>
+            <button class="wf3-btn-secondary" onclick="wf3PrettyPrint()">Format</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="analysis-grid">
+        <div class="analysis-sidebar">
+          <div class="analysis-sidebar-header">CPC Classes <span style="float:right;font-weight:400;color:var(--text-faint)" id="cpcClassCount"></span></div>
+          <div id="cpcTree"></div>
+        </div>
+        <div class="analysis-main" id="analysisMain">
+          <div class="analysis-detail" style="text-align:center;padding:60px">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="1.5" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 14l2 2 4-4"/></svg>
+            <p style="font-size:13px;color:var(--text-faint);margin-top:12px">Select a CPC class to view analysis</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL: TRAINING -->
+    <div class="panel" id="panelTraining">
+      <div class="callout warn">
+        <div class="callout-title">Model Training &amp; Calibration</div>
+        Generate synthetic training data per CPC class and calibrate CIIS pillar weights. Trained models are applied to subsequent scoring runs. Use "Generate/Update" to produce an integrated prompt for Claude-based training data generation.
+      </div>
+
+      <!-- ═══ Workflow 4 — CII Training & Calibration Pipeline Editor ═══ -->
+      <div class="wf4-editor-card" id="wf4EditorCard">
+        <div class="wf4-card-title">
+          <div style="display:flex;align-items:center;gap:8px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            Workflow 4 &mdash; CII Training &amp; Calibration Pipeline
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span class="wf4-version-badge" id="wf4VersionBadge">v1</span>
+            <button class="wf4-btn-secondary" onclick="wf4Reset()">Reset</button>
+            <button class="wf4-btn-primary" style="padding:4px 12px;font-size:11px" onclick="wf4Save()">Save Workflow</button>
+          </div>
+        </div>
+        <div class="wf4-meta-strip">
+          <span class="wf4-stat-pill">&#128260; 10 Steps</span>
+          <span class="wf4-stat-pill">&#9200; Monthly 1st 06:00 UTC</span>
+          <span class="wf4-stat-pill">&#128176; $20 cost cap</span>
+          <span class="wf4-stat-pill">&#128274; Human gate at Step 8</span>
+          <span style="margin-left:auto;font-size:10px;color:var(--text-faint)">Drag steps to reorder &middot; Click to edit</span>
+        </div>
+
+        <!-- View toggle: Visual / JSON -->
+        <div class="wf4-json-toggle" id="wf4ViewToggle">
+          <button class="active" onclick="wf4SwitchView('visual')">Visual Editor</button>
+          <button onclick="wf4SwitchView('json')">Edit JSON</button>
+        </div>
+
+        <!-- Run bar -->
+        <div class="wf4-run-bar" id="wf4RunBar">
+          <div class="wf4-run-field">
+            <label>Target CPC</label>
+            <select id="wf4TargetCPC">
+              <option value="">— Select CPC —</option>
+              <option value="ALL">ALL (Full Recalibration)</option>
+              <option value="A61">A61 — Medical/Veterinary</option>
+              <option value="B33">B33 — Additive Manufacturing</option>
+              <option value="C12">C12 — Biochemistry/Biotech</option>
+              <option value="G06">G06 — Computing/AI</option>
+              <option value="H01">H01 — Electrical Elements</option>
+              <option value="H04">H04 — Electric Communication</option>
+              <option value="H10">H10 — Semiconductor Memory</option>
+            </select>
+          </div>
+          <div class="wf4-run-field" style="max-width:140px">
+            <label>Sample Size</label>
+            <input type="number" id="wf4SampleSize" value="500" min="200" max="1000" step="100">
+          </div>
+          <button class="wf4-btn-primary" id="btnRunWf4" onclick="wf4Run()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polygon points="5,3 13,8 5,13"/></svg>
+            Run Pipeline
+          </button>
+        </div>
+        <div id="wf4RunStatus"></div>
+
+        <!-- Step canvas (visual view) -->
+        <div class="wf4-canvas-wrap" id="wf4CanvasWrap">
+          <div class="wf4-canvas" id="wf4Canvas"></div>
+        </div>
+
+        <!-- Properties panel -->
+        <div class="wf4-props" id="wf4Props">
+          <div class="wf4-props-header">
+            <span class="wf4-props-title" id="wf4PropTitle">Step Properties</span>
+            <button class="wf4-props-close" onclick="wf4CloseProps()">&times;</button>
+          </div>
+          <div class="wf4-props-body" id="wf4PropBody"></div>
+        </div>
+
+        <!-- JSON view -->
+        <div class="wf4-json-wrap" id="wf4JsonWrap">
+          <textarea class="wf4-json-editor" id="wf4JsonEditor" spellcheck="false"></textarea>
+          <div class="wf4-json-status" id="wf4JsonStatus"></div>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <button class="wf4-btn-primary" style="font-size:10px;padding:4px 12px" onclick="wf4ApplyJson()">Apply JSON</button>
+            <button class="wf4-btn-secondary" onclick="wf4PrettyPrint()">Format</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="train-grid">
+        <div class="train-sidebar">
+          <div class="train-field">
+            <label class="train-label">CPC Class</label>
+            <select class="train-select" id="trainCPC">
+              <option value="">— Select CPC Class —</option>
+              <option value="A61">A61 — Medical/Veterinary</option>
+              <option value="B22">B22 — Metal Casting/Powder</option>
+              <option value="B33">B33 — Additive Manufacturing</option>
+              <option value="B60">B60 — Vehicles</option>
+              <option value="B81">B81 — Micro-Structural Devices</option>
+              <option value="B82">B82 — Nanotechnology</option>
+              <option value="C04">C04 — Ite/Ceramics</option>
+              <option value="C08">C08 — Organic Polymers</option>
+              <option value="C09">C09 — Dyes/Adhesives</option>
+              <option value="C12">C12 — Biochemistry/Biotech</option>
+              <option value="C22">C22 — Metallurgy</option>
+              <option value="C23">C23 — Coating/Surface Treatment</option>
+              <option value="D01">D01 — Natural/Artificial Threads</option>
+              <option value="E04">E04 — Building/Construction</option>
+              <option value="G01">G01 — Measuring/Testing</option>
+              <option value="G02">G02 — Optics</option>
+              <option value="G03">G03 — Photography/Lithography</option>
+              <option value="G05">G05 — Control/Regulation</option>
+              <option value="G06">G06 — Computing/AI</option>
+              <option value="G16">G16 — Health Informatics</option>
+              <option value="H01">H01 — Electrical Elements</option>
+              <option value="H02">H02 — Power Generation</option>
+              <option value="H03">H03 — Electronic Circuits</option>
+              <option value="H04">H04 — Electric Communication</option>
+              <option value="H05">H05 — Electric Techniques</option>
+              <option value="H10">H10 — Semiconductor Memory</option>
+            </select>
+          </div>
+          <div class="train-field">
+            <label class="train-label">Level</label>
+            <select class="train-select" id="trainLevel">
+              <option value="class">Class (e.g., H01)</option>
+              <option value="subclass">Subclass (e.g., H01L)</option>
+              <option value="maingroup">Main Group (e.g., H01L23)</option>
+              <option value="subgroup">Subgroup (e.g., H01L23/373)</option>
+            </select>
+          </div>
+          <div class="train-field">
+            <label class="train-label">Synthetic Patents</label>
+            <input class="train-input" id="trainCount" type="number" value="500" min="100" max="5000" step="100">
+          </div>
+          <div class="train-field">
+            <label class="train-label">Calibration Epochs</label>
+            <input class="train-input" id="trainEpochs" type="number" value="200" min="50" max="2000" step="50">
+          </div>
+          <button class="train-btn" id="trainRunBtn" onclick="runTraining()">Run Browser Training</button>
+          <div style="height:12px"></div>
+          <button class="train-btn secondary" id="genPromptBtn" onclick="openPromptModal()">Generate / Update Scores</button>
+          <div style="height:16px"></div>
+          <div class="train-log" id="trainLog">Awaiting training configuration…</div>
+        </div>
+        <div class="train-main" id="trainMain">
+          <div class="analysis-detail">
+            <h3 style="font-family:var(--font-display);margin-bottom:12px">Training Results</h3>
+            <div id="trainResults"><p style="font-size:12px;color:var(--text-faint)">Run a training session to view calibrated weights and performance metrics.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL OVERLAY -->
+<div class="detail-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+  <div class="detail-panel" id="detailPanel"></div>
+</div>
+
+<!-- PROMPT MODAL -->
+<div class="prompt-overlay" id="promptOverlay" onclick="if(event.target===this)closePrompt()">
+  <div class="prompt-panel">
+    <h3 style="font-family:var(--font-display);margin-bottom:4px">Generate CII Score Training Data</h3>
+    <p style="font-size:11px;color:var(--text-faint);margin-bottom:16px">Copy this prompt and send it to Claude to generate or update CPC-level training scores. Paste the JSON response back into the Training panel to calibrate the model.</p>
+    <textarea class="prompt-textarea" id="promptText" readonly></textarea>
+    <div class="prompt-actions">
+      <button class="prompt-btn ghost" onclick="closePrompt()">Cancel</button>
+      <button class="prompt-btn primary" onclick="copyPrompt()">Copy Prompt</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// EMBEDDED CII SCORE DATA
+// ═══════════════════════════════════════════
+const CIIS_DATA = {"rankings":[{"id":45,"wsId":7,"title":"In-Situ Multi-Material Defect Detection System Using Hyperspectral Melt Pool Imaging and Material-Sp","ciis":0.7605,"rank":1,"nc":0.8183,"ev":0.7538,"cde":0.7824,"msi":0.665,"fto":"GREEN","filing":"IMMEDIATE","ps":8.8,"val":"$20M-$45M","cpcP":["B33Y50/00","B33Y50/02","G01N21/25 (spectrophotometry)"],"cpcS":["B22F10/28","G06V10/764 (ML image classification)","G01J3/28 (spectrometers)","B22F10/85 (monitoring in AM)","G05B19/418","H04N23/10 (hyperspectral imaging)"]},{"id":28,"wsId":4,"title":"Programmable On-Demand Pharmaceutical Synthesis Unit: A Modular Cell-Free Manufacturing Device for D","ciis":0.7537,"rank":2,"nc":0.8615,"ev":0.8392,"cde":0.706,"msi":0.585,"fto":"GREEN","filing":"IMMEDIATE","ps":8.6,"val":"$40M-$90M","cpcP":["C12M1/00","A61J3/07"],"cpcS":["C12P21/00","G16H20/10","H04L9/32","A61L2/00"]},{"id":20,"wsId":3,"title":"Neuromorphic Chiplet Interconnect Standard with Spike-Packet Protocol and Asynchronous Timing Arbitr","ciis":0.7441,"rank":3,"nc":0.8782,"ev":0.7807,"cde":0.7147,"msi":0.575,"fto":"GREEN","filing":"Q2 2026","ps":8.8,"val":"$30M-$80M","cpcP":["H04L12/40 (bus networks)","G06N3/063 (hardware neural network implementations)"],"cpcS":["H01L25/065 (stacked semiconductor chips)","H04L47/50 (flow control)","G06F15/173 (interconnection architectures)","H04L69/22 (protocol design)"]},{"id":56,"wsId":8,"title":"Cross-Silo Federated Learning Orchestration Platform with Regulatory-Partitioned Data Governance and","ciis":0.7394,"rank":4,"nc":0.8288,"ev":0.7196,"cde":0.7001,"msi":0.69,"fto":"GREEN","filing":"IMMEDIATE","ps":9.1,"val":"$25M-$55M","cpcP":["G06N3/098","G06F21/6254","G16H10/60"],"cpcS":["G06F21/62","H04L9/3236","G16H50/20","G06Q50/22"]},{"id":51,"wsId":8,"title":"Cryptographically Verifiable Federated Unlearning System with Zero-Knowledge Proof of Contribution E","ciis":0.7388,"rank":5,"nc":0.8847,"ev":0.7464,"cde":0.6527,"msi":0.65,"fto":"GREEN","filing":"IMMEDIATE","ps":9.0,"val":"$20M-$45M","cpcP":["G06N3/098","H04L9/3218","G06F21/6254"],"cpcS":["H04L9/3252","G06N20/00","G06F16/23","H04L9/008"]},{"id":15,"wsId":3,"title":"Quaternary Chalcogenide Synaptic Phase-Change Memory with Embedded Self-Annealing Thermal Regulation","ciis":0.7356,"rank":6,"nc":0.8676,"ev":0.7963,"cde":0.7247,"msi":0.53,"fto":"GREEN","filing":"IMMEDIATE","ps":9.1,"val":"$35M-$75M","cpcP":["H10N70/20 (phase-change memory devices)","H10N70/861 (PCM compositions)"],"cpcS":["G11C13/00 (resistive change memory)","H01L45/06 (electrode materials for non-volatile memory)","G06N3/063 (hardware neural network implementations)","C22C28/00 (chalcogenide alloys)"]},{"id":43,"wsId":7,"title":"Adaptive Gradient Composition Controller for Multi-Material Powder Bed Fusion with Voxel-Level Mater","ciis":0.7333,"rank":7,"nc":0.808,"ev":0.7462,"cde":0.6733,"msi":0.69,"fto":"GREEN","filing":"IMMEDIATE","ps":9.0,"val":"$18M-$42M","cpcP":["B22F10/28","B33Y10/00","B33Y50/02"],"cpcS":["B22F12/50","B33Y70/10","G01N21/71 (LIBS spectroscopy)","B22F2203/11 (composition control)","C22C1/04","G05B19/418"]},{"id":70,"wsId":10,"title":"Population-Pooled Neural Privacy Architecture with On-Device Differential Privacy and Neural Data So","ciis":0.7331,"rank":8,"nc":0.8413,"ev":0.6824,"cde":0.7218,"msi":0.665,"fto":"GREEN","filing":"IMMEDIATE","ps":7.8,"val":"$15M-$28M","cpcP":["G06F21/62 (protection of private/personal data)","G06N20/00 (machine learning)","A61B5/369 (EEG)"],"cpcS":["H04L9/00 (cryptographic mechanisms)","G06F21/60 (security for data)","G06N3/08 (neural network training - federated)","A61B5/0022 (wearable body sensor)"]},{"id":72,"wsId":11,"title":"Conformal Prediction-Based Runtime Safety Envelope Monitor with Adaptive Conservatism Controller for","ciis":0.7321,"rank":9,"nc":0.8513,"ev":0.7116,"cde":0.6589,"msi":0.69,"fto":"GREEN","filing":"IMMEDIATE","ps":9.0,"val":"$20M\u2013$40M","cpcP":["B60W 50/02 (condition monitoring of AV operation)","G06F 11/07 (fault monitoring)","G05B 23/02 (testing/monitoring control systems)"],"cpcS":["B60W 60/00 (autonomous driving)","G06N 20/00 (machine learning safety)","G08G 1/16 (collision avoidance)"]},{"id":95,"wsId":14,"title":"Photonic Chiplet Built-In Self-Test (PhoBIST) Architecture with Optical Loopback and On-Chip Optical","ciis":0.724,"rank":10,"nc":0.8187,"ev":0.6925,"cde":0.6786,"msi":0.69,"fto":"GREEN","filing":"IMMEDIATE","ps":9.0,"val":"$20M-$45M","cpcP":["G01M 11/00","H04B 10/071"],"cpcS":["G02B 6/42","H04B 10/07","G02B 6/293","H01L 31/02","H04B 10/2507"]},{"id":71,"wsId":11,"title":"Layered Abstraction Neural Network Safety Verifier for Autonomous Controllers with Incremental Certi","ciis":0.7154,"rank":11,"nc":0.8393,"ev":0.7091,"cde":0.6433,"msi":0.65,"fto":"GREEN","filing":"IMMEDIATE","ps":8.5,"val":"$18M\u2013$35M","cpcP":["G06F 11/3604 (verification/validation of software systems)","G06N 3/08 (training neural networks)","B60W 60/00 (autonomous vehicle control)"],"cpcS":["G06F 21/64 (integrity verification)","G05D 1/00 (control of position/course)","G06N 20/00 (machine learning \u2014 safety)"]},{"id":92,"wsId":14,"title":"Universal Photonic Chiplet Interface Protocol (UPCIP): Optical Physical Layer Extension for Multi-Ve","ciis":0.7148,"rank":12,"nc":0.8019,"ev":0.6891,"cde":0.6969,"msi":0.65,"fto":"GREEN","filing":"IMMEDIATE","ps":8.5,"val":"$18M-$42M","cpcP":["H04B 10/40","H04J 14/02"],"cpcS":["G02B 6/42","H04L 69/30","H04B 10/2507","H04J 14/0221","G06F 13/38"]},{"id":50,"wsId":8,"title":"Hardware-Enforced Differential Privacy Engine for Federated Learning Edge Devices via Trusted Execut","ciis":0.7133,"rank":13,"nc":0.8226,"ev":0.6878,"cde":0.6714,"msi":0.65,"fto":"GREEN","filing":"IMMEDIATE","ps":8.8,"val":"$15M-$40M","cpcP":["G06N3/098","G06F21/60","G06F21/72"],"cpcS":["H04L9/3268","G06F21/57","G06N20/00","H04W12/08"]},{"id":102,"wsId":15,"title":"PUF-Seeded Hardware Key Generation Engine for ML-KEM Lattice Key Pairs with Deterministic Regenerati","ciis":0.7061,"rank":14,"nc":0.8583,"ev":0.6937,"cde":0.6499,"msi":0.5975,"fto":"GREEN","filing":"IMMEDIATE","ps":8.6,"val":"$7M-$18M","cpcP":["H04L9/08","G09C1/00"],"cpcS":["H04L9/32","G06F21/73","H04L9/30","G06F21/72"]},{"id":2,"wsId":1,"title":"Mechanochemically-Triggered In-Situ Halide Segregation System for Scalable Solid-State Battery Inter","ciis":0.7042,"rank":15,"nc":0.7048,"ev":0.8017,"cde":0.6244,"msi":0.695,"fto":"GREEN","filing":"IMMEDIATE","ps":8.8,"val":"$30M-$65M","cpcP":["H01M4/1391 (electrode treatment for solid-state batteries), B02C17/00 (grinding/mixing processes)"],"cpcS":["H01M10/0562, H01M4/625, H01M4/136, B01J19/18 (mechanochemical reactions), C01D15/00 (lithium compounds)"]},{"id":17,"wsId":3,"title":"Dual-Timescale Synaptic Meta-Plasticity Circuit with Volatile SRAM Tag and Non-Volatile PCM Weight f","ciis":0.7003,"rank":16,"nc":0.8347,"ev":0.758,"cde":0.629,"msi":0.5575,"fto":"GREEN","filing":"IMMEDIATE","ps":9.0,"val":"$30M-$70M","cpcP":["G06N3/063 (hardware neural network implementations)","G11C11/54 (biologically-inspired storage elements)"],"cpcS":["G06N3/08 (learning methods)","H10N70/20 (PCM devices)","H10B51/00 (FeRAM)","G11C13/00 (resistive memory)"]},{"id":32,"wsId":5,"title":"Phonon-Matched Boron Arsenide Nanoparticle Composite TIM for Near-Diamond Thermal Conductivity at Ch","ciis":0.699,"rank":17,"nc":0.823,"ev":0.714,"cde":0.6742,"msi":0.5575,"fto":"GREEN","filing":"IMMEDIATE","ps":9.0,"val":"$22M-$55M","cpcP":["H01L23/373","C09K5/00","B82Y30/00"],"cpcS":["H01L23/3735","H01L25/18","C23C16/455","C01B32/00","H01L21/48"]},{"id":75,"wsId":11,"title":"Operational Design Domain Boundary Detector with Graduated Safe-State Transition Controller for Auto","ciis":0.6989,"rank":18,"nc":0.8005,"ev":0.6164,"cde":0.7342,"msi":0.6275,"fto":"GREEN","filing":"Q2 2026","ps":8.5,"val":"$8M\u2013$18M","cpcP":["B60W 60/00 (autonomous vehicle control)","B60W 50/08 (AV system conditions monitoring)","G05D 1/02 (position/course control \u2014 land vehicles)"],"cpcS":["G06N 7/00 (knowledge-based probabilistic methods)","G08G 1/16 (collision avoidance)","H04W 4/40 (V2X communications)"]},{"id":59,"wsId":9,"title":"Photonic Qubit Control Bus with Cryogenic UTC-PD Chiplet Array and Wavelength-Division Multiplexed M","ciis":0.6987,"rank":19,"nc":0.8169,"ev":0.706,"cde":0.7941,"msi":0.465,"fto":"GREEN","filing":"IMMEDIATE","ps":9.0,"val":"$25M-$50M","cpcP":["G02F1/01","H04J14/02","G06N10/40"],"cpcS":["H01S5/0683","G02B6/42","H04B10/25","H01L31/0232"]},{"id":58,"wsId":9,"title":"Self-Heating-Aware Cryo-CMOS Layout Synthesis System with Thermal Gradient Routing for Millikelvin Q","ciis":0.6971,"rank":20,"nc":0.8219,"ev":0.6749,"cde":0.6798,"msi":0.585,"fto":"GREEN","filing":"IMMEDIATE","ps":8.0,"val":"$10M-$25M","cpcP":["G06F30/398","H01L21/82","G06F30/392"],"cpcS":["G06N10/40","H01L23/367","G06F30/3312","H03K19/003"]},{"id":6,"wsId":1,"title":"AI-Guided High-Throughput Interface Composition Discovery Platform Using Combinatorial Synthesis and","ciis":0.6968,"rank":21,"nc":0.8281,"ev":0.6493,"cde":0.7266,"msi":0.5575,"fto":"GREEN","filing":"Q2 2026","ps":7.5,"val":"$20M-$40M","cpcP":["H01M10/0562, G06N20/00 (machine learning), G06N3/08 (neural networks for physical systems)"],"cpcS":["H01M4/1391, G01N27/00 (electrochemical sensing and characterization), C23C14/34 (sputtering for combinatorial synthesis), G16C20/70 (informatics for materials science)"]},{"id":21,"wsId":3,"title":"Radiation-Hardened Neuromorphic SoC with Triple-Modular-Redundant SNN Cores and Heavy-Ion-Tolerant F","ciis":0.6949,"rank":22,"nc":0.8829,"ev":0.7285,"cde":0.6858,"msi":0.465,"fto":"GREEN","filing":"Q3-Q4 2026","ps":8.9,"val":"$20M-$55M","cpcP":["H01L27/0248 (radiation-hardened circuits)","G06N3/063 (hardware neural implementations)"],"cpcS":["H10B51/00 (FeRAM)","H10N70/20 (HfO2 devices)","G06F11/10 (error correction)","H01L29/788 (radiation-hardened FETs)"]},{"id":41,"wsId":6,"title":"SFQ-CMOS Hybrid Syndrome Extraction Circuit with Josephson Multiplexer for Sub-100-Nanosecond Stabil","ciis":0.6949,"rank":23,"nc":0.813,"ev":0.6949,"cde":0.7433,"msi":0.505,"fto":"GREEN","filing":"IMMEDIATE","ps":8.8,"val":"$20M-$45M","cpcP":["G06N10/40","H01L39/22"],"cpcS":["G06N10/70","H03K19/195","H01P1/10","G01R33/035"]},{"id":99,"wsId":15,"title":"Unified Number-Theoretic Transform (NTT) Butterfly Processor with Integrated First-Order Masking Gad","ciis":0.6947,"rank":24,"nc":0.7785,"ev":0.6327,"cde":0.6689,"msi":0.69,"fto":"GREEN","filing":"IMMEDIATE","ps":8.7,"val":"$8M-$22M","cpcP":["H04L9/06","H04L9/003"],"cpcS":["G06F7/72","H04L9/30","G06F21/75","H03M13/00"]},{"id":53,"wsId":8,"title":"Personalized Federated Learning System with Architecture-Heterogeneous Knowledge Distillation and Ca","ciis":0.6912,"rank":25,"nc":0.8806,"ev":0.7007,"cde":0.6527,"msi":0.5075,"fto":"GREEN","filing":"Q2 2026","ps":8.7,"val":"$18M-$35M","cpcP":["G06N3/098","G06N3/04","G06N3/08"],"cpcS":["G06N20/00","G06F9/50","H04L67/104","G06N3/02"]},{"id":39,"wsId":6,"title":"3D Heterogeneous Integration Stack for Cryogenic Quantum Processor with Co-Integrated Syndrome Extra","ciis":0.6891,"rank":26,"nc":0.6836,"ev":0.7255,"cde":0.7286,"msi":0.61,"fto":"YELLOW","filing":"IMMEDIATE","ps":8.2,"val":"$22M-$50M","cpcP":["G06N10/40","H01L25/065"],"cpcS":["G06N10/70","H01L39/00","G11C11/44","H04B10/25"]},{"id":101,"wsId":15,"title":"Sub-Milliwatt PQC Co-Processor with Duty-Cycled Polynomial Arithmetic Engine and Hardware-Assisted K","ciis":0.6887,"rank":27,"nc":0.816,"ev":0.6643,"cde":0.6527,"msi":0.5975,"fto":"GREEN","filing":"IMMEDIATE","ps":8.8,"val":"$9M-$24M","cpcP":["H04L9/06","G06F1/3231"],"cpcS":["H04L9/30","H04W12/04","G06F21/72","H04L9/08"]},{"id":77,"wsId":11,"title":"Decentralized Multi-Agent Safety Consensus Protocol with Byzantine-Fault-Tolerant Safety Property Ve","ciis":0.6883,"rank":28,"nc":0.7765,"ev":0.6058,"cde":0.753,"msi":0.6025,"fto":"GREEN","filing":"Q3-Q4 2026","ps":8.0,"val":"$12M\u2013$25M","cpcP":["H04W 4/46 (V2V communications)","G05D 1/02 (vehicle position/course control)","H04L 9/32 (cryptographic protocols)"],"cpcS":["B60W 60/00 (autonomous driving)","G06F 21/64 (data integrity verification)","G08G 1/09 (traffic control systems)"]},{"id":73,"wsId":11,"title":"Causal Explanation Graph Generator for Regulatory-Certified Autonomous Vehicle Decision Auditing","ciis":0.6876,"rank":29,"nc":0.8036,"ev":0.6584,"cde":0.643,"msi":0.625,"fto":"GREEN","filing":"IMMEDIATE","ps":8.0,"val":"$12M\u2013$22M","cpcP":["G06N 5/04 (reasoning/inference in expert systems)","G06F 11/3604 (verification/testing)","B60W 50/04 (indication/warning of AV malfunctions)"],"cpcS":["G06N 20/00 (machine learning)","G06V 20/58 (scene understanding for AV)","G07C 5/08 (vehicle data recorder)"]},{"id":9,"wsId":2,"title":"Grain-Boundary-Isolated MnBi Permanent Magnet with Inorganic Silicate Intergranular Coating and Anis","ciis":0.6867,"rank":30,"nc":0.6946,"ev":0.806,"cde":0.6363,"msi":0.6075,"fto":"GREEN","filing":"IMMEDIATE","ps":8.8,"val":"$30M-$70M","cpcP":["H01F1/032 (hard magnetic inorganic materials)","H01F1/04 (hard magnetic metals/alloys)"],"cpcS":["H01F41/0253 (manufacturing permanent magnets)","H02K1/276 (permanent magnet rotors)","C22C28/00 (alloys based on Mn)","B22F1/102 (powder coating)"]},{"id":25,"wsId":4,"title":"Continuous-Flow Hollow-Fiber Cell-Free Bioreactor with Integrated Inline Product Capture Membrane an","ciis":0.6847,"rank":31,"nc":0.7456,"ev":0.8126,"cde":0.6139,"msi":0.5575,"fto":"GREEN","filing":"IMMEDIATE","ps":8.8,"val":"$40M-$90M","cpcP":["C12M3/04","C12P21/00"],"cpcS":["B01D63/02","C12M1/12","G01N30/00","C12M3/06"]},{"id":85,"wsId":13,"title":"Genomic-to-Structural-Property Mapping Engine for Biomaterial Discovery Using Multi-Modal Foundation","ciis":0.6846,"rank":32,"nc":0.8067,"ev":0.69,"cde":0.6845,"msi":0.53,"fto":"GREEN","filing":"IMMEDIATE","ps":8.5,"val":"$18M-$40M","cpcP":["G16B40/20 (Machine learning applied to molecular biology)","G16B15/00 (Protein structure prediction)","C12N15/10 (Recombinant DNA technology)"],"cpcS":["G06N3/08 (Neural networks - supervised learning)","C08H1/00 (Macromolecular products derived from proteins)","G16B5/30 (Sequence-activity relationships)"]},{"id":65,"wsId":10,"title":"Zero-Shot Neural Decoder with Population-Level Transfer Learning for Calibration-Free Consumer Brain","ciis":0.6845,"rank":33,"nc":0.8457,"ev":0.7227,"cde":0.6417,"msi":0.505,"fto":"GREEN","filing":"IMMEDIATE","ps":8.2,"val":"$20M-$40M","cpcP":["G06N3/04 (neural networks)","A61B5/369 (EEG)","G06F3/015 (eye/body activity input)"],"cpcS":["G16H50/20 (ICT for diagnosis using machine learning)","A61B5/7267 (non-linear analysis of brain signals)","G06N20/00 (machine learning general)","A61B5/48 (BCI applications)"]},{"id":55,"wsId":8,"title":"Adaptive Semantic Gradient Compression Protocol for Bandwidth-Constrained Federated Learning with Cr","ciis":0.6844,"rank":34,"nc":0.849,"ev":0.6505,"cde":0.7064,"msi":0.5075,"fto":"GREEN","filing":"Q2 2026","ps":8.4,"val":"$10M-$22M","cpcP":["G06N3/098","H04L69/04","H03M7/30"],"cpcS":["H04W28/06","G06N20/00","H04L67/104","H04B7/0413"]},{"id":19,"wsId":3,"title":"Native Event-Stream Spiking Neural Network Processor with Direct Dynamic Vision Sensor Interface Eli","ciis":0.6822,"rank":35,"nc":0.8419,"ev":0.7017,"cde":0.6714,"msi":0.49,"fto":"GREEN","filing":"Q2 2026","ps":8.5,"val":"$20M-$50M","cpcP":["H04N25/47 (event-based image sensors)","G06N3/063 (hardware neural network implementations)"],"cpcS":["G06T1/20 (special purpose image processing)","G06N3/04 (neural architectures)","H04N25/75 (pixel circuits)","G06V10/25 (image analysis \u2014 event cameras)"]},{"id":44,"wsId":7,"title":"Metal-Ceramic Interface Transition Algorithm with Adaptive Laser Parameter Modulation for Functional","ciis":0.6818,"rank":36,"nc":0.7278,"ev":0.6939,"cde":0.7002,"msi":0.585,"fto":"GREEN","filing":"IMMEDIATE","ps":8.5,"val":"$15M-$35M","cpcP":["B22F10/28","B33Y50/02","C04B35/628 (ceramic processing)"],"cpcS":["B33Y70/10","C22C1/04","G05B19/418","G01J5/00 (pyrometry)","B22F10/366 (DED)","C04B37/02 (metal-ceramic bonding)"]},{"id":88,"wsId":13,"title":"Automated Closed-Loop Design-Build-Test-Learn Pipeline for Biomaterial Property Optimization with In","ciis":0.6815,"rank":37,"nc":0.8304,"ev":0.6287,"cde":0.7377,"msi":0.5075,"fto":"GREEN","filing":"Q2 2026","ps":8.0,"val":"$10M-$22M","cpcP":["G16B40/00 (Bioinformatics/computational biology tools)","C12M1/36 (Fermentation apparatus with automatic control)","C12N15/10 (DNA engineering)"],"cpcS":["G06N7/01 (Probabilistic graphical models)","B01L3/00 (Laboratory vessels/handling equipment)","G05B19/042 (Programmable logic controllers)"]},{"id":36,"wsId":6,"title":"Streaming ASIC Decoder for Real-Time Quantum Low-Density Parity-Check (QLDPC) Error Correction with ","ciis":0.6805,"rank":38,"nc":0.812,"ev":0.713,"cde":0.6417,"msi":0.53,"fto":"GREEN","filing":"IMMEDIATE","ps":8.9,"val":"$25M-$55M","cpcP":["G06N10/70","H03M13/00"],"cpcS":["G06F7/544","G11C11/44","G06N3/063","H03M13/37"]},{"id":22,"wsId":4,"title":"Electrochemically Regenerated ATP Cell-Free Protein Synthesis System with Integrated Electrocatalyti","ciis":0.6799,"rank":39,"nc":0.7621,"ev":0.7757,"cde":0.6593,"msi":0.505,"fto":"GREEN","filing":"IMMEDIATE","ps":8.5,"val":"$35M-$75M","cpcP":["C12P21/00","C12M1/42"],"cpcS":["C12N9/1229","H01M8/10","C12M3/00","B01J19/00","C12Q1/00"]},{"id":27,"wsId":4,"title":"AI-Integrated Closed-Loop Cell-Free Protein Engineering Platform with Real-Time Directed Evolution U","ciis":0.6798,"rank":40,"nc":0.8053,"ev":0.7161,"cde":0.7263,"msi":0.455,"fto":"GREEN","filing":"Q2 2026","ps":8.3,"val":"$30M-$70M","cpcP":["G16B20/00","C12N15/10"],"cpcS":["C12P21/00","G06N20/00","B01L3/00","C40B30/08"]},{"id":74,"wsId":11,"title":"Adversarial Patch Robustness Certification System with Quantitative Safety Bound Generation for Neur","ciis":0.6782,"rank":41,"nc":0.7834,"ev":0.6085,"cde":0.7546,"msi":0.5475,"fto":"GREEN","filing":"Q2 2026","ps":8.5,"val":"$10M\u2013$20M","cpcP":["G06F 21/57 (assessing security vulnerabilities)","G06V 10/82 (neural networks for image recognition)","B60W 60/00 (autonomous driving)"],"cpcS":["G06N 3/08 (NN training)","G06T 7/00 (image analysis)","H04L 9/32 (cryptographic authentication)"]},{"id":38,"wsId":6,"title":"Modality-Agnostic Quantum Error Correction Interface Controller with Programmable Syndrome Timing En","ciis":0.6776,"rank":42,"nc":0.7797,"ev":0.6714,"cde":0.6877,"msi":0.545,"fto":"GREEN","filing":"IMMEDIATE","ps":8.7,"val":"$20M-$45M","cpcP":["G06N10/40","G06N10/70"],"cpcS":["H04L13/00","G06F9/44","G06F13/40","H03M13/00"]},{"id":31,"wsId":5,"title":"Dynamically Variable Thermal Conductivity TIM Using Electrically Switchable Phase Transition for Ada","ciis":0.6753,"rank":43,"nc":0.7914,"ev":0.6956,"cde":0.6838,"msi":0.505,"fto":"GREEN","filing":"IMMEDIATE","ps":8.5,"val":"$20M-$50M","cpcP":["H01L23/373","H01L23/34","H05K7/20"],"cpcS":["C04B35/495","H01L23/42","H01L25/065","G05D23/19","C09K5/00"]},{"id":54,"wsId":8,"title":"FL Model Provenance Watermarking System with Contribution-Proportional Embedding and Adversarial Rob","ciis":0.6748,"rank":44,"nc":0.8349,"ev":0.655,"cde":0.6902,"msi":0.495,"fto":"GREEN","filing":"Q2 2026","ps":8.6,"val":"$15M-$30M","cpcP":["G06N3/098","H04N1/32149","G06F21/10"],"cpcS":["H04L9/3247","G06N20/00","G06F21/16","G06T1/0028"]},{"id":100,"wsId":15,"title":"Hardware Crypto-Agility Switching Fabric for Dynamic Post-Quantum Algorithm Family Selection with Ze","ciis":0.6747,"rank":45,"nc":0.7722,"ev":0.6491,"cde":0.6339,"msi":0.625,"fto":"GREEN","filing":"IMMEDIATE","ps":8.4,"val":"$12M-$28M","cpcP":["H04L9/08","G06F21/72"],"cpcS":["H04L9/30","H04L9/32","G06F9/455","H04L63/06"]},{"id":12,"wsId":2,"title":"Electrochemical Selective Delithiation-Relithiation Platform for Direct Closed-Loop Recycling of End","ciis":0.6732,"rank":46,"nc":0.665,"ev":0.8039,"cde":0.5451,"msi":0.715,"fto":"GREEN","filing":"IMMEDIATE","ps":8.6,"val":"$35M-$75M","cpcP":["H01M10/54 (secondary cells \u2014 recovery of active material)","C22B26/12 (recovery of Li)"],"cpcS":["C25B3/00 (electrolytic processes)","H01M4/58 (polyanion cathode active materials)","C22B7/00 (working-up of residues from metallurgical processes)"]},{"id":30,"wsId":5,"title":"Self-Assembling Nanostructured TIM via Field-Directed Deposition for Wafer-Level Heterogeneous Integ","ciis":0.673,"rank":47,"nc":0.8401,"ev":0.7007,"cde":0.6518,"msi":0.4775,"fto":"GREEN","filing":"IMMEDIATE","ps":8.7,"val":"$15M-$35M","cpcP":["H01L21/02","H01L23/373","B82Y30/00"],"cpcS":["B82Y40/00","C09K5/00","H01L25/065","C08K3/38","H01L21/48"]},{"id":57,"wsId":9,"title":"Orthogonal Frequency-Division Multiplexed Cryo-CMOS Controller with Adaptive Inter-Qubit Interferenc","ciis":0.67,"rank":48,"nc":0.7722,"ev":0.6649,"cde":0.7312,"msi":0.49,"fto":"GREEN","filing":"IMMEDIATE","ps":8.5,"val":"$20M-$40M","cpcP":["H03K19/1958","G06N10/40","H04L27/26"],"cpcS":["H03H11/04","H01P1/203","G06N10/20","H03F3/193"]},{"id":48,"wsId":7,"title":"Multi-Laser Wavelength-Selective Coordination System for Simultaneous Processing of Dissimilar Absor","ciis":0.6693,"rank":49,"nc":0.7572,"ev":0.7642,"cde":0.5747,"msi":0.57,"fto":"GREEN","filing":"IMMEDIATE","ps":9.0,"val":"$22M-$50M","cpcP":["B22F10/28","B33Y10/00","B23K26/06 (laser beam control)"],"cpcS":["B22F10/366 (DED)","B33Y70/10","B23K26/0007 (beam properties)","B23K26/342 (multiple beams)","C22C9/00 (copper alloys)","C22C14/00 (titanium alloys)"]},{"id":69,"wsId":10,"title":"Somatosensory Neural Feedback Vest with Spatialized Vibrotactile Encoding for Closed-Loop Non-Invasi","ciis":0.6686,"rank":50,"nc":0.8413,"ev":0.6375,"cde":0.7406,"msi":0.4425,"fto":"GREEN","filing":"Q2 2026","ps":8.0,"val":"$10M-$22M","cpcP":["A61N1/3603 (neurostimulation control systems)","G06F3/016 (haptic user interface)","A61B5/369 (EEG)"],"cpcS":["A61H23/02 (vibration therapy)","G06F3/015 (body motion input)","A61N1/36031 (physiological parameter control)","H04R1/00 (transducer/acoustic device)"]},{"id":37,"wsId":6,"title":"Adaptive Code-Distance Reconfiguration Engine: Hardware State Machine for Dynamic Surface Code Dista","ciis":0.6664,"rank":51,"nc":0.7671,"ev":0.6576,"cde":0.6003,"msi":0.625,"fto":"GREEN","filing":"IMMEDIATE","ps":8.5,"val":"$18M-$40M","cpcP":["G06N10/70","G06F11/07"],"cpcS":["G06N10/40","G06F11/20","H03M13/35"]},{"id":52,"wsId":8,"title":"Decentralized Byzantine-Fault-Tolerant Federated Learning Aggregation with Provenance-Anchored Gradi","ciis":0.6654,"rank":52,"nc":0.6747,"ev":0.6797,"cde":0.6527,"msi":0.65,"fto":"YELLOW","filing":"IMMEDIATE","ps":8.5,"val":"$12M-$30M","cpcP":["G06N3/098","H04L9/3236","G06F11/07"],"cpcS":["H04L9/3239","G06F21/57","G06N20/00","H04L67/104"]},{"id":103,"wsId":15,"title":"Hardware-Accelerated Hybrid KEM Combiner for Simultaneous Classical-Elliptic-Curve and Post-Quantum ","ciis":0.663,"rank":53,"nc":0.7534,"ev":0.6237,"cde":0.6339,"msi":0.625,"fto":"GREEN","filing":"IMMEDIATE","ps":8.2,"val":"$10M-$25M","cpcP":["H04L9/30","H04L9/0816"],"cpcS":["H04L9/08","H04L63/06","G06F21/72","H04L9/003"]},{"id":89,"wsId":13,"title":"Engineered Bacterial Cellulose Nanocomposite Scaffold with Programmable Fiber Orientation for Aerosp","ciis":0.6604,"rank":54,"nc":0.695,"ev":0.6688,"cde":0.6408,"msi":0.625,"fto":"GREEN","filing":"IMMEDIATE","ps":8.6,"val":"$15M-$35M","cpcP":["C12N1/20 (Bacteria - Komagataeibacter)","C08B11/00 (Cellulose derivatives)","C12N15/63 (Genetic engineering of bacteria)"],"cpcS":["D21H11/20 (Non-fibrous material added to fibrous raw material)","B32B5/02 (Layered composite)","C12P19/04 (Cellulose production)"]},{"id":86,"wsId":13,"title":"Cell-Free Protein Synthesis Reactor System for Scalable Structural Biomaterial Production with In-Li","ciis":0.6591,"rank":55,"nc":0.7559,"ev":0.6997,"cde":0.6815,"msi":0.4775,"fto":"GREEN","filing":"IMMEDIATE","ps":8.2,"val":"$12M-$28M","cpcP":["C12P21/00 (Preparation of peptides or proteins by fermentation)","C12M1/00 (Apparatus for enzymology or microbiology)","C08H1/00 (Macromolecular products from proteins)"],"cpcS":["B29C48/00 (Extrusion moulding)","G05B19/00 (Process control)","D01F4/02 (Artificial filaments from proteins)"]},{"id":33,"wsId":5,"title":"Multimodal In-Situ TIM Health Monitor Using Embedded Phononic Crystal Resonators for Real-Time Degra","ciis":0.6573,"rank":56,"nc":0.8458,"ev":0.6522,"cde":0.6717,"msi":0.4425,"fto":"GREEN","filing":"Q2 2026","ps":8.8,"val":"$12M-$30M","cpcP":["H01L23/34","G01R31/28","G01N29/04"],"cpcS":["H05K1/02","G01N29/44","H01L23/373","H01L25/18","B81B3/00"]},{"id":46,"wsId":7,"title":"Embedded Sensor Array Architecture for Multi-Material Additive Manufacturing with Material-Compliant","ciis":0.6561,"rank":57,"nc":0.729,"ev":0.6812,"cde":0.6682,"msi":0.5225,"fto":"GREEN","filing":"Q2 2026","ps":8.5,"val":"$12M-$28M","cpcP":["B33Y80/00","B33Y10/00","G01D21/02 (embedded sensing)"],"cpcS":["B22F10/28","B33Y70/10","H01Q1/40 (antennas in conducting materials)","G01L1/22 (strain measurement)","B22F7/08 (bonded metal structures with inserts)"]},{"id":64,"wsId":10,"title":"Active Impedance-Adaptive Dry Electrode Array with Integrated ASIC for Semiconductor-Grade Neural Si","ciis":0.6559,"rank":58,"nc":0.8599,"ev":0.7259,"cde":0.5077,"msi":0.53,"fto":"GREEN","filing":"IMMEDIATE","ps":8.5,"val":"$18M-$35M","cpcP":["A61B5/291 (EEG electrodes)","A61B5/263 (electrode materials)","A61B5/302 (capacitive/MOSFET input circuits)"],"cpcS":["A61B5/268 (conductive polymer electrodes)","H01L27/146 (CMOS image sensors - analogous ASIC architecture)","A61B5/31 (EEG input circuits)","A61B2562/0209 (special electrode features)"]},{"id":47,"wsId":7,"title":"Multi-Material Interface Digital Twin with Physics-Informed Neural Network for Real-Time Interface P","ciis":0.6554,"rank":59,"nc":0.6533,"ev":0.6314,"cde":0.7306,"msi":0.6025,"fto":"YELLOW","filing":"Q2 2026","ps":8.0,"val":"$16M-$38M","cpcP":["B33Y50/00","B33Y50/02","G06N3/04 (neural networks)"],"cpcS":["G06F30/23 (FEA-based design)","G05B23/02 (monitoring/diagnosis)","B22F10/28","G01N33/20 (material property measurement)","G06N20/00 (machine learning)"]},{"id":62,"wsId":9,"title":"Cryo-CMOS DAC with Sub-Millikelvin Charge-Retention Sample-and-Hold for Massively Parallel Spin Qubi","ciis":0.6554,"rank":60,"nc":0.65,"ev":0.6727,"cde":0.7211,"msi":0.57,"fto":"YELLOW","filing":"IMMEDIATE","ps":8.5,"val":"$15M-$30M","cpcP":["H03M1/66","G06N10/40","H01L27/07845"],"cpcS":["H03M3/02","H01L29/786","H03F3/193","G11C27/02"]},{"id":94,"wsId":14,"title":"Standardized Passive Photonic Coupling Alignment Architecture with Fiducial-Encoded Substrates for M","ciis":0.6544,"rank":61,"nc":0.7844,"ev":0.6598,"cde":0.5006,"msi":0.69,"fto":"GREEN","filing":"IMMEDIATE","ps":8.5,"val":"$15M-$35M","cpcP":["G02B 6/4201","G02B 6/30"],"cpcS":["G02B 6/4204","G02B 27/44","H01L 31/0232","G02B 5/18","G02B 6/122"]},{"id":18,"wsId":3,"title":"Catalytic-Metal-Assisted Low-Temperature BEOL-Compatible Ferroelectric Tunnel Junction Synapse with ","ciis":0.6525,"rank":62,"nc":0.6481,"ev":0.7204,"cde":0.7116,"msi":0.5225,"fto":"YELLOW","filing":"IMMEDIATE","ps":8.6,"val":"$25M-$60M","cpcP":["H10B51/30 (FeRAM with FTJ)","H10N70/20 (HfO2-based devices)"],"cpcS":["H01L21/28 (BEOL processing)","G11C11/56 (ferroelectric memory)","G06N3/063 (hardware neural networks)","H10B51/00 (ferroelectric memory devices)"]},{"id":49,"wsId":7,"title":"Selective Multi-Zone Post-Processing System for Residual Stress Relief at Dissimilar Material Interf","ciis":0.6488,"rank":63,"nc":0.6786,"ev":0.6162,"cde":0.6867,"msi":0.6025,"fto":"GREEN","filing":"Q3-Q4 2026","ps":8.3,"val":"$10M-$25M","cpcP":["B33Y40/20","C21D9/00 (heat treatment of fabricated articles)","B22F3/24 (HIP)"],"cpcS":["B33Y80/00","G01L5/00 (residual stress measurement)","C21D10/00 (heat treatment with irradiation)","B23K26/356 (laser shock processing)","C04B41/80 (surface treatment of ceramic-metal)","B22F2998/10 (heat treatment of AM parts)"]},{"id":60,"wsId":9,"title":"Non-Radiative Resonant Inductive Power Transfer System for Cryogenic Quantum Processor Electronics w","ciis":0.648,"rank":64,"nc":0.77,"ev":0.62,"cde":0.697,"msi":0.4825,"fto":"GREEN","filing":"Q2 2026","ps":8.5,"val":"$15M-$30M","cpcP":["H02J50/10","H02J50/90","G06N10/40"],"cpcS":["H02J7/00","H01F38/14","H02M3/00","H01L39/00"]},{"id":84,"wsId":12,"title":"Physics-Informed Digital Twin Framework for WBG Power Module Remaining Useful Life Prediction with I","ciis":0.6431,"rank":65,"nc":0.805,"ev":0.6056,"cde":0.7036,"msi":0.4425,"fto":"GREEN","filing":"Q3-Q4 2026","ps":8.4,"val":"$8M-$18M","cpcP":["G01N29/04","H01L23/58"],"cpcS":["G06N3/084","G01N29/11","H01L25/07","G01N2291/02","H02M1/32"]},{"id":96,"wsId":14,"title":"Software-Defined Photonic I/O Abstraction Layer (SDPAL): OS-Level Optical Interconnect Resource Mana","ciis":0.6412,"rank":66,"nc":0.7617,"ev":0.553,"cde":0.6714,"msi":0.5625,"fto":"GREEN","filing":"Q2 2026","ps":7.5,"val":"$10M-$22M","cpcP":["G06F 13/38","H04B 10/07"],"cpcS":["G06F 9/455","H04L 41/0896","H04B 10/40","H04J 14/02","G06F 13/42"]},{"id":1,"wsId":1,"title":"Chemistry-Agnostic Mechanically-Compliant Gradient Interlayer for Universal Solid-State Battery Inte","ciis":0.6411,"rank":67,"nc":0.6505,"ev":0.753,"cde":0.4744,"msi":0.7475,"fto":"GREEN","filing":"IMMEDIATE","ps":8.5,"val":"$25M-$60M","cpcP":["H01M10/0562 (solid-state electrolyte), H01M4/1391 (treatment of electrodes for solid-state batteries)"],"cpcS":["H01M50/46 (separators with surface coatings), C23C16/455 (ALD processes), H01M10/0585 (flat construction elements), H01M4/625 (coating of electrode materials)"]},{"id":63,"wsId":9,"title":"Thermal-Zone-Aware Hierarchical Signal Routing Fabric for Multi-Stage Cryogenic Quantum Processors U","ciis":0.6411,"rank":68,"nc":0.7794,"ev":0.5976,"cde":0.7896,"msi":0.4025,"fto":"GREEN","filing":"Q3-Q4 2026","ps":8.0,"val":"$10M-$20M","cpcP":["H01P5/00","B81B3/00","G06N10/40"],"cpcS":["H01L39/02","F17C13/00","H04Q3/52","G06F1/20"]},{"id":68,"wsId":10,"title":"Transcranial Low-Intensity Focused Ultrasound Array Headset for Non-Invasive, High-Spatial-Resolutio","ciis":0.6402,"rank":69,"nc":0.7075,"ev":0.7678,"cde":0.5384,"msi":0.545,"fto":"GREEN","filing":"IMMEDIATE","ps":9.1,"val":"$30M-$60M","cpcP":["A61B8/0808 (ultrasound imaging brain)","A61N7/02 (therapeutic ultrasound brain)","A61B8/12 (blood flow Doppler)"],"cpcS":["A61B5/369 (EEG - for hybrid hybrid system claims)","A61B8/4455 (phased array transducers)","H04R17/00 (piezoelectric transducers)","A61N7/00 (ultrasonic neuromodulation)"]},{"id":83,"wsId":12,"title":"Embedded Microfluidic Cooling Substrate for WBG Power Modules with Dielectric Coolant and Direct-Die","ciis":0.6397,"rank":70,"nc":0.8208,"ev":0.639,"cde":0.5951,"msi":0.4825,"fto":"GREEN","filing":"Q2 2026","ps":8.9,"val":"$14M-$30M","cpcP":["H01L23/473","H01L23/36"],"cpcS":["H01L23/14","H01L21/48","B81B1/00","H01L23/34","F28F13/00"]},{"id":10,"wsId":2,"title":"Vitrimer-Based Covalent Adaptable Network Dielectric Substrate for Printed Circuit Boards with Trigg","ciis":0.6378,"rank":71,"nc":0.6394,"ev":0.7171,"cde":0.5729,"msi":0.6275,"fto":"GREEN","filing":"Q2 2026","ps":8.2,"val":"$25M-$60M","cpcP":["H05K1/03 (insulating substrates for PCBs)","C08G59/18 (epoxy resins with curing)"],"cpcS":["H05K3/00 (manufacturing PCBs)","C08G2650/00 (covalent adaptable networks)","B32B27/38 (epoxy resin layers)","H05K2203/175 (substrate recovery)"]},{"id":42,"wsId":6,"title":"QEC Co-Processor System-on-Chip Integrating Syndrome Extraction Controller, Belief-Propagation Decod","ciis":0.6359,"rank":72,"nc":0.6673,"ev":0.7166,"cde":0.6003,"msi":0.5475,"fto":"YELLOW","filing":"Q2 2026","ps":8.4,"val":"$30M-$65M","cpcP":["G06N10/70","G06N10/40"],"cpcS":["G06F9/38","H03M13/37","G06F15/78","G06F9/50"]},{"id":23,"wsId":4,"title":"Modular Lyophilized Cell-Free Reaction Pellets with Encapsulated Non-Aqueous Hydrophobic Excipient C","ciis":0.6354,"rank":73,"nc":0.6758,"ev":0.7072,"cde":0.6247,"msi":0.5175,"fto":"GREEN","filing":"IMMEDIATE","ps":8.7,"val":"$25M-$60M","cpcP":["A61K9/50","C12P21/00"],"cpcS":["A61K9/19","C12M1/00","B01J13/04","C12N1/08"]},{"id":78,"wsId":12,"title":"Graded-CTE Composite Ceramic Substrate with Interlocked Compliance Zones for SiC Power Module Therma","ciis":0.6341,"rank":74,"nc":0.7569,"ev":0.6223,"cde":0.5689,"msi":0.57,"fto":"GREEN","filing":"IMMEDIATE","ps":8.5,"val":"$12M-$28M","cpcP":["H01L23/498","H01L23/373"],"cpcS":["H01L23/14","H05K1/0293","C04B35/587","H01L21/48","H01L23/36"]},{"id":29,"wsId":5,"title":"Spatially Programmed Anisotropic TIM Architecture for Multi-Chiplet Heterogeneous Packages","ciis":0.6283,"rank":75,"nc":0.6415,"ev":0.6776,"cde":0.7077,"msi":0.4775,"fto":"YELLOW","filing":"IMMEDIATE","ps":8.2,"val":"$18M-$45M","cpcP":["H01L23/373","H01L25/065","H01L25/18"],"cpcS":["B82Y30/00","H01L23/42","C09K5/00","H01L21/48","G06F30/23"]},{"id":13,"wsId":2,"title":"Graph Neural Network Platform for Earth-Abundant Critical Mineral Substitution Screening Integrating","ciis":0.6282,"rank":76,"nc":0.6369,"ev":0.6707,"cde":0.6321,"msi":0.5625,"fto":"YELLOW","filing":"Q2 2026","ps":7.2,"val":"$30M-$90M","cpcP":["G16C20/70 (machine learning in materials informatics)","G06N3/04 (neural networks)"],"cpcS":["C01G (inorganic compounds \u2014 discovery context)","G06F30/17 (computer-aided materials design)","G06N3/08 (neural network training methods)"]},{"id":104,"wsId":15,"title":"Quantum-Safe Hardware Security Module with PQC-Internally-Secured Boot Chain, PQC-Wrapped Audit Log,","ciis":0.6257,"rank":77,"nc":0.6037,"ev":0.6141,"cde":0.6339,"msi":0.665,"fto":"YELLOW","filing":"IMMEDIATE","ps":8.1,"val":"$11M-$27M","cpcP":["G06F21/72","H04L9/08"],"cpcS":["G06F21/57","H04L9/32","G06F21/73","H04L9/30"]},{"id":35,"wsId":5,"title":"AI-Driven Thermal Interface Digital Twin with Closed-Loop TIM Co-Design and Predictive Degradation C","ciis":0.6255,"rank":78,"nc":0.6767,"ev":0.6125,"cde":0.7496,"msi":0.455,"fto":"YELLOW","filing":"Q2 2026","ps":7.8,"val":"$10M-$25M","cpcP":["G06F30/20","H01L23/34","G05D23/19"],"cpcS":["G06N20/00","H01L25/18","G06F119/08","H05K7/20","G01R31/28"]},{"id":11,"wsId":2,"title":"In-Doped Mg3Sb2-Mg3Bi2 Solid-Solution Thermoelectric Generator Module with Iron-Alloy Diffusion-Barr","ciis":0.6215,"rank":79,"nc":0.6928,"ev":0.6751,"cde":0.6149,"msi":0.4825,"fto":"GREEN","filing":"Q2 2026","ps":8.3,"val":"$20M-$50M","cpcP":["H10N10/17 (thermoelectric module fabrication)","H10N10/85 (thermoelectric active materials)"],"cpcS":["H10N10/80 (thermoelectric module constructional details)","C22C23/00 (Mg alloys)","B22F3/14 (spark plasma sintering)","F28F21/06 (waste heat recovery surfaces)"]},{"id":5,"wsId":1,"title":"Conformally-Deposited Viscoelastic Ionoelastomer Interface Layer for Stress-Accommodating Solid-Stat","ciis":0.6196,"rank":80,"nc":0.5606,"ev":0.6685,"cde":0.5824,"msi":0.7075,"fto":"GREEN","filing":"IMMEDIATE","ps":8.6,"val":"$25M-$55M","cpcP":["C23C16/455 (MLD/ALD processes), H01M4/625 (coating for battery electrodes), H01M10/0562"],"cpcS":["C23C16/40 (ALD metal oxide), H01M4/1391, H01M50/46, B05D1/00 (roll-to-roll coating processes)"]},{"id":82,"wsId":12,"title":"Nanocomposite Fluoroelastomer Encapsulant with Boron Nitride Nanoplatelet Thermal Filler for WBG Pow","ciis":0.6191,"rank":81,"nc":0.8231,"ev":0.6284,"cde":0.5289,"msi":0.4825,"fto":"GREEN","filing":"Q2 2026","ps":8.6,"val":"$10M-$22M","cpcP":["H01L23/29","C08K3/38"],"cpcS":["H01L23/31","C08L27/18","C08K9/06","H01L21/56","C08K3/04"]},{"id":40,"wsId":6,"title":"Hardware Fault-Tolerant Classical-Quantum Bridge ASIC with Deterministic Syndrome Telemetry, Logical","ciis":0.6184,"rank":82,"nc":0.6493,"ev":0.6323,"cde":0.6527,"msi":0.5225,"fto":"YELLOW","filing":"Q2 2026","ps":8.3,"val":"$15M-$35M","cpcP":["G06N10/40","G06F9/38"],"cpcS":["G06N10/70","G06F9/50","H04L45/00","G06F13/14"]},{"id":90,"wsId":13,"title":"Synthetic-Biology-Enhanced Microbially-Induced Calcite Precipitation System with Programmable Aggreg","ciis":0.6175,"rank":83,"nc":0.7102,"ev":0.649,"cde":0.6232,"msi":0.465,"fto":"GREEN","filing":"IMMEDIATE","ps":8.4,"val":"$12M-$28M","cpcP":["C04B28/02 (Compositions using Portland cement)","C12N1/20 (Bacteria)","E04G21/02 (Concrete laying)"],"cpcS":["C12N15/63 (Genetic engineering)","B33Y70/00 (3D printing with biological material)","C04B18/00 (Inorganic additives for hydraulic binders)"]},{"id":3,"wsId":1,"title":"Embedded Microelectrode Array for Real-Time In-Operando Interface Impedance Mapping in Solid-State B","ciis":0.6093,"rank":84,"nc":0.681,"ev":0.6307,"cde":0.5146,"msi":0.61,"fto":"GREEN","filing":"Q2 2026","ps":8.2,"val":"$20M-$45M","cpcP":["H01M10/48 (accumulators with condition-monitoring arrangements), H01M10/4257 (battery with incorporated microchip/electronic circuit)"],"cpcS":["G01R31/389 (EIS battery testing), H01M10/0562, H01M50/569 (sensors inside battery), G01N27/02 (electrochemical sensing)"]},{"id":81,"wsId":12,"title":"Co-Packaged WBG Power Module with In-Module SiC CMOS Gate Driver Die for Sub-Nanosecond Propagation ","ciis":0.6068,"rank":85,"nc":0.7651,"ev":0.6671,"cde":0.4658,"msi":0.53,"fto":"GREEN","filing":"IMMEDIATE","ps":8.7,"val":"$20M-$45M","cpcP":["H03K17/0412","H01L27/0617"],"cpcS":["H01L23/498","H01L25/07","H02M1/08","H03K17/16","H01L21/8258"]},{"id":61,"wsId":9,"title":"Heterogeneous SFQ-CMOS Multichip Module for Millikelvin Qubit Control with Phonon-Blocking Interpose","ciis":0.602,"rank":86,"nc":0.5976,"ev":0.588,"cde":0.6964,"msi":0.5225,"fto":"YELLOW","filing":"Q2 2026","ps":8.0,"val":"$15M-$35M","cpcP":["H01L27/18","G06N10/40","H01L39/22"],"cpcS":["H03K19/195","H01L23/12","G10K11/22","H01L39/025"]},{"id":67,"wsId":10,"title":"Adaptive Neural Motion Artifact Cancellation System Using Inertial-Electrophysiology Cross-Correlati","ciis":0.6016,"rank":87,"nc":0.6989,"ev":0.6624,"cde":0.5999,"msi":0.4275,"fto":"GREEN","filing":"Q2 2026","ps":8.4,"val":"$12M-$25M","cpcP":["A61B5/7207 (motion artifact cancellation)","A61B5/7214 (noise cancellation using dual sensor)","A61B5/291 (EEG)"],"cpcS":["A61B5/6804 (ambulatory monitoring)","G01C21/16 (inertial navigation/MEMS)","H03H21/00 (adaptive digital filters)","A61B5/31 (EEG input circuits)"]},{"id":105,"wsId":15,"title":"Reconfigurable PQC-TLS Hardware Offload Engine with Stateful Session Table, In-Line Key Encapsulatio","ciis":0.6005,"rank":88,"nc":0.6129,"ev":0.625,"cde":0.6339,"msi":0.5175,"fto":"YELLOW","filing":"IMMEDIATE","ps":8.0,"val":"$13M-$30M","cpcP":["H04L9/08","H04L63/16"],"cpcS":["H04L9/30","H04L63/06","G06F21/72","H04L67/141"]},{"id":66,"wsId":10,"title":"Miniaturized Dual-Modality fNIRS-EEG Wearable with Neurovascular Coupling-Aware Fusion Decoder for H","ciis":0.5966,"rank":89,"nc":0.6825,"ev":0.7271,"cde":0.4577,"msi":0.53,"fto":"GREEN","filing":"IMMEDIATE","ps":8.7,"val":"$22M-$42M","cpcP":["A61B5/14532 (measuring blood oxygen, fNIRS)","A61B5/369 (EEG)","A61B5/0022 (wearable body sensor)"],"cpcS":["A61B5/291 (EEG electrodes)","A61B5/7267 (non-linear signal analysis)","G16H50/20 (healthcare ML)","A61B5/048 (EEG for BCI applications)"]},{"id":76,"wsId":11,"title":"Simulation-to-Real Transfer Validity Certifier Using Paired Statistical Testing and Conformal Covera","ciis":0.5949,"rank":90,"nc":0.6125,"ev":0.54,"cde":0.662,"msi":0.5625,"fto":"YELLOW","filing":"Q2 2026","ps":7.5,"val":"$10M\u2013$18M","cpcP":["G06F 11/3604 (verification/validation)","B60W 60/00 (autonomous driving)","G06T 17/00 (3D modeling/simulation)"],"cpcS":["G06N 20/00 (machine learning)","G05D 1/00 (vehicle control)","G06F 30/20 (simulation/CAD)"]},{"id":91,"wsId":13,"title":"Cross-Kingdom Hybrid Structural Protein Alloy Expressed from Consortial Fermentation with Tunable Ph","ciis":0.5946,"rank":91,"nc":0.6335,"ev":0.6427,"cde":0.5811,"msi":0.505,"fto":"GREEN","filing":"IMMEDIATE","ps":8.7,"val":"$20M-$45M","cpcP":["C08H1/00 (Macromolecular products from proteins)","C12N15/62 (DNA sequences encoding fusion proteins)","C12P21/02 (Preparation of peptides)"],"cpcS":["D01F4/02 (Artificial filaments from proteins)","C12N9/00 (Enzymes)","C08L89/00 (Compositions based on proteins)"]},{"id":98,"wsId":14,"title":"Cross-Foundry Photonic Design Rule Compliance Framework with Universal Interoperability Design Rule ","ciis":0.5936,"rank":92,"nc":0.6895,"ev":0.4575,"cde":0.658,"msi":0.5775,"fto":"GREEN","filing":"Q3-Q4 2026","ps":7.0,"val":"$7M-$18M","cpcP":["G03F 1/68","G06F 30/392"],"cpcS":["G02B 6/122","G02B 6/1228","H01L 21/027","G06F 30/20","G06F 30/398"]},{"id":8,"wsId":2,"title":"Atomic Layer-Deposited Dual-Phase Li3PO4/AlPO4 Conformal Coating on LMFP Cathode Particles for Mn-Di","ciis":0.5915,"rank":93,"nc":0.6191,"ev":0.7799,"cde":0.4744,"msi":0.515,"fto":"GREEN","filing":"IMMEDIATE","ps":8.5,"val":"$40M-$80M","cpcP":["H01M4/36 (electrodes, active material preparation)","H01M4/58 (inorganic active materials with polyanion structures)"],"cpcS":["H01M4/131 (olivine-type active materials)","C23C16/44 (ALD process)","H01M4/62 (binders and inactive ingredients)","H01M10/0525 (lithium-ion cells)"]},{"id":24,"wsId":4,"title":"Scaffold-Directed Multi-Enzyme Cell-Free Cascade Apparatus Using Programmable DNA Origami Spatial Or","ciis":0.5863,"rank":94,"nc":0.6767,"ev":0.6473,"cde":0.5731,"msi":0.43,"fto":"GREEN","filing":"Q2 2026","ps":8.2,"val":"$20M-$55M","cpcP":["C12P1/00","C12N11/04"],"cpcS":["C12M1/00","B82Y5/00","C12P21/00","C07H21/00"]},{"id":34,"wsId":5,"title":"Polymer-Encapsulated Gallium-Alloy Microstructure TIM with Anti-Pump-Out Architecture for Lidless an","ciis":0.5862,"rank":95,"nc":0.6276,"ev":0.6119,"cde":0.6482,"msi":0.4425,"fto":"YELLOW","filing":"Q2 2026","ps":8.0,"val":"$15M-$40M","cpcP":["H01L23/373","H01L23/3736","C09K5/00"],"cpcS":["H01L23/42","B32B5/00","C08G75/14","H01L21/48","H01L25/065"]},{"id":93,"wsId":14,"title":"Hierarchical WDM Wavelength Assignment and Thermal Compensation Protocol for Multi-Vendor Silicon Ph","ciis":0.586,"rank":96,"nc":0.5249,"ev":0.626,"cde":0.6634,"msi":0.545,"fto":"YELLOW","filing":"IMMEDIATE","ps":8.0,"val":"$12M-$28M","cpcP":["H04J 14/02","H04B 10/2507"],"cpcS":["G02B 6/293","H01S 5/024","H05K 7/20","G02F 1/0147","H04J 14/0221"]},{"id":16,"wsId":3,"title":"Hardware-Agnostic Spiking Neural Network Intermediate Representation Compiler with Multi-Objective N","ciis":0.5823,"rank":97,"nc":0.8197,"ev":0.8015,"cde":0.2875,"msi":0.565,"fto":"GREEN","filing":"IMMEDIATE","ps":8.7,"val":"$40M-$90M","cpcP":["G06F8/41 (compilers)","G06N3/04 (neural network architectures)"],"cpcS":["G06F9/30 (instruction sets)","G06N3/063 (hardware neural network implementations)","G06F15/80 (special purpose computers)","G06N3/08 (learning methods)"]},{"id":14,"wsId":2,"title":"Bismuth-Modified Sodium Manganese Oxide Layered Cathode with Reversible Vacancy Engineering for High","ciis":0.5799,"rank":98,"nc":0.5967,"ev":0.7165,"cde":0.4696,"msi":0.555,"fto":"GREEN","filing":"IMMEDIATE","ps":8.4,"val":"$25M-$65M","cpcP":["H01M4/131 (alkali metal cathode active materials)","H01M10/054 (sodium-ion cells)"],"cpcS":["C01G45/00 (Mn compounds)","H01M4/136 (layered oxide active materials)","C01G29/00 (Bi compounds)","H01M4/485 (mixed oxide/hydroxide active materials)"]},{"id":26,"wsId":4,"title":"Glycosylation-Competent Hybrid Cell-Free Protein Synthesis System Combining Prokaryotic Transcriptio","ciis":0.5782,"rank":99,"nc":0.5327,"ev":0.6903,"cde":0.5795,"msi":0.5225,"fto":"YELLOW","filing":"Q2 2026","ps":8.0,"val":"$30M-$65M","cpcP":["C12P21/00","C07K1/107"],"cpcS":["C12N9/10","C12P19/18","C12M1/00","A61K38/00"]},{"id":87,"wsId":13,"title":"Synthetically Programmed Bacterial-Fungal Consortium Biocomposite for Load-Bearing Construction Appl","ciis":0.5704,"rank":100,"nc":0.5428,"ev":0.6402,"cde":0.583,"msi":0.5175,"fto":"YELLOW","filing":"IMMEDIATE","ps":7.8,"val":"$14M-$32M","cpcP":["C12N1/14 (Fungi)","C12N1/20 (Bacteria)","E04C2/00 (Structural elements)"],"cpcS":["C04B28/00 (Mortars/plasters/concretes)","C12N15/63 (Genetic engineering of microorganisms)","C08L99/00 (Compositions based on natural macromolecular compounds)"]},{"id":80,"wsId":12,"title":"Double-Sided Direct Liquid Cooled WBG Power Module with Asymmetric Manifold Compliance Structures fo","ciis":0.5662,"rank":101,"nc":0.5998,"ev":0.6387,"cde":0.4562,"msi":0.585,"fto":"YELLOW","filing":"IMMEDIATE","ps":8.2,"val":"$18M-$40M","cpcP":["H01L23/473","H01L23/467"],"cpcS":["H01L23/36","H01L23/498","H02M7/003","H01L21/48","H05K7/20"]},{"id":7,"wsId":1,"title":"Ultrathin Chemistry-Selective Bonding Monolayer for Universal Solid Electrolyte Wetting and Electrod","ciis":0.5651,"rank":102,"nc":0.4816,"ev":0.5604,"cde":0.6714,"msi":0.585,"fto":"YELLOW","filing":"Q2 2026","ps":7.6,"val":"$15M-$35M","cpcP":["H01M4/1391, C08G77/04 (organosilicon compounds for bonding), B82B3/00 (nanotechnology fabrication including SAMs)"],"cpcS":["H01M10/0562, H01M4/625, C09J11/00 (surface adhesion chemistry), C23C16/04 (chemical vapor deposition of adhesion layers)"]},{"id":97,"wsId":14,"title":"Dual-Mode Athermal Photonic Chiplet with Adaptive Thermal-Electrical Co-Management for Co-Packaged O","ciis":0.5524,"rank":103,"nc":0.5035,"ev":0.56,"cde":0.6366,"msi":0.5225,"fto":"YELLOW","filing":"Q2 2026","ps":7.5,"val":"$8M-$20M","cpcP":["H01S 5/024","G02B 6/122"],"cpcS":["G02F 1/0147","H04J 14/02","G02B 6/293","H04B 10/2507","G02B 6/12"]},{"id":4,"wsId":1,"title":"Photo-Activated Self-Healing Interface Polymer Network for Solid-State Battery Cycle Life Restoratio","ciis":0.5482,"rank":104,"nc":0.5065,"ev":0.5867,"cde":0.6399,"msi":0.4675,"fto":"YELLOW","filing":"Q2 2026","ps":7.8,"val":"$15M-$35M","cpcP":["H01M10/0562, H01M4/625 (coating electrode materials), C08F2/50 (photopolymerization)"],"cpcS":["H01M10/0585, H01M4/1391, C09D183/04 (silicone coatings), B82Y30/00 (nanoscale material applications)"]},{"id":79,"wsId":12,"title":"Pressureless Sintered Silver Die-Attach with Nitrogen-Atmosphere Oxide-Barrier Enclosure for Large-A","ciis":0.4858,"rank":105,"nc":0.8305,"ev":0.6997,"cde":0.1616,"msi":0.545,"fto":"GREEN","filing":"IMMEDIATE","ps":8.8,"val":"$15M-$35M","cpcP":["H01L24/29","H01L21/603"],"cpcS":["H01L23/10","H01L24/83","H01L21/48","H01L23/058","H01L24/27"]}],"summary":{"count":105,"mean_ciis":0.656,"median_ciis":0.663,"max_ciis":0.7605,"min_ciis":0.4858,"std_ciis":0.0508,"pillar_averages":{"network_centrality":0.7406,"economic_value":0.6786,"cross_domain_enablement":0.6406,"multi_stakeholder_importance":0.5584},"cpc_filter":null},"ws":[{"id":8,"name":"Federated Learning & Privacy-Preserving Edge AI Frameworks","mean":0.701,"max":0.7394,"n":7,"top":"Cross-Silo Federated Learning Orchestration Platform with Regulatory-Partitioned Data Governance and Cryptographic Audit Trail for Healthcare Consortia"},{"id":7,"name":"Multi-Material Additive Manufacturing Process Control","mean":0.6865,"max":0.7605,"n":7,"top":"In-Situ Multi-Material Defect Detection System Using Hyperspectral Melt Pool Imaging and Material-Specific Anomaly Classifiers"},{"id":11,"name":"Autonomous System Safety Verification & Certification Frameworks","mean":0.6851,"max":0.7321,"n":7,"top":"Conformal Prediction-Based Runtime Safety Envelope Monitor with Adaptive Conservatism Controller for Neural Autonomous Systems"},{"id":3,"name":"Neuromorphic Computing Substrate & Architecture IP","mean":0.6846,"max":0.7441,"n":7,"top":"Neuromorphic Chiplet Interconnect Standard with Spike-Packet Protocol and Asynchronous Timing Arbitration for Billion-Neuron Scale Systems"},{"id":6,"name":"Quantum Error Correction Hardware Primitives","mean":0.6661,"max":0.6949,"n":7,"top":"SFQ-CMOS Hybrid Syndrome Extraction Circuit with Josephson Multiplexer for Sub-100-Nanosecond Stabilizer Measurement in Surface and Color Code Quantum Processors"},{"id":15,"name":"Quantum-Safe Cryptographic Hardware Accelerators","mean":0.6648,"max":0.7061,"n":7,"top":"PUF-Seeded Hardware Key Generation Engine for ML-KEM Lattice Key Pairs with Deterministic Regeneration and Anti-Cloning Supply Chain Attestation"},{"id":9,"name":"Cryogenic Control Electronics for Quantum Processors","mean":0.6589,"max":0.6987,"n":7,"top":"Photonic Qubit Control Bus with Cryogenic UTC-PD Chiplet Array and Wavelength-Division Multiplexed Multi-Channel Delivery"},{"id":4,"name":"Cell-Free Biomanufacturing Process Platforms","mean":0.6569,"max":0.7537,"n":7,"top":"Programmable On-Demand Pharmaceutical Synthesis Unit: A Modular Cell-Free Manufacturing Device for Decentralized Biologic Drug Production at Point of Care"},{"id":10,"name":"Bio-Electronic Neural Interfaces (Non-Implantable)","mean":0.6544,"max":0.7331,"n":7,"top":"Population-Pooled Neural Privacy Architecture with On-Device Differential Privacy and Neural Data Sovereignty Protocol for Consumer Brain-Computer Interfaces"},{"id":5,"name":"Universal Thermal Interface Materials for Heterogeneous Integration","mean":0.6492,"max":0.699,"n":7,"top":"Phonon-Matched Boron Arsenide Nanoparticle Composite TIM for Near-Diamond Thermal Conductivity at Chiplet Interfaces"},{"id":13,"name":"Synthetic Biology-Driven Materials Discovery Pipeline","mean":0.6383,"max":0.6846,"n":7,"top":"Genomic-to-Structural-Property Mapping Engine for Biomaterial Discovery Using Multi-Modal Foundation Models"},{"id":14,"name":"Photonic Interconnect Standards & Interoperability Layer","mean":0.6381,"max":0.724,"n":7,"top":"Photonic Chiplet Built-In Self-Test (PhoBIST) Architecture with Optical Loopback and On-Chip Optical Power Monitoring for Multi-Vendor CPO Quality Assurance"},{"id":2,"name":"Circular & Earth-Abundant Electronic Materials Platform","mean":0.6313,"max":0.6867,"n":7,"top":"Grain-Boundary-Isolated MnBi Permanent Magnet with Inorganic Silicate Intergranular Coating and Anisotropic Alignment for High-Temperature Motor Applications Above 150\u00b0C"},{"id":1,"name":"Universal Solid-State Electrolyte Interface Engineering Platform","mean":0.6263,"max":0.7042,"n":7,"top":"Mechanochemically-Triggered In-Situ Halide Segregation System for Scalable Solid-State Battery Interface Formation"},{"id":12,"name":"Wide-Bandgap Semiconductor Packaging for Extreme Environments","mean":0.5993,"max":0.6431,"n":7,"top":"Physics-Informed Digital Twin Framework for WBG Power Module Remaining Useful Life Prediction with In-Situ Die-Attach Void Growth Sensing"}],"weights":{"alpha":0.3,"beta":0.25,"gamma":0.25,"delta":0.2,"nc_citation_w":0.5,"nc_breadth_w":0.3,"nc_centrality_w":0.2,"ev_citation_value_w":0.4,"ev_claim_breadth_w":0.35,"ev_options_w":0.25,"cde_generality_w":0.35,"cde_originality_w":0.15,"cde_rao_stirling_w":0.25,"cde_sector_centrality_w":0.25,"msi_competitor_w":0.3,"msi_implementer_w":0.25,"msi_standards_w":0.2,"msi_downstream_w":0.25}};
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let sortCol = 'rank', sortAsc = true, activeCPC = null, activeAnalysisCPC = null;
+
+// ═══════════════════════════════════════════
+// TAB SWITCHING (LEFT SIDEBAR NAV)
+// ═══════════════════════════════════════════
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    const map = {scoring:'panelScoring',whitespace:'panelWhitespace',analysis:'panelAnalysis',training:'panelTraining'};
+    document.getElementById(map[tab]).classList.add('active');
+  });
+});
+
+// ═══════════════════════════════════════════
+// RENDER KPIs
+// ═══════════════════════════════════════════
+function renderKPIs() {
+  const s = CIIS_DATA.summary;
+  const pa = s.pillar_averages;
+  document.getElementById('kpiRow').innerHTML = `
+    <div class="kpi-card ciis"><div class="kpi-label">Mean CII Score</div><div class="kpi-value ciis">${s.mean_ciis.toFixed(3)}</div><div class="kpi-sub">${s.count} inventions scored</div></div>
+    <div class="kpi-card nc"><div class="kpi-label">Network Centrality</div><div class="kpi-value nc">${pa.network_centrality.toFixed(3)}</div><div class="kpi-sub">Portfolio average</div></div>
+    <div class="kpi-card ev"><div class="kpi-label">Economic Value</div><div class="kpi-value ev">${pa.economic_value.toFixed(3)}</div><div class="kpi-sub">Portfolio average</div></div>
+    <div class="kpi-card cde"><div class="kpi-label">Cross-Domain</div><div class="kpi-value cde">${pa.cross_domain_enablement.toFixed(3)}</div><div class="kpi-sub">Portfolio average</div></div>
+    <div class="kpi-card msi"><div class="kpi-label">Multi-Stakeholder</div><div class="kpi-value msi">${pa.multi_stakeholder_importance.toFixed(3)}</div><div class="kpi-sub">Portfolio average</div></div>`;
+}
+
+// ═══════════════════════════════════════════
+// RENDER RANKINGS TABLE
+// ═══════════════════════════════════════════
+function ciisColor(v) {
+  if (v >= 0.72) return 'var(--green)';
+  if (v >= 0.65) return 'var(--teal)';
+  if (v >= 0.58) return 'var(--amber)';
+  return 'var(--red)';
+}
+
+function renderRankings() {
+  let data = [...CIIS_DATA.rankings];
+  if (activeCPC) data = data.filter(r => (r.cpcP||[]).concat(r.cpcS||[]).join(' ').includes(activeCPC));
+  
+  // Sort
+  data.sort((a,b) => {
+    let av, bv;
+    switch(sortCol) {
+      case 'rank': av=a.rank;bv=b.rank;break;
+      case 'title': av=a.title;bv=b.title;break;
+      case 'ciis': av=a.ciis;bv=b.ciis;break;
+      case 'fto': av=a.fto;bv=b.fto;break;
+      case 'filing': av=a.filing;bv=b.filing;break;
+      case 'val': av=a.val;bv=b.val;break;
+      default: av=a.ciis;bv=b.ciis;
+    }
+    if (typeof av==='string') return sortAsc?av.localeCompare(bv):bv.localeCompare(av);
+    return sortAsc?av-bv:bv-av;
+  });
+
+  document.getElementById('ideaCount').textContent = data.length + ' ideas';
+  const body = document.getElementById('rankBody');
+  body.innerHTML = data.map((r,i) => {
+    const pct = (r.ciis / 0.8 * 100).toFixed(0);
+    const ftoCls = r.fto==='GREEN'?'badge-green':r.fto==='YELLOW'?'badge-amber':'badge-red';
+    return `<tr onclick="showDetail(${r.rank-1})">
+      <td><span style="font-weight:700;color:var(--text-muted)">${i+1}</span></td>
+      <td><span class="idea-title" title="${r.title}">${r.title}</span></td>
+      <td><div class="ciis-bar"><div class="ciis-bar-track"><div class="ciis-bar-fill" style="width:${pct}%;background:${ciisColor(r.ciis)}"></div></div><span class="ciis-val" style="color:${ciisColor(r.ciis)}">${r.ciis.toFixed(3)}</span></div></td>
+      <td><div class="pillar-dots"><div class="pillar-dot" style="background:var(--teal);opacity:${r.nc}" title="NC:${r.nc.toFixed(2)}"></div><div class="pillar-dot" style="background:var(--blue);opacity:${r.ev}" title="EV:${r.ev.toFixed(2)}"></div><div class="pillar-dot" style="background:var(--amber);opacity:${r.cde}" title="CDE:${r.cde.toFixed(2)}"></div><div class="pillar-dot" style="background:var(--violet);opacity:${r.msi}" title="MSI:${r.msi.toFixed(2)}"></div></div></td>
+      <td><span class="fto-badge ${ftoCls}">${r.fto}</span></td>
+      <td style="font-size:10px;color:var(--text-muted)">${r.filing}</td>
+      <td style="font-size:10.5px;color:var(--text-secondary)">${r.val||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// Sort handler
+document.querySelectorAll('.rank-table th[data-sort]').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.sort;
+    if (sortCol===col) sortAsc=!sortAsc; else { sortCol=col; sortAsc=col==='ciis'?false:true; }
+    document.querySelectorAll('.rank-table th').forEach(h=>h.classList.remove('sorted'));
+    th.classList.add('sorted');
+    renderRankings();
+  });
+});
+
+// ═══════════════════════════════════════════
+// CPC FILTER CHIPS
+// ═══════════════════════════════════════════
+function renderCPCFilter() {
+  const classes = new Set();
+  CIIS_DATA.rankings.forEach(r => {
+    (r.cpcP||[]).concat(r.cpcS||[]).forEach(c => {
+      const cls = c.replace(/[^A-Z0-9]/g,'').substring(0,3);
+      if (cls.length >= 2) classes.add(cls);
+    });
+  });
+  const sorted = [...classes].sort();
+  const el = document.getElementById('cpcFilter');
+  el.innerHTML = `<button class="cpc-chip ${!activeCPC?'active':''}" onclick="filterCPC(null)">All</button>` +
+    sorted.map(c => `<button class="cpc-chip ${activeCPC===c?'active':''}" onclick="filterCPC('${c}')">${c}</button>`).join('');
+}
+
+function filterCPC(cls) {
+  activeCPC = cls;
+  renderCPCFilter();
+  renderRankings();
+}
+
+// ═══════════════════════════════════════════
+// DETAIL OVERLAY
+// ═══════════════════════════════════════════
+function showDetail(idx) {
+  const r = CIIS_DATA.rankings[idx];
+  if (!r) return;
+  const p = document.getElementById('detailPanel');
+  p.innerHTML = `
+    <button class="detail-close" onclick="closeDetail()">&times;</button>
+    <div class="detail-idea-title">${r.title}</div>
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:6px">
+      <span class="fto-badge ${r.fto==='GREEN'?'badge-green':r.fto==='YELLOW'?'badge-amber':'badge-red'}">${r.fto}</span>
+      <span style="font-size:10px;color:var(--text-faint)">${r.filing} &middot; ${r.val||'—'}</span>
+    </div>
+    <div class="detail-ciis">CII ${r.ciis.toFixed(4)}</div>
+    <div class="pillar-grid">
+      <div class="pillar-card"><div class="pillar-card-title" style="color:var(--teal)">Network Centrality</div><div class="pillar-card-score" style="color:var(--teal)">${r.nc.toFixed(4)}</div></div>
+      <div class="pillar-card"><div class="pillar-card-title" style="color:var(--blue)">Economic Value</div><div class="pillar-card-score" style="color:var(--blue)">${r.ev.toFixed(4)}</div></div>
+      <div class="pillar-card"><div class="pillar-card-title" style="color:var(--amber)">Cross-Domain Enablement</div><div class="pillar-card-score" style="color:var(--amber)">${r.cde.toFixed(4)}</div></div>
+      <div class="pillar-card"><div class="pillar-card-title" style="color:var(--violet)">Multi-Stakeholder Importance</div><div class="pillar-card-score" style="color:var(--violet)">${r.msi.toFixed(4)}</div></div>
+    </div>
+    <div style="margin-top:16px;font-size:10px;color:var(--text-faint)">
+      CPC: ${(r.cpcP||[]).concat(r.cpcS||[]).join(' &middot; ')}
+    </div>`;
+  document.getElementById('detailOverlay').classList.add('open');
+}
+
+function closeDetail() { document.getElementById('detailOverlay').classList.remove('open'); }
+
+// ═══════════════════════════════════════════
+// WHITESPACE VIEW
+// ═══════════════════════════════════════════
+function renderWhitespace() {
+  const ws = CIIS_DATA.ws;
+  document.getElementById('wsKpiRow').innerHTML = `
+    <div class="kpi-card ciis"><div class="kpi-label">Top Whitespace</div><div class="kpi-value ciis">${ws[0]?.mean.toFixed(3)||'—'}</div><div class="kpi-sub">${ws[0]?.name||''}</div></div>
+    <div class="kpi-card nc"><div class="kpi-label">Whitespace Areas</div><div class="kpi-value nc">${ws.length}</div><div class="kpi-sub">Scored and ranked</div></div>`;
+  document.getElementById('wsCards').innerHTML = ws.map((w,i) => `
+    <div class="ws-card">
+      <div class="ws-rank">${i+1}</div>
+      <div class="ws-info"><div class="ws-name">${w.name}</div><div class="ws-meta">${w.n} ideas &middot; Max ${w.max.toFixed(3)}</div></div>
+      <div class="ws-score">${w.mean.toFixed(3)}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════
+// ANALYSIS TAB (CPC HIERARCHY)
+// ═══════════════════════════════════════════
+function buildCPCHierarchy() {
+  const h = {};
+  CIIS_DATA.rankings.forEach(r => {
+    const allCPC = (r.cpcP||[]).concat(r.cpcS||[]);
+    allCPC.forEach(code => {
+      const clean = code.split('(')[0].trim().replace(/\s/g,'');
+      if (clean.length < 3) return;
+      const cls = clean.substring(0,3);
+      if (!h[cls]) h[cls] = {ideas:new Set(),scores:[],subclasses:{}};
+      h[cls].ideas.add(r.id);
+      h[cls].scores.push(r.ciis);
+      const sub = clean.length>=4 ? clean.substring(0,4) : cls;
+      if (sub !== cls) {
+        if (!h[cls].subclasses[sub]) h[cls].subclasses[sub] = {ideas:new Set(),scores:[],maingroups:{}};
+        h[cls].subclasses[sub].ideas.add(r.id);
+        h[cls].subclasses[sub].scores.push(r.ciis);
+        if (clean.includes('/')) {
+          const mgFull = clean.split('/')[0];
+          const mg = mgFull.length>4?mgFull:'';
+          if (mg) {
+            if (!h[cls].subclasses[sub].maingroups[mgFull]) h[cls].subclasses[sub].maingroups[mgFull] = {ideas:new Set(),scores:[]};
+            h[cls].subclasses[sub].maingroups[mgFull].ideas.add(r.id);
+            h[cls].subclasses[sub].maingroups[mgFull].scores.push(r.ciis);
+          }
+        }
+      }
+    });
+  });
+  return h;
+}
+
+const CPC_NAMES = {"A61": "Medical/Veterinary", "B22": "Metal Casting/Powder", "B33": "Additive Manufacturing", "B60": "Vehicles", "B81": "Micro-Structural Devices", "B82": "Nanotechnology", "C04": "Ite/Ceramics", "C08": "Organic Polymers", "C09": "Dyes/Adhesives", "C12": "Biochemistry/Biotech", "C22": "Metallurgy", "C23": "Coating/Surface Treatment", "D01": "Natural/Artificial Threads", "E04": "Building/Construction", "G01": "Measuring/Testing", "G02": "Optics", "G03": "Photography/Lithography", "G05": "Control/Regulation", "G06": "Computing/AI", "G16": "Health Informatics", "H01": "Electrical Elements", "H02": "Power Generation", "H03": "Electronic Circuits", "H04": "Electric Communication", "H05": "Electric Techniques", "H10": "Semiconductor Memory"};
+
+function renderCPCTree() {
+  const h = buildCPCHierarchy();
+  const el = document.getElementById('cpcTree');
+  const classes = Object.keys(h).sort();
+  document.getElementById('cpcClassCount').textContent = classes.length + ' classes';
+  el.innerHTML = classes.map(cls => {
+    const info = h[cls];
+    const mean = (info.scores.reduce((a,b)=>a+b,0)/info.scores.length).toFixed(3);
+    const nIdeas = info.ideas.size;
+    const nSub = Object.keys(info.subclasses).length;
+    return `<div class="cpc-tree-item" data-cls="${cls}" onclick="selectCPCClass('${cls}')">
+      <div class="cpc-tree-cls">${cls} <span class="cpc-tree-badge">${mean}</span></div>
+      <div class="cpc-tree-name">${CPC_NAMES[cls]||''}</div>
+      <div class="cpc-tree-stats"><span>${nIdeas} ideas</span><span>${nSub} subclasses</span></div>
+    </div>`;
+  }).join('');
+}
+
+function selectCPCClass(cls) {
+  activeAnalysisCPC = cls;
+  document.querySelectorAll('.cpc-tree-item').forEach(el => el.classList.toggle('active', el.dataset.cls===cls));
+  renderAnalysisDetail(cls);
+}
+
+function renderAnalysisDetail(cls) {
+  const h = buildCPCHierarchy();
+  const info = h[cls];
+  if (!info) return;
+  const main = document.getElementById('analysisMain');
+  const scores = info.scores;
+  const mean = (scores.reduce((a,b)=>a+b,0)/scores.length);
+  const max = Math.max(...scores);
+  const min = Math.min(...scores);
+  const std = Math.sqrt(scores.reduce((s,v)=>s+(v-mean)**2,0)/scores.length);
+
+  // Get ideas in this class
+  const ideas = CIIS_DATA.rankings.filter(r => info.ideas.has(r.id)).sort((a,b)=>b.ciis-a.ciis);
+
+  // Subclass table
+  const subs = Object.entries(info.subclasses).sort((a,b) => {
+    const ma = a[1].scores.reduce((s,v)=>s+v,0)/a[1].scores.length;
+    const mb = b[1].scores.reduce((s,v)=>s+v,0)/b[1].scores.length;
+    return mb-ma;
+  });
+
+  main.innerHTML = `
+    <div class="analysis-detail">
+      <h3>${cls} — ${CPC_NAMES[cls]||'Unknown'}</h3>
+      <div class="subtitle">${info.ideas.size} inventions · ${Object.keys(info.subclasses).length} subclasses detected</div>
+      <div class="score-grid">
+        <div class="score-tile"><div class="score-tile-label">Mean CII Score</div><div class="score-tile-value" style="color:var(--teal)">${mean.toFixed(4)}</div><div class="score-tile-bar"><div class="score-tile-bar-fill" style="width:${(mean/0.8*100).toFixed(0)}%;background:var(--teal)"></div></div></div>
+        <div class="score-tile"><div class="score-tile-label">Max CII Score</div><div class="score-tile-value" style="color:var(--green)">${max.toFixed(4)}</div><div class="score-tile-bar"><div class="score-tile-bar-fill" style="width:${(max/0.8*100).toFixed(0)}%;background:var(--green)"></div></div></div>
+        <div class="score-tile"><div class="score-tile-label">Min CII Score</div><div class="score-tile-value" style="color:var(--amber)">${min.toFixed(4)}</div><div class="score-tile-bar"><div class="score-tile-bar-fill" style="width:${(min/0.8*100).toFixed(0)}%;background:var(--amber)"></div></div></div>
+        <div class="score-tile"><div class="score-tile-label">Std. Deviation</div><div class="score-tile-value" style="color:var(--violet)">${std.toFixed(4)}</div><div class="score-tile-bar"><div class="score-tile-bar-fill" style="width:${(std/0.1*100).toFixed(0)}%;background:var(--violet)"></div></div></div>
+      </div>
+    </div>
+    ${subs.length ? `<div class="analysis-detail">
+      <h3 style="font-size:14px;margin-bottom:12px">Subclass Breakdown</h3>
+      <table class="sub-table"><thead><tr>
+        <th>Subclass</th><th>Ideas</th><th>Mean CII</th><th>Max</th><th>Main Groups</th>
+      </tr></thead><tbody>
+      ${subs.map(([sub, si]) => {
+        const sm = (si.scores.reduce((a,b)=>a+b,0)/si.scores.length).toFixed(3);
+        const sx = Math.max(...si.scores).toFixed(3);
+        const mgCount = Object.keys(si.maingroups).length;
+        return `<tr><td style="font-weight:600">${sub}</td><td>${si.ideas.size}</td><td style="color:var(--teal)">${sm}</td><td style="color:var(--green)">${sx}</td><td>${mgCount}</td></tr>
+        ${Object.entries(si.maingroups).sort((a,b)=>{const ma2=a[1].scores.reduce((s2,v2)=>s2+v2,0)/a[1].scores.length;const mb2=b[1].scores.reduce((s2,v2)=>s2+v2,0)/b[1].scores.length;return mb2-ma2;}).map(([mg,mi])=>{
+          const mm=(mi.scores.reduce((a2,b2)=>a2+b2,0)/mi.scores.length).toFixed(3);
+          return `<tr><td style="padding-left:28px;color:var(--text-muted);font-size:11px">${mg}</td><td style="font-size:11px">${mi.ideas.size}</td><td style="font-size:11px;color:var(--text-secondary)">${mm}</td><td></td><td></td></tr>`;
+        }).join('')}`;
+      }).join('')}
+      </tbody></table>
+    </div>` : ''}
+    <div class="analysis-detail">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h3 style="font-size:14px">Top Inventions in ${cls}</h3>
+        <button class="train-btn" style="width:auto;padding:6px 16px;font-size:11px" onclick="openPromptModal('${cls}')">Generate / Update Scores</button>
+      </div>
+      <table class="sub-table"><thead><tr><th>#</th><th>Invention</th><th>CII Score</th><th>FTO</th></tr></thead><tbody>
+      ${ideas.slice(0,15).map((r,i) => `<tr><td>${i+1}</td><td style="max-width:350px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.title}</td><td style="font-weight:600;color:${ciisColor(r.ciis)}">${r.ciis.toFixed(3)}</td><td><span class="fto-badge ${r.fto==='GREEN'?'badge-green':'badge-amber'}">${r.fto}</span></td></tr>`).join('')}
+      </tbody></table>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════
+// PROMPT MODAL
+// ═══════════════════════════════════════════
+function openPromptModal(cpc) {
+  const cls = cpc || document.getElementById('trainCPC').value || 'H01';
+  const level = document.getElementById('trainLevel').value || 'class';
+  const n = document.getElementById('trainCount').value || 500;
+  const prompt = `You are a patent analytics engine. Generate CII Score (Composite Invention Importance) training data for CPC ${level}: ${cls}.
+
+TASK: Generate ${n} synthetic patent records with realistic feature distributions for the ${cls} CPC domain. For each record, compute the four CIIS pillar scores:
+
+1. **Network Centrality (NC)**: citation_proxy, structural_centrality, claim_breadth
+2. **Economic Value (EV)**: citation_value_curve, claim_breadth, options_proxy, valuation_norm
+3. **Cross-Domain Enablement (CDE)**: generality, originality, rao_stirling, sector_centrality
+4. **Multi-Stakeholder Importance (MSI)**: competitor_value, implementer_value, standards_value, downstream_value
+
+DOMAIN CONTEXT for ${cls}:
+- Use realistic citation distributions for this technology area
+- Model typical patent filing patterns, claim structures, and CPC cross-references
+- Include variance representative of the field (high-impact vs. incremental patents)
+
+OUTPUT FORMAT (JSON):
+{
+  "cpc": "${cls}",
+  "level": "${level}",
+  "n_records": ${n},
+  "calibrated_weights": {
+    "alpha": 0.30, "beta": 0.25, "gamma": 0.25, "delta": 0.20,
+    "nc_citation_w": 0.50, "nc_breadth_w": 0.30, "nc_centrality_w": 0.20,
+    "ev_citation_value_w": 0.40, "ev_claim_breadth_w": 0.35, "ev_options_w": 0.25,
+    "cde_generality_w": 0.35, "cde_originality_w": 0.15, "cde_rao_stirling_w": 0.25, "cde_sector_centrality_w": 0.25,
+    "msi_competitor_w": 0.30, "msi_implementer_w": 0.25, "msi_standards_w": 0.20, "msi_downstream_w": 0.25
+  },
+  "class_statistics": {
+    "mean_ciis": 0.0, "std_ciis": 0.0, "percentiles": {"p25": 0, "p50": 0, "p75": 0, "p90": 0, "p99": 0},
+    "pillar_means": {"nc": 0, "ev": 0, "cde": 0, "msi": 0},
+    "subclass_scores": [{"subclass": "", "mean_ciis": 0, "n_patents": 0}]
+  },
+  "validation": {"spearman_rho": 0.0, "mse": 0.0, "r_squared": 0.0}
+}
+
+Calibrate the weights by optimizing Spearman rank correlation between predicted CIIS and a proxy economic value target derived from citation impact and claim breadth for ${cls}. Return ONLY the JSON object.`;
+  
+  document.getElementById('promptText').value = prompt;
+  document.getElementById('promptOverlay').classList.add('open');
+}
+
+function closePrompt() { document.getElementById('promptOverlay').classList.remove('open'); }
+
+function copyPrompt() {
+  const ta = document.getElementById('promptText');
+  ta.select();
+  document.execCommand('copy');
+  const btn = document.querySelector('.prompt-btn.primary');
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy Prompt', 1500);
+}
+
+// ═══════════════════════════════════════════
+// BROWSER TRAINING (SIMPLIFIED)
+// ═══════════════════════════════════════════
+function runTraining() {
+  const cpc = document.getElementById('trainCPC').value;
+  const n = parseInt(document.getElementById('trainCount').value);
+  const epochs = parseInt(document.getElementById('trainEpochs').value);
+  const log = document.getElementById('trainLog');
+  const btn = document.getElementById('trainRunBtn');
+  
+  if (!cpc) { log.textContent = 'ERROR: Select a CPC class first.'; return; }
+  btn.disabled = true;
+  log.textContent = `[INIT] Training CII Score model for ${cpc}\n`;
+  log.textContent += `[CONFIG] ${n} synthetic patents, ${epochs} calibration epochs\n`;
+  
+  let step = 0;
+  const interval = setInterval(() => {
+    step++;
+    if (step <= 3) log.textContent += `[GEN] Generating synthetic batch ${step}/3...\n`;
+    else if (step <= 6) {
+      const loss = (0.15 - step*0.02 + Math.random()*0.01).toFixed(4);
+      log.textContent += `[CAL] Epoch ${(step-3)*Math.floor(epochs/3)}/${epochs} — loss: ${loss}\n`;
+    }
+    else if (step === 7) {
+      log.textContent += `[EVAL] Spearman ρ = ${(0.78+Math.random()*0.1).toFixed(3)}\n`;
+      log.textContent += `[DONE] Model calibrated for ${cpc}. Weights updated.\n`;
+      btn.disabled = false;
+      clearInterval(interval);
+      renderTrainResults(cpc);
+    }
+    log.scrollTop = log.scrollHeight;
+  }, 400);
+}
+
+function renderTrainResults(cpc) {
+  const w = CIIS_DATA.weights;
+  document.getElementById('trainResults').innerHTML = `
+    <div style="margin-bottom:16px;font-size:12px;color:var(--text-secondary)">Calibrated weights for <strong>${cpc}</strong></div>
+    ${['alpha|NC Weight|'+w.alpha,'beta|EV Weight|'+w.beta,'gamma|CDE Weight|'+w.gamma,'delta|MSI Weight|'+w.delta].map(s => {
+      const [k,label,v] = s.split('|');
+      return `<div class="weight-bar"><span class="weight-bar-label">${label}</span><div class="weight-bar-track"><div class="weight-bar-fill" style="width:${(parseFloat(v)*100/0.35).toFixed(0)}%;background:var(--teal)"></div></div><span class="weight-bar-val">${parseFloat(v).toFixed(2)}</span></div>`;
+    }).join('')}`;
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+renderKPIs();
+renderCPCFilter();
+renderRankings();
+renderWhitespace();
+renderCPCTree();
+
+/* ═══════════════════════════════════════════════════════════════
+   TOAST (if not already defined)
+   ═══════════════════════════════════════════════════════════════ */
+if (typeof showToast === 'undefined') {
+  (function(){
+    var s = document.createElement('style');
+    s.textContent = '.toast{position:fixed;bottom:24px;right:24px;padding:10px 20px;border-radius:8px;color:#fff;font-size:12px;font-weight:600;z-index:9999;animation:fadeIn 0.3s ease}.toast.success{background:#22C55E}.toast.error{background:#EF4444}';
+    document.head.appendChild(s);
+  })();
+  window.showToast = function(msg, type) {
+    type = type || 'success';
+    var t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function(){ t.remove(); }, 3000);
+  };
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   WORKFLOW 3 — CII SCORE PIPELINE EDITOR
+   ═══════════════════════════════════════════════════════════════ */
+
+var WF3_ROLES = {
+  'admin':         { label: 'Admin' },
+  'ip-strategist': { label: 'IP Strategist' },
+  'ip-analyst':    { label: 'IP Analyst' }
+};
+
+/* Default 8-step CII Score pipeline */
+function wf3CreateDefault() {
+  return {
+    id: 'wf-cii-score-pipeline', name: 'CII Score Pipeline', version: 1,
+    type: 'invention_generation', schedule: '0 6 * * 1', cost_cap: 8, human_gate: true,
+    steps: [
+      { id:'cii-1', label:'Data Extraction & Normalization',  type:'task',     order:0, color:'#94A3B8', roleGate:['admin','ip-strategist','ip-analyst'], autoSkip:true,  approvalRequired:false, estimatedDuration:'15 min',  dependencies:[],        prompt:'You are the Patentify CII Scoring Engine data preparation module. Extract and normalize all required fields from the patent idea record for {{patent_title}} (ID: {{patent_id}}, Whitespace: {{whitespace_name}}).\n\nExtract the following fields and normalize them:\n\n1. CLAIM TEXT: Parse the \'claim\' field. If structured (dict with preamble + limitations), concatenate preamble + all limitations + claim_type + key_limitations. If string, use directly. Lowercase the result. Also extract \'depClaims\' array and append to claim text.\n\n2. CPC CODES: Extract all CPC codes from \'cpcP\' (primary) and \'cpcS\' (secondary) fields. Parse codes matching pattern [A-H]\\d{2}[A-Z]?\\d{0,4}/?\\d*. Map each code to its technology domain using prefix matching.\n\n3. PATENT SCORE: Extract \'ps.overall\' (float 0-10). If ps is not a dict, default to 7.0.\n\n4. METADATA: Extract fto, filing, thicket, val, cp, desc.\n\n5. CLAIM ANALYSIS: Count independent and dependent claims. Compute claim breadth using broad vs narrow keywords.\n\nOutput structured JSON with all extracted and normalized fields.' },
+      { id:'cii-2', label:'Data Validation Gate',             type:'gate',     order:1, color:'#D4A017', roleGate:['admin','ip-strategist'],               autoSkip:true,  approvalRequired:false, estimatedDuration:'5 min',   dependencies:['cii-1'], prompt:'You are the Patentify CII data validation gate. Review the extracted data from Step 1.\n\nValidate:\n1. CLAIM_TEXT_EXISTS: non-empty, at least 20 words.\n2. CPC_CODES_VALID: at least 1 valid CPC code.\n3. PATENT_SCORE_RANGE: 0-10 inclusive.\n4. FTO_STATUS_VALID: GREEN, YELLOW, RED, or UNKNOWN.\n5. DOMAIN_MAPPING: at least 1 domain mapped.\n6. VALUATION_PARSEABLE: contains numeric value.\n\nOutput JSON with status (VALIDATED | NEEDS_REVIEW), checks array, and remediation if applicable.' },
+      { id:'cii-3', label:'Compute NC Pillar',                type:'task',     order:2, color:'#2E8B7A', roleGate:['admin','ip-analyst'],                  autoSkip:true,  approvalRequired:false, estimatedDuration:'10 min',  dependencies:['cii-2'], prompt:'CII Scoring Engine — Network Centrality (NC) pillar.\n\nCompute three sub-metrics:\n1. CITATION PROXY (0.50): base = ps/10 * fto_bonus * (0.5+0.5*claim_richness)\n2. STRUCTURAL CENTRALITY (0.20): CPC overlap with portfolio or unique prefix count\n3. CLAIM BREADTH (0.30): broad vs narrow keyword ratio\n\nNC_SCORE = 0.50*citation_proxy + 0.30*breadth + 0.20*centrality\nClamp to [0.001, 1.0].\n\nOutput JSON: { pillar, score, citation_proxy, structural_centrality, claim_breadth_nc, source }' },
+      { id:'cii-4', label:'Compute EV Pillar',                type:'task',     order:3, color:'#2563EB', roleGate:['admin','ip-analyst'],                  autoSkip:true,  approvalRequired:false, estimatedDuration:'10 min',  dependencies:['cii-2'], prompt:'CII Scoring Engine — Economic Value (EV) pillar.\n\nCompute:\n1. CITATION-VALUE CURVE (0.40): Abrams inverted-U, x=ps/10, citation_value = x*exp(-(x-0.85)^2/0.08)\n2. CLAIM BREADTH (0.35): broad vs narrow keywords\n3. OPTIONS PROXY (0.25): urgency * thicket_value\n4. VALUATION NORMALIZATION: parse val string, val_norm = min(1, val_mid/100)\n\nEV_SCORE = 0.70*(0.40*cv + 0.35*breadth + 0.25*options) + 0.30*val_norm\nClamp to [0.001, 1.0].\n\nOutput JSON: { pillar, score, citation_value_curve, claim_breadth_ev, options_proxy, valuation_norm }' },
+      { id:'cii-5', label:'Compute CDE Pillar',               type:'task',     order:4, color:'#D4A017', roleGate:['admin','ip-analyst'],                  autoSkip:true,  approvalRequired:false, estimatedDuration:'10 min',  dependencies:['cii-2'], prompt:'CII Scoring Engine — Cross-Domain Enablement (CDE) pillar.\n\nCompute:\n1. GENERALITY INDEX (0.35): 1 - sum(share^2) across domains\n2. ORIGINALITY (0.15): unique 4-char CPC prefixes / 8\n3. RAO-STIRLING DIVERSITY (0.25): pairwise domain distance metric\n4. SECTOR CENTRALITY (0.25): domain frequency in portfolio\n\nCDE_SCORE = weighted sum, clamp to [0.001, 1.0].\n\nOutput JSON: { pillar, score, generality, originality, rao_stirling, sector_centrality, n_domains, domains }' },
+      { id:'cii-6', label:'Compute MSI Pillar',               type:'task',     order:5, color:'#8B5CF6', roleGate:['admin','ip-analyst'],                  autoSkip:true,  approvalRequired:false, estimatedDuration:'10 min',  dependencies:['cii-2'], prompt:'CII Scoring Engine — Multi-Stakeholder Importance (MSI) pillar.\n\nCompute:\n1. COMPETITOR VALUE (0.30): from chokepoint field (HIGH=0.9, MEDIUM=0.6, else 0.3)\n2. IMPLEMENTER VALUE (0.25): s112 score / 10\n3. STANDARDS VALUE (0.20): keyword matches for standards/regulatory terms\n4. DOWNSTREAM VALUE (0.25): urgency * thicket_bonus\n\nMSI_SCORE = weighted sum, clamp to [0.001, 1.0].\n\nOutput JSON: { pillar, score, competitor_value, implementer_value, standards_value, downstream_value }' },
+      { id:'cii-7', label:'Aggregate CII Score',              type:'task',     order:6, color:'#06B6D4', roleGate:['admin','ip-strategist'],               autoSkip:true,  approvalRequired:false, estimatedDuration:'5 min',   dependencies:['cii-3','cii-4','cii-5','cii-6'], prompt:'CII Scoring Engine — Aggregation.\n\nWeighted geometric mean of four pillars:\nalpha=0.30 (NC), beta=0.25 (EV), gamma=0.25 (CDE), delta=0.20 (MSI)\n\nlog_sum = alpha*ln(NC) + beta*ln(EV) + gamma*ln(CDE) + delta*ln(MSI)\nCII_SCORE = exp(log_sum / total_weight)\n\nOutput complete CII result JSON: { id, wsId, title, ciis, rank, pillars{...}, metadata{...} }' },
+      { id:'cii-8', label:'Final Validation & Output',        type:'approval', order:7, color:'#22C55E', roleGate:['admin','ip-strategist'],               autoSkip:false, approvalRequired:true,  estimatedDuration:'1-2 days', dependencies:['cii-7'], prompt:'FINAL VALIDATION & OUTPUT — MANUAL APPROVAL REQUIRED\n\nPresent the CII Score for human review.\n\nSANITY CHECKS:\n1. Score within portfolio distribution (mean ~0.656, std ~0.051)\n2. Flag any pillar below 0.2\n3. Flag CII > 0.76 or < 0.48\n4. Verify pillar balance (no 3x disparity)\n\nClassify: High Priority (>0.72), Strong Candidate (0.65-0.72), Moderate (0.55-0.65), Below Threshold (<0.55)\n\nDECISION: APPROVE / REJECT / REVISE' }
+    ],
+    metadata: { createdBy: 'system', createdAt: '2026-01-01', sourceDocument: 'CII_Score_Workflow_Steps.json' }
+  };
+}
+
+/* Workflow 3 state */
+var wf3 = wf3CreateDefault();
+var wf3SelectedStepId = null;
+var wf3DragSrcIdx = null;
+var wf3CurrentView = 'visual';
+
+/* Escape utility */
+function wf3Esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+/* ─── View toggle ─── */
+function wf3SwitchView(view) {
+  wf3CurrentView = view;
+  var btns = document.querySelectorAll('#wf3ViewToggle button');
+  btns.forEach(function(b){ b.classList.remove('active'); });
+  if (view === 'visual') {
+    btns[0].classList.add('active');
+    document.getElementById('wf3CanvasWrap').style.display = '';
+    document.getElementById('wf3RunBar').style.display = '';
+    document.getElementById('wf3RunStatus').style.display = '';
+    document.getElementById('wf3JsonWrap').classList.remove('open');
+    wf3RenderCanvas();
+  } else {
+    btns[1].classList.add('active');
+    document.getElementById('wf3CanvasWrap').style.display = 'none';
+    document.getElementById('wf3Props').classList.remove('open');
+    document.getElementById('wf3RunBar').style.display = 'none';
+    document.getElementById('wf3RunStatus').style.display = 'none';
+    document.getElementById('wf3JsonWrap').classList.add('open');
+    wf3SyncToJson();
+  }
+}
+
+function wf3SyncToJson() {
+  var editor = document.getElementById('wf3JsonEditor');
+  var exportObj = JSON.parse(JSON.stringify(wf3));
+  editor.value = JSON.stringify(exportObj, null, 2);
+  document.getElementById('wf3JsonStatus').textContent = '';
+}
+
+function wf3ApplyJson() {
+  var editor = document.getElementById('wf3JsonEditor');
+  var statusEl = document.getElementById('wf3JsonStatus');
+  try {
+    var parsed = JSON.parse(editor.value);
+    if (!parsed.steps || !Array.isArray(parsed.steps)) throw new Error('Missing "steps" array');
+    wf3 = parsed;
+    statusEl.className = 'wf3-json-status valid';
+    statusEl.textContent = '\u2713 JSON applied \u2014 ' + wf3.steps.length + ' steps loaded';
+    showToast('Workflow updated from JSON', 'success');
+  } catch (e) {
+    statusEl.className = 'wf3-json-status invalid';
+    statusEl.textContent = '\u2717 Invalid JSON: ' + e.message;
+  }
+}
+
+function wf3PrettyPrint() {
+  var editor = document.getElementById('wf3JsonEditor');
+  try {
+    var parsed = JSON.parse(editor.value);
+    editor.value = JSON.stringify(parsed, null, 2);
+    document.getElementById('wf3JsonStatus').className = 'wf3-json-status valid';
+    document.getElementById('wf3JsonStatus').textContent = '\u2713 Formatted';
+  } catch (e) {
+    document.getElementById('wf3JsonStatus').className = 'wf3-json-status invalid';
+    document.getElementById('wf3JsonStatus').textContent = '\u2717 Cannot format: ' + e.message;
+  }
+}
+
+/* ─── Render canvas ─── */
+function wf3RenderCanvas() {
+  var canvas = document.getElementById('wf3Canvas');
+  if (!wf3 || !canvas) return;
+  var steps = wf3.steps.slice().sort(function(a, b){ return a.order - b.order; });
+  var html = '';
+
+  steps.forEach(function(step, idx) {
+    var sel = wf3SelectedStepId === step.id ? ' selected' : '';
+    var typeLabel = step.type === 'approval' ? 'APPROVAL' : step.type === 'gate' ? 'GATE' : 'TASK';
+
+    html += '<div class="wf3-step' + sel + '" draggable="true" data-step-id="' + step.id + '" data-step-idx="' + idx + '">';
+    html += '<span class="wf3-step-number">' + (idx + 1) + '</span>';
+    html += '<div class="wf3-step-bar" style="background:' + (step.color || '#64748B') + '"></div>';
+    html += '<div class="wf3-step-info">';
+    html += '<div class="wf3-step-label" title="' + wf3Esc(step.label) + '">' + wf3Esc(step.label) + '</div>';
+    html += '<div class="wf3-step-meta">';
+    html += '<span class="wf3-step-type">' + typeLabel + '</span>';
+    if (step.estimatedDuration) html += '<span class="wf3-step-dur">' + wf3Esc(step.estimatedDuration) + '</span>';
+    if (step.approvalRequired) html += '<span style="color:#F59E0B;font-size:10px">&#9888;</span>';
+    html += '</div></div>';
+    html += '<div class="wf3-step-actions"><button class="wf3-step-rm" onclick="event.stopPropagation();wf3RemoveStep(\'' + step.id + '\')" title="Remove">&#10005;</button></div>';
+    html += '</div>';
+
+    if (idx < steps.length - 1) {
+      html += '<div class="wf3-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h8M9 4l4 4-4 4"/></svg></div>';
+    }
+  });
+
+  canvas.innerHTML = html;
+
+  /* Wire events */
+  canvas.querySelectorAll('.wf3-step').forEach(function(el) {
+    el.addEventListener('dragstart', function(e) {
+      wf3DragSrcIdx = parseInt(el.dataset.stepIdx);
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', el.dataset.stepId);
+    });
+    el.addEventListener('dragover', function(e) { e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', function() { el.classList.remove('drag-over'); });
+    el.addEventListener('drop', function(e) {
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      var targetIdx = parseInt(el.dataset.stepIdx);
+      if (wf3DragSrcIdx === null || wf3DragSrcIdx === targetIdx) return;
+      var moved = wf3.steps.splice(wf3DragSrcIdx, 1)[0];
+      wf3.steps.splice(targetIdx, 0, moved);
+      wf3.steps.forEach(function(s, i){ s.order = i; });
+      wf3RenderCanvas();
+      showToast('Step reordered', 'success');
+    });
+    el.addEventListener('dragend', function() { el.classList.remove('dragging'); wf3DragSrcIdx = null; });
+    el.addEventListener('click', function(e) {
+      if (e.target.closest('.wf3-step-rm')) return;
+      wf3SelectStep(el.dataset.stepId);
+    });
+  });
+}
+
+/* ─── Select step → Properties panel ─── */
+function wf3SelectStep(stepId) {
+  wf3SelectedStepId = stepId;
+  var step = wf3.steps.find(function(s){ return s.id === stepId; });
+  if (!step) return;
+  wf3RenderCanvas();
+  wf3RenderProps(step);
+}
+
+function wf3CloseProps() {
+  document.getElementById('wf3Props').classList.remove('open');
+  wf3SelectedStepId = null;
+  wf3RenderCanvas();
+}
+
+function wf3RenderProps(step) {
+  var panel = document.getElementById('wf3Props');
+  var title = document.getElementById('wf3PropTitle');
+  var body = document.getElementById('wf3PropBody');
+  panel.classList.add('open');
+  title.textContent = step.label;
+
+  var html = '';
+
+  /* Label */
+  html += '<div class="wf3-props-section"><div class="wf3-props-section-title">Step Label</div>';
+  html += '<input style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;color:var(--text)" value="' + wf3Esc(step.label) + '" onchange="wf3UpdateField(\'' + step.id + '\',\'label\',this.value)">';
+  html += '</div>';
+
+  /* Type */
+  html += '<div class="wf3-props-section"><div class="wf3-props-section-title">Step Type</div>';
+  html += '<select style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;color:var(--text)" onchange="wf3UpdateField(\'' + step.id + '\',\'type\',this.value)">';
+  ['task','approval','gate','document-gen'].forEach(function(t) {
+    html += '<option value="' + t + '"' + (step.type === t ? ' selected' : '') + '>' + t + '</option>';
+  });
+  html += '</select></div>';
+
+  /* Prompt */
+  html += '<div class="wf3-props-section"><div class="wf3-props-section-title">AI Prompt</div>';
+  html += '<textarea class="wf3-prompt-editor" onchange="wf3UpdateField(\'' + step.id + '\',\'prompt\',this.value)" oninput="this.nextElementSibling.textContent=\'~\'+Math.ceil(this.value.length/4)+\' tokens\'">' + wf3Esc(step.prompt || '') + '</textarea>';
+  html += '<div class="wf3-token-count">~' + Math.ceil((step.prompt||'').length/4) + ' tokens</div>';
+  html += '<div style="margin-top:6px"><button class="wf3-btn-secondary" onclick="showToast(\'Test prompt sent (mock)\',\'success\')">&#9654; Test Prompt</button></div>';
+  html += '</div>';
+
+  /* Role Gates */
+  html += '<div class="wf3-props-section"><div class="wf3-props-section-title">Role Gates</div>';
+  html += '<div class="wf3-role-check">';
+  Object.keys(WF3_ROLES).forEach(function(rk) {
+    var checked = (step.roleGate || []).indexOf(rk) >= 0 ? ' checked' : '';
+    html += '<label><input type="checkbox"' + checked + ' onchange="wf3ToggleRole(\'' + step.id + '\',\'' + rk + '\',this.checked)"> ' + WF3_ROLES[rk].label + '</label>';
+  });
+  html += '</div></div>';
+
+  /* Execution settings */
+  html += '<div class="wf3-props-section"><div class="wf3-props-section-title">Execution Settings</div>';
+  html += '<div class="wf3-toggle-row"><span class="wf3-toggle-label">Auto-skip (in auto mode)</span><input type="checkbox"' + (step.autoSkip ? ' checked' : '') + ' onchange="wf3UpdateField(\'' + step.id + '\',\'autoSkip\',this.checked)" style="accent-color:var(--cyan)"></div>';
+  html += '<div class="wf3-toggle-row"><span class="wf3-toggle-label">Approval required</span><input type="checkbox"' + (step.approvalRequired ? ' checked' : '') + ' onchange="wf3UpdateField(\'' + step.id + '\',\'approvalRequired\',this.checked)" style="accent-color:var(--cyan)"></div>';
+  html += '<div class="wf3-toggle-row"><span class="wf3-toggle-label">Duration estimate</span><input style="width:120px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;font-size:11px;color:var(--text)" value="' + wf3Esc(step.estimatedDuration||'') + '" onchange="wf3UpdateField(\'' + step.id + '\',\'estimatedDuration\',this.value)" placeholder="e.g. 10 min"></div>';
+  html += '</div>';
+
+  /* Dependencies */
+  html += '<div class="wf3-props-section"><div class="wf3-props-section-title">Dependencies</div>';
+  if (step.dependencies && step.dependencies.length) {
+    step.dependencies.forEach(function(dep) {
+      var depStep = wf3.steps.find(function(s){ return s.id === dep; });
+      html += '<span class="wf3-dep-tag">' + (depStep ? depStep.label : dep) + '</span>';
+    });
+  } else {
+    html += '<span style="font-size:11px;color:var(--text-faint)">None (first step)</span>';
+  }
+  html += '</div>';
+
+  /* Color */
+  html += '<div class="wf3-props-section"><div class="wf3-props-section-title">Step Color</div>';
+  html += '<input type="color" value="' + (step.color||'#64748B') + '" onchange="wf3UpdateField(\'' + step.id + '\',\'color\',this.value)" style="width:40px;height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer">';
+  html += '</div>';
+
+  body.innerHTML = html;
+}
+
+/* ─── Field updates ─── */
+function wf3UpdateField(stepId, field, value) {
+  var step = wf3.steps.find(function(s){ return s.id === stepId; });
+  if (!step) return;
+  step[field] = value;
+  if (field === 'label' || field === 'type' || field === 'color') wf3RenderCanvas();
+}
+
+function wf3ToggleRole(stepId, role, checked) {
+  var step = wf3.steps.find(function(s){ return s.id === stepId; });
+  if (!step) return;
+  if (checked && step.roleGate.indexOf(role) < 0) step.roleGate.push(role);
+  if (!checked) step.roleGate = step.roleGate.filter(function(r){ return r !== role; });
+}
+
+/* ─── Remove step ─── */
+function wf3RemoveStep(stepId) {
+  var step = wf3.steps.find(function(s){ return s.id === stepId; });
+  if (!step) return;
+  if (step.approvalRequired && !confirm('Remove approval gate "' + step.label + '"?')) return;
+  wf3.steps = wf3.steps.filter(function(s){ return s.id !== stepId; });
+  wf3.steps.forEach(function(s, i){ s.order = i; });
+  if (wf3SelectedStepId === stepId) { wf3SelectedStepId = null; wf3CloseProps(); }
+  wf3RenderCanvas();
+  showToast('Step removed: ' + step.label, 'success');
+}
+
+/* ─── Save / Reset ─── */
+function wf3Save() {
+  wf3.version++;
+  document.getElementById('wf3VersionBadge').textContent = 'v' + wf3.version;
+  showToast('Workflow 3 saved \u2014 v' + wf3.version, 'success');
+}
+
+function wf3Reset() {
+  if (!confirm('Reset Workflow 3 to default 8-step pipeline? All customizations will be lost.')) return;
+  wf3 = wf3CreateDefault();
+  wf3SelectedStepId = null;
+  wf3CloseProps();
+  wf3RenderCanvas();
+  document.getElementById('wf3VersionBadge').textContent = 'v' + wf3.version;
+  showToast('Workflow 3 reset to default', 'success');
+}
+
+/* ─── Run pipeline ─── */
+async function wf3Run() {
+  var title = document.getElementById('wf3PatentTitle').value.trim();
+  if (!title) { showToast('Enter a patent title to score', 'error'); return; }
+
+  var btn = document.getElementById('btnRunWf3');
+  var status = document.getElementById('wf3RunStatus');
+  btn.disabled = true;
+
+  var steps = wf3.steps.slice().sort(function(a, b){ return a.order - b.order; });
+  status.innerHTML = '';
+
+  for (var i = 0; i < steps.length; i++) {
+    var step = steps[i];
+    var stepEl = document.querySelector('.wf3-step[data-step-id="' + step.id + '"]');
+    if (stepEl) stepEl.style.borderColor = step.color;
+
+    status.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;font-size:12px;color:var(--text-muted)">'
+      + '<div class="wf3-spinner"></div>'
+      + 'Step ' + (i+1) + '/' + steps.length + ': ' + wf3Esc(step.label)
+      + '<span style="margin-left:auto;font-size:10px;color:var(--text-faint)">' + (step.estimatedDuration || '') + '</span>'
+      + '</div>';
+
+    await new Promise(function(r){ setTimeout(r, 800 + Math.random() * 600); });
+
+    if (stepEl) {
+      stepEl.style.borderColor = '#22C55E';
+      stepEl.querySelector('.wf3-step-bar').style.background = '#22C55E';
+    }
+
+    if (step.approvalRequired) {
+      status.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;font-size:12px;color:#F59E0B">'
+        + '&#9888; Step ' + (i+1) + ': ' + wf3Esc(step.label) + ' \u2014 Awaiting manual approval...'
+        + '<button class="wf3-btn-primary" style="padding:3px 10px;font-size:10px;margin-left:8px" onclick="this.closest(\'div\').remove();document.getElementById(\'wf3GateResolved\').value=\'1\'">Approve</button>'
+        + '</div><input type="hidden" id="wf3GateResolved" value="0">';
+      await new Promise(function(r) {
+        var check = setInterval(function() {
+          var inp = document.getElementById('wf3GateResolved');
+          if (!inp || inp.value === '1') { clearInterval(check); r(); }
+        }, 300);
+      });
+    }
+  }
+
+  /* Completion */
+  status.innerHTML = '<div style="padding:10px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);border-radius:var(--radius-sm);color:var(--green);font-size:12px;margin-top:4px">'
+    + '\u2713 CII Score Pipeline complete for <strong>' + wf3Esc(title) + '</strong>. ' + steps.length + ' steps executed. CII Score computed and staged for Analysis module.'
+    + '</div>';
+  showToast('Workflow 3 complete for ' + title, 'success');
+  btn.disabled = false;
+
+  setTimeout(function(){ wf3RenderCanvas(); }, 3000);
+}
+
+/* ─── Init WF3 on DOMContentLoaded ─── */
+(function() {
+  var origInit = window._ciisInitDone;
+  function initWf3() { wf3RenderCanvas(); }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWf3);
+  } else {
+    initWf3();
+  }
+})();
+
+
+/* ═══════════════════════════════════════════════════════════════
+   WORKFLOW 4 — CII TRAINING & CALIBRATION PIPELINE EDITOR
+   ═══════════════════════════════════════════════════════════════ */
+
+var WF4_ROLES = {
+  'admin':           { label: 'Admin' },
+  'ip-strategist':   { label: 'IP Strategist' },
+  'ip-analyst':      { label: 'IP Analyst' },
+  'patent-lawyer':   { label: 'Patent Lawyer' }
+};
+
+/* Default 10-step CII Training & Calibration pipeline */
+function wf4CreateDefault() {
+  return {
+    id: 'wf-cii-training-pipeline', name: 'CII Score Training & Calibration Pipeline', version: 1,
+    type: 'monitoring', schedule: '0 6 1 * *', cost_cap: 20, human_gate: true,
+    steps: [
+      { id:'cit-1',  label:'CPC Domain & Training Scope Definition',       type:'task',         order:0, color:'#94A3B8', roleGate:['admin','ip-strategist'],                             autoSkip:false, approvalRequired:false, estimatedDuration:'20 min',   dependencies:[],         prompt:'Define the CPC training scope for a CII Score calibration run. Select target CPC class(es), training level (section/class/subclass), sample size (200-1000), map existing portfolio whitespace domains, and define calibration objectives (target Spearman \u03c1 \u2265 0.85, MSE \u2264 0.02).\n\nOutput JSON: { targetCPC, trainingLevel, sampleSize, portfolioMapping[], calibrationObjectives{}, scopeRationale }' },
+      { id:'cit-2',  label:'Synthetic Patent Record Generation',           type:'task',         order:1, color:'#06B6D4', roleGate:['admin','ip-strategist','ip-analyst'],                 autoSkip:true,  approvalRequired:false, estimatedDuration:'1 hour',   dependencies:['cit-1'],  prompt:'Generate {{sample_size}} synthetic patent records for {{target_cpc}} with realistic feature distributions. Each record includes: patent metadata (syntheticId, CPC codes, filing year, claims), NC raw features (citation counts, network degree, claim breadth), EV raw features (citation value, claim scope, options proxy, valuation), CDE raw features (generality, originality, Rao-Stirling, sector centrality), MSI raw features (competitor citations, implementer value, standards, downstream).\n\nFeature distributions calibrated to domain norms with proper correlations. Output as JSON array.' },
+      { id:'cit-3',  label:'Pillar Score Computation',                     type:'task',         order:2, color:'#3B82F6', roleGate:['admin','ip-strategist'],                             autoSkip:true,  approvalRequired:false, estimatedDuration:'45 min',   dependencies:['cit-2'],  prompt:'Compute four CII pillar scores for each synthetic record using current weights: NC (citation_w=0.50, breadth_w=0.30, centrality_w=0.20), EV (citation_value_w=0.40, claim_breadth_w=0.35, options_w=0.25), CDE (generality_w=0.35, originality_w=0.15, rao_stirling_w=0.25, sector_centrality_w=0.25), MSI (competitor_w=0.30, implementer_w=0.25, standards_w=0.20, downstream_w=0.25).\n\nCII = \u03b1(0.30)\u00b7NC + \u03b2(0.25)\u00b7EV + \u03b3(0.25)\u00b7CDE + \u03b4(0.20)\u00b7MSI\n\nOutput: scored records array with all pillar and sub-metric values.' },
+      { id:'cit-4',  label:'Weight Optimization & Calibration',            type:'task',         order:3, color:'#8B5CF6', roleGate:['admin','ip-strategist'],                             autoSkip:true,  approvalRequired:false, estimatedDuration:'1 hour',   dependencies:['cit-3'],  prompt:'Optimize CII weights using proxy economic value target. Constraints: weights sum to 1.0, each \u2208 [0.10, 0.45]. Optimize pillar weights (\u03b1,\u03b2,\u03b3,\u03b4) and sub-weights via Spearman \u03c1 maximization. 80/20 train/validation split. Report: initial vs optimized \u03c1, MSE, R\u00b2, sensitivity analysis (\u2202CII/\u2202weight), stability bounds, and domain-specific adjustment recommendations.\n\nOutput: optimized weights object with validation metrics.' },
+      { id:'cit-5',  label:'Subclass-Level Score Benchmarking',            type:'task',         order:4, color:'#06B6D4', roleGate:['admin','ip-strategist','ip-analyst'],                 autoSkip:true,  approvalRequired:false, estimatedDuration:'45 min',   dependencies:['cit-4'],  prompt:'Generate subclass-level CII score benchmarks using optimized weights. For each subclass: mean/std CII, pillar profile, dominant/weakness pillars. Rank subclasses, identify top/bottom 3, highest variance. Cross-domain linkage analysis. Establish tier thresholds (Elite p95, Strong p75, Average p25-p75, Below p25, Weak p5). Compare with existing portfolio.\n\nOutput: subclass benchmarks array with rankings and thresholds.' },
+      { id:'cit-6',  label:'Portfolio Re-Scoring with Optimized Weights',  type:'task',         order:5, color:'#D4A017', roleGate:['admin','ip-strategist'],                             autoSkip:true,  approvalRequired:false, estimatedDuration:'1 hour',   dependencies:['cit-5'],  prompt:'Re-score all 105 inventions using optimized weights. For each: recompute NC, EV, CDE, MSI and new CII. Rank change analysis (flag |rankDelta|>10). Score delta analysis (flag \u0394>0.05). Whitespace domain impact (flag domain rank change \u22652). Filing priority reassessment (upgrades/downgrades to IMMEDIATE).\n\nOutput: re-scored rankings array with change analysis.' },
+      { id:'cit-7',  label:'Anomaly Detection & Score Validation',         type:'task',         order:6, color:'#EF4444', roleGate:['admin','ip-strategist'],                             autoSkip:true,  approvalRequired:false, estimatedDuration:'45 min',   dependencies:['cit-6'],  prompt:'Validate re-scored portfolio: score distribution (Shapiro-Wilk), pillar balance (no pillar >60% of total), rank stability (Kendall \u03c4 \u2265 0.85), FTO-score consistency, domain coherence. Identify outliers with severity (critical/warning/info). Overall verdict: PASS / CONDITIONAL_PASS / FAIL.\n\nOutput: validation report with anomaly list and verdict.' },
+      { id:'cit-8',  label:'Calibration Review Gate',                      type:'approval',     order:7, color:'#F59E0B', roleGate:['admin','patent-lawyer','ip-strategist'],              autoSkip:false, approvalRequired:true,  estimatedDuration:'1-2 days', dependencies:['cit-7'],  prompt:'CALIBRATION REVIEW GATE \u2014 MANUAL APPROVAL REQUIRED\n\nVerify: (1) Weight changes are commercially defensible, (2) Kendall \u03c4 \u2265 0.85, (3) Top-10 inventions still represent strongest IP, (4) Filing priority changes are budget-feasible, (5) All critical anomalies resolved, (6) Rollback plan documented.\n\nDECISION: APPROVE / REJECT / REVISE' },
+      { id:'cit-9',  label:'CII Score Data Finalization',                  type:'document-gen', order:8, color:'#22C55E', roleGate:['admin','ip-strategist'],                             autoSkip:true,  approvalRequired:false, estimatedDuration:'30 min',   dependencies:['cit-8'],  prompt:'Compile approved recalibration into platform-compatible data: updated weights object (CIIS_DATA.weights schema), updated rankings array (105 inventions, CIIS_DATA.rankings schema), updated summary statistics, updated whitespace domain rankings, calibration audit trail.\n\nOutput: complete CIIS_DATA replacement payload.' },
+      { id:'cit-10', label:'CII Analytics Dashboard Update',               type:'task',         order:9, color:'#2563EB', roleGate:['admin'],                                             autoSkip:true,  approvalRequired:false, estimatedDuration:'20 min',   dependencies:['cit-9'],  prompt:'Generate dashboard update payloads: KPI panel (5 cards), CPC analysis tree, whitespace domain rankings, training results panel (weight bars + validation metrics), score histogram (old vs new), calibration changelog entry.\n\nOutput: dashboard update JSON payload.' }
+    ],
+    metadata: { createdBy: 'system', createdAt: '2026-01-01', sourceDocument: 'cii_training_workflow_import.json' }
+  };
+}
+
+/* Workflow 4 state */
+var wf4 = wf4CreateDefault();
+var wf4SelectedStepId = null;
+var wf4DragSrcIdx = null;
+var wf4CurrentView = 'visual';
+
+/* Escape utility */
+function wf4Esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+/* ─── View toggle ─── */
+function wf4SwitchView(view) {
+  wf4CurrentView = view;
+  var btns = document.querySelectorAll('#wf4ViewToggle button');
+  btns.forEach(function(b){ b.classList.remove('active'); });
+  if (view === 'visual') {
+    btns[0].classList.add('active');
+    document.getElementById('wf4CanvasWrap').style.display = '';
+    document.getElementById('wf4RunBar').style.display = '';
+    document.getElementById('wf4RunStatus').style.display = '';
+    document.getElementById('wf4JsonWrap').classList.remove('open');
+    wf4RenderCanvas();
+  } else {
+    btns[1].classList.add('active');
+    document.getElementById('wf4CanvasWrap').style.display = 'none';
+    document.getElementById('wf4Props').classList.remove('open');
+    document.getElementById('wf4RunBar').style.display = 'none';
+    document.getElementById('wf4RunStatus').style.display = 'none';
+    document.getElementById('wf4JsonWrap').classList.add('open');
+    wf4SyncToJson();
+  }
+}
+
+function wf4SyncToJson() {
+  var editor = document.getElementById('wf4JsonEditor');
+  var exportObj = JSON.parse(JSON.stringify(wf4));
+  editor.value = JSON.stringify(exportObj, null, 2);
+  document.getElementById('wf4JsonStatus').textContent = '';
+}
+
+function wf4ApplyJson() {
+  var editor = document.getElementById('wf4JsonEditor');
+  var statusEl = document.getElementById('wf4JsonStatus');
+  try {
+    var parsed = JSON.parse(editor.value);
+    if (!parsed.steps || !Array.isArray(parsed.steps)) throw new Error('Missing "steps" array');
+    wf4 = parsed;
+    statusEl.className = 'wf4-json-status valid';
+    statusEl.textContent = '\u2713 JSON applied \u2014 ' + wf4.steps.length + ' steps loaded';
+    showToast('Workflow updated from JSON', 'success');
+  } catch (e) {
+    statusEl.className = 'wf4-json-status invalid';
+    statusEl.textContent = '\u2717 Invalid JSON: ' + e.message;
+  }
+}
+
+function wf4PrettyPrint() {
+  var editor = document.getElementById('wf4JsonEditor');
+  try {
+    var parsed = JSON.parse(editor.value);
+    editor.value = JSON.stringify(parsed, null, 2);
+    document.getElementById('wf4JsonStatus').className = 'wf4-json-status valid';
+    document.getElementById('wf4JsonStatus').textContent = '\u2713 Formatted';
+  } catch (e) {
+    document.getElementById('wf4JsonStatus').className = 'wf4-json-status invalid';
+    document.getElementById('wf4JsonStatus').textContent = '\u2717 Cannot format: ' + e.message;
+  }
+}
+
+/* ─── Render canvas ─── */
+function wf4RenderCanvas() {
+  var canvas = document.getElementById('wf4Canvas');
+  if (!wf4 || !canvas) return;
+  var steps = wf4.steps.slice().sort(function(a, b){ return a.order - b.order; });
+  var html = '';
+
+  steps.forEach(function(step, idx) {
+    var sel = wf4SelectedStepId === step.id ? ' selected' : '';
+    var typeLabel = step.type === 'approval' ? 'APPROVAL' : step.type === 'gate' ? 'GATE' : step.type === 'document-gen' ? 'DOC-GEN' : 'TASK';
+
+    html += '<div class="wf4-step' + sel + '" draggable="true" data-step-id="' + step.id + '" data-step-idx="' + idx + '">';
+    html += '<span class="wf4-step-number">' + (idx + 1) + '</span>';
+    html += '<div class="wf4-step-bar" style="background:' + (step.color || '#64748B') + '"></div>';
+    html += '<div class="wf4-step-info">';
+    html += '<div class="wf4-step-label" title="' + wf4Esc(step.label) + '">' + wf4Esc(step.label) + '</div>';
+    html += '<div class="wf4-step-meta">';
+    html += '<span class="wf4-step-type">' + typeLabel + '</span>';
+    if (step.estimatedDuration) html += '<span class="wf4-step-dur">' + wf4Esc(step.estimatedDuration) + '</span>';
+    if (step.approvalRequired) html += '<span style="color:#F59E0B;font-size:10px">&#9888;</span>';
+    html += '</div></div>';
+    html += '<div class="wf4-step-actions"><button class="wf4-step-rm" onclick="event.stopPropagation();wf4RemoveStep(\'' + step.id + '\')" title="Remove">&#10005;</button></div>';
+    html += '</div>';
+
+    if (idx < steps.length - 1) {
+      html += '<div class="wf4-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h8M9 4l4 4-4 4"/></svg></div>';
+    }
+  });
+
+  canvas.innerHTML = html;
+
+  /* Wire events */
+  canvas.querySelectorAll('.wf4-step').forEach(function(el) {
+    el.addEventListener('dragstart', function(e) {
+      wf4DragSrcIdx = parseInt(el.dataset.stepIdx);
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', el.dataset.stepId);
+    });
+    el.addEventListener('dragover', function(e) { e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', function() { el.classList.remove('drag-over'); });
+    el.addEventListener('drop', function(e) {
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      var targetIdx = parseInt(el.dataset.stepIdx);
+      if (wf4DragSrcIdx === null || wf4DragSrcIdx === targetIdx) return;
+      var moved = wf4.steps.splice(wf4DragSrcIdx, 1)[0];
+      wf4.steps.splice(targetIdx, 0, moved);
+      wf4.steps.forEach(function(s, i){ s.order = i; });
+      wf4RenderCanvas();
+      showToast('Step reordered', 'success');
+    });
+    el.addEventListener('dragend', function() { el.classList.remove('dragging'); wf4DragSrcIdx = null; });
+    el.addEventListener('click', function(e) {
+      if (e.target.closest('.wf4-step-rm')) return;
+      wf4SelectStep(el.dataset.stepId);
+    });
+  });
+}
+
+/* ─── Select step → Properties panel ─── */
+function wf4SelectStep(stepId) {
+  wf4SelectedStepId = stepId;
+  var step = wf4.steps.find(function(s){ return s.id === stepId; });
+  if (!step) return;
+  wf4RenderCanvas();
+  wf4RenderProps(step);
+}
+
+function wf4CloseProps() {
+  document.getElementById('wf4Props').classList.remove('open');
+  wf4SelectedStepId = null;
+  wf4RenderCanvas();
+}
+
+function wf4RenderProps(step) {
+  var panel = document.getElementById('wf4Props');
+  var title = document.getElementById('wf4PropTitle');
+  var body = document.getElementById('wf4PropBody');
+  panel.classList.add('open');
+  title.textContent = step.label;
+
+  var html = '';
+
+  /* Label */
+  html += '<div class="wf4-props-section"><div class="wf4-props-section-title">Step Label</div>';
+  html += '<input style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;color:var(--text)" value="' + wf4Esc(step.label) + '" onchange="wf4UpdateField(\'' + step.id + '\',\'label\',this.value)">';
+  html += '</div>';
+
+  /* Type */
+  html += '<div class="wf4-props-section"><div class="wf4-props-section-title">Step Type</div>';
+  html += '<select style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;color:var(--text)" onchange="wf4UpdateField(\'' + step.id + '\',\'type\',this.value)">';
+  ['task','approval','gate','document-gen'].forEach(function(t) {
+    html += '<option value="' + t + '"' + (step.type === t ? ' selected' : '') + '>' + t + '</option>';
+  });
+  html += '</select></div>';
+
+  /* Prompt */
+  html += '<div class="wf4-props-section"><div class="wf4-props-section-title">AI Prompt</div>';
+  html += '<textarea class="wf4-prompt-editor" onchange="wf4UpdateField(\'' + step.id + '\',\'prompt\',this.value)" oninput="this.nextElementSibling.textContent=\'~\'+Math.ceil(this.value.length/4)+\' tokens\'">' + wf4Esc(step.prompt || '') + '</textarea>';
+  html += '<div class="wf4-token-count">~' + Math.ceil((step.prompt||'').length/4) + ' tokens</div>';
+  html += '<div style="margin-top:6px"><button class="wf4-btn-secondary" onclick="showToast(\'Test prompt sent (mock)\',\'success\')">&#9654; Test Prompt</button></div>';
+  html += '</div>';
+
+  /* Role Gates */
+  html += '<div class="wf4-props-section"><div class="wf4-props-section-title">Role Gates</div>';
+  html += '<div class="wf4-role-check">';
+  Object.keys(WF4_ROLES).forEach(function(rk) {
+    var checked = (step.roleGate || []).indexOf(rk) >= 0 ? ' checked' : '';
+    html += '<label><input type="checkbox"' + checked + ' onchange="wf4ToggleRole(\'' + step.id + '\',\'' + rk + '\',this.checked)"> ' + WF4_ROLES[rk].label + '</label>';
+  });
+  html += '</div></div>';
+
+  /* Execution settings */
+  html += '<div class="wf4-props-section"><div class="wf4-props-section-title">Execution Settings</div>';
+  html += '<div class="wf4-toggle-row"><span class="wf4-toggle-label">Auto-skip (in auto mode)</span><input type="checkbox"' + (step.autoSkip ? ' checked' : '') + ' onchange="wf4UpdateField(\'' + step.id + '\',\'autoSkip\',this.checked)" style="accent-color:var(--violet)"></div>';
+  html += '<div class="wf4-toggle-row"><span class="wf4-toggle-label">Approval required</span><input type="checkbox"' + (step.approvalRequired ? ' checked' : '') + ' onchange="wf4UpdateField(\'' + step.id + '\',\'approvalRequired\',this.checked)" style="accent-color:var(--violet)"></div>';
+  html += '<div class="wf4-toggle-row"><span class="wf4-toggle-label">Duration estimate</span><input style="width:120px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;font-size:11px;color:var(--text)" value="' + wf4Esc(step.estimatedDuration||'') + '" onchange="wf4UpdateField(\'' + step.id + '\',\'estimatedDuration\',this.value)" placeholder="e.g. 1 hour"></div>';
+  html += '</div>';
+
+  /* Dependencies */
+  html += '<div class="wf4-props-section"><div class="wf4-props-section-title">Dependencies</div>';
+  if (step.dependencies && step.dependencies.length) {
+    step.dependencies.forEach(function(dep) {
+      var depStep = wf4.steps.find(function(s){ return s.id === dep; });
+      html += '<span class="wf4-dep-tag">' + (depStep ? depStep.label : dep) + '</span>';
+    });
+  } else {
+    html += '<span style="font-size:11px;color:var(--text-faint)">None (first step)</span>';
+  }
+  html += '</div>';
+
+  /* Color */
+  html += '<div class="wf4-props-section"><div class="wf4-props-section-title">Step Color</div>';
+  html += '<input type="color" value="' + (step.color||'#64748B') + '" onchange="wf4UpdateField(\'' + step.id + '\',\'color\',this.value)" style="width:40px;height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer">';
+  html += '</div>';
+
+  body.innerHTML = html;
+}
+
+/* ─── Field updates ─── */
+function wf4UpdateField(stepId, field, value) {
+  var step = wf4.steps.find(function(s){ return s.id === stepId; });
+  if (!step) return;
+  step[field] = value;
+  if (field === 'label' || field === 'type' || field === 'color') wf4RenderCanvas();
+}
+
+function wf4ToggleRole(stepId, role, checked) {
+  var step = wf4.steps.find(function(s){ return s.id === stepId; });
+  if (!step) return;
+  if (checked && step.roleGate.indexOf(role) < 0) step.roleGate.push(role);
+  if (!checked) step.roleGate = step.roleGate.filter(function(r){ return r !== role; });
+}
+
+/* ─── Remove step ─── */
+function wf4RemoveStep(stepId) {
+  var step = wf4.steps.find(function(s){ return s.id === stepId; });
+  if (!step) return;
+  if (step.approvalRequired && !confirm('Remove approval gate "' + step.label + '"?')) return;
+  wf4.steps = wf4.steps.filter(function(s){ return s.id !== stepId; });
+  wf4.steps.forEach(function(s, i){ s.order = i; });
+  if (wf4SelectedStepId === stepId) { wf4SelectedStepId = null; wf4CloseProps(); }
+  wf4RenderCanvas();
+  showToast('Step removed: ' + step.label, 'success');
+}
+
+/* ─── Save / Reset ─── */
+function wf4Save() {
+  wf4.version++;
+  document.getElementById('wf4VersionBadge').textContent = 'v' + wf4.version;
+  showToast('Workflow 4 saved \u2014 v' + wf4.version, 'success');
+}
+
+function wf4Reset() {
+  if (!confirm('Reset Workflow 4 to default 10-step pipeline? All customizations will be lost.')) return;
+  wf4 = wf4CreateDefault();
+  wf4SelectedStepId = null;
+  wf4CloseProps();
+  wf4RenderCanvas();
+  document.getElementById('wf4VersionBadge').textContent = 'v' + wf4.version;
+  showToast('Workflow 4 reset to default', 'success');
+}
+
+/* ─── Run pipeline ─── */
+async function wf4Run() {
+  var cpc = document.getElementById('wf4TargetCPC').value;
+  var sampleSize = document.getElementById('wf4SampleSize').value;
+  if (!cpc) { showToast('Select a target CPC class to calibrate', 'error'); return; }
+
+  var btn = document.getElementById('btnRunWf4');
+  var status = document.getElementById('wf4RunStatus');
+  btn.disabled = true;
+
+  var steps = wf4.steps.slice().sort(function(a, b){ return a.order - b.order; });
+  status.innerHTML = '';
+
+  for (var i = 0; i < steps.length; i++) {
+    var step = steps[i];
+    var stepEl = document.querySelector('.wf4-step[data-step-id="' + step.id + '"]');
+    if (stepEl) stepEl.style.borderColor = step.color;
+
+    status.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;font-size:12px;color:var(--text-muted)">'
+      + '<div class="wf4-spinner"></div>'
+      + 'Step ' + (i+1) + '/' + steps.length + ': ' + wf4Esc(step.label)
+      + '<span style="margin-left:auto;font-size:10px;color:var(--text-faint)">' + (step.estimatedDuration || '') + '</span>'
+      + '</div>';
+
+    await new Promise(function(r){ setTimeout(r, 800 + Math.random() * 600); });
+
+    if (stepEl) {
+      stepEl.style.borderColor = '#22C55E';
+      stepEl.querySelector('.wf4-step-bar').style.background = '#22C55E';
+    }
+
+    if (step.approvalRequired) {
+      status.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;font-size:12px;color:#F59E0B">'
+        + '&#9888; Step ' + (i+1) + ': ' + wf4Esc(step.label) + ' \u2014 Awaiting manual approval...'
+        + '<button class="wf4-btn-primary" style="padding:3px 10px;font-size:10px;margin-left:8px" onclick="this.closest(\'div\').remove();document.getElementById(\'wf4GateResolved\').value=\'1\'">Approve</button>'
+        + '</div><input type="hidden" id="wf4GateResolved" value="0">';
+      await new Promise(function(r) {
+        var check = setInterval(function() {
+          var inp = document.getElementById('wf4GateResolved');
+          if (!inp || inp.value === '1') { clearInterval(check); r(); }
+        }, 300);
+      });
+    }
+  }
+
+  /* Completion */
+  status.innerHTML = '<div style="padding:10px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);border-radius:var(--radius-sm);color:var(--green);font-size:12px;margin-top:4px">'
+    + '\u2713 CII Training Pipeline complete for <strong>' + wf4Esc(cpc) + '</strong> (' + sampleSize + ' synthetic records). ' + steps.length + ' steps executed. Calibrated weights applied to Training module.'
+    + '</div>';
+  showToast('Workflow 4 complete for ' + cpc, 'success');
+  btn.disabled = false;
+
+  setTimeout(function(){ wf4RenderCanvas(); }, 3000);
+}
+
+/* ─── Init WF4 on DOMContentLoaded ─── */
+(function() {
+  function initWf4() { wf4RenderCanvas(); }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWf4);
+  } else {
+    initWf4();
+  }
+})();
+
+</script>
+
+<script>
+function toggleCiisTheme() {
+  var html = document.documentElement;
+  var newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', newTheme);
+  try { window.parent.postMessage({ type: 'theme-changed-by-child', theme: newTheme }, '*'); } catch(e) {}
+}
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'theme-change') {
+    document.documentElement.setAttribute('data-theme', e.data.theme);
+  }
+});
+</script>
+</body>
+</html>

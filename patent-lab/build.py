@@ -2,7 +2,10 @@
 """Build the Patent Ideation Lab single-file HTML dashboard."""
 import json
 
-with open('/home/user/workspace/ipco-merged/patent-lab/patent_data_normalized.json', 'r') as f:
+import os
+script_dir = os.path.dirname(os.path.abspath(__file__))
+data_path = os.path.join(script_dir, 'patent_data_normalized.json')
+with open(data_path, 'r') as f:
     data_json = f.read()
 
 html = '''<!--

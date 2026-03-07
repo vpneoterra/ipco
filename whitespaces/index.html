@@ -1,0 +1,2024 @@
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+  WhiteSpaces — CPC-Driven IP Whitespace Intelligence Module
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://api.anthropic.com; img-src 'self' data:;">
+<title>Patentify WhiteSpaces Intelligence</title>
+<link rel="stylesheet" href="../design-tokens.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS (LOCAL OVERRIDES)
+   ═══════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root {
+  --font-display:'DM Serif Display',serif;
+  --font-body:'DM Sans',sans-serif;
+  --ease:cubic-bezier(0.22,1,0.36,1);
+  --dur:250ms;
+  --dur-slow:400ms;
+  --radius-sm:6px;
+  --radius:10px;
+  --radius-lg:14px;
+  --teal:#2E8B7A;
+  --blue:#2563EB;
+  --amber:#D4A017;
+  --green:#22C55E;
+  --yellow:#EAB308;
+  --red:#EF4444;
+  --violet:#8B5CF6;
+  --cyan:#06B6D4;
+  --rose:#F43F5E;
+}
+[data-theme="dark"]{
+  --bg:#000;--bg-surface:#0A0A0A;--bg-card:#111;--bg-hover:#1A1A1A;--bg-elevated:#1E1E1E;
+  --border:rgba(255,255,255,0.08);--border-strong:rgba(255,255,255,0.15);
+  --text:#F1F5F9;--text-secondary:#CBD5E1;--text-muted:#94A3B8;--text-faint:#64748B;
+  --shadow:0 1px 3px rgba(0,0,0,0.5);--shadow-lg:0 8px 32px rgba(0,0,0,0.6);
+  --glow-teal:rgba(46,139,122,0.12);--glow-cyan:rgba(6,182,212,0.12);
+  --drawer-bg:#0C0C0C;--tab-active:rgba(6,182,212,0.15);
+  --scrollbar-thumb:#333;--scrollbar-track:transparent;
+}
+[data-theme="light"]{
+  --bg:#FAFBFC;--bg-surface:#F5F6F8;--bg-card:#FFFFFF;--bg-hover:#EEF1F5;--bg-elevated:#FFFFFF;
+  --border:rgba(15,23,42,0.08);--border-strong:rgba(15,23,42,0.15);
+  --text:#0F172A;--text-secondary:#334155;--text-muted:#475569;--text-faint:#94A3B8;
+  --shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.08);
+  --glow-teal:rgba(46,139,122,0.08);--glow-cyan:rgba(6,182,212,0.08);
+  --drawer-bg:#F0F2F5;--tab-active:rgba(6,182,212,0.10);
+  --scrollbar-thumb:#C4C4C4;--scrollbar-track:transparent;
+  /* Accent colors stay vivid */
+  --teal:#2E8B7A;--cyan:#0891B2;--green:#059669;--red:#DC2626;
+  --amber:#D97706;--blue:#2563EB;--violet:#7C3AED;--rose:#DB2777;--yellow:#CA8A04;
+}
+[data-theme="light"] .sidebar{background:#FFFFFF;border-right-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .nav-item.active{background:rgba(6,182,212,0.06)}
+[data-theme="light"] .card{border-color:rgba(15,23,42,0.10);background:#FFFFFF}
+[data-theme="light"] .ws-table th{background:#F0F2F5;color:#334155}
+[data-theme="light"] .ws-table td{border-color:rgba(15,23,42,0.06)}
+[data-theme="light"] .ws-table tr:hover td{background:rgba(6,182,212,0.04)}
+[data-theme="light"] .drawer{background:#FFFFFF;border-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .drawer-tab.active{background:rgba(6,182,212,0.08);color:#0891B2}
+[data-theme="light"] .viz-mode-btn.active{background:var(--cyan);color:#fff}
+[data-theme="light"] .btn-primary{color:#fff}
+[data-theme="light"] .guide-panel{background:#FFFFFF;border-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .guide-btn:hover{color:#fff}
+[data-theme="light"] .stat-pill{background:rgba(15,23,42,0.05);color:#334155}
+[data-theme="light"] .new-badge{color:#fff}
+[data-theme="light"] .wf2-step{background:#FFFFFF;border-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .wf2-version-badge{color:#fff}
+[data-theme="light"] .toast.success{color:#fff}
+[data-theme="light"] .wf2-props-panel{background:#FFFFFF;border-color:rgba(15,23,42,0.10)}
+[data-theme="light"] .wf2-json-editor textarea{background:#F5F6F8;color:#0F172A;border-color:rgba(15,23,42,0.10)}
+html,body{height:100%;overflow:hidden;font-family:var(--font-body);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums lining-nums}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--scrollbar-track)}
+::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:3px}
+
+/* ═══════════════════════════════════════════
+   APP LAYOUT — LEFT SIDEBAR GRID
+   ═══════════════════════════════════════════ */
+:root{--sidebar-width:220px;--sidebar-collapsed:56px}
+.app{display:grid;grid-template-columns:var(--sidebar-width) 1fr;height:100dvh;overflow:hidden}
+.app.collapsed{grid-template-columns:var(--sidebar-collapsed) 1fr}
+
+/* ─── SIDEBAR ─── */
+.sidebar{grid-row:1/-1;background:var(--bg-surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;transition:all 0.3s cubic-bezier(0.22,1,0.36,1);z-index:20}
+.sidebar-header{padding:16px 14px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);min-height:56px}
+.sidebar-logo{flex-shrink:0;width:24px;height:24px;color:var(--cyan)}
+.sidebar-brand{overflow:hidden;white-space:nowrap;transition:opacity 0.3s,width 0.3s}
+.app.collapsed .sidebar-brand{opacity:0;width:0}
+.sidebar-brand h1{font-family:var(--font-display);font-size:15px;color:var(--text);letter-spacing:-0.02em;margin:0}
+.sidebar-brand span{font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.06em;display:block}
+.sidebar-badge{font-size:10px;padding:3px 8px;border-radius:10px;background:var(--glow-cyan);color:var(--cyan);font-weight:600;letter-spacing:0.03em;margin-left:auto}
+.app.collapsed .sidebar-badge{display:none}
+
+.sidebar-nav{flex:1;padding:8px;display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-muted);transition:all 0.25s var(--ease);border:none;background:none;font:inherit;width:100%;text-align:left;border-left:3px solid transparent;position:relative}
+.nav-item:hover{background:var(--bg-hover);color:var(--text)}
+.nav-item.active{border-left-color:var(--cyan);color:var(--cyan);background:var(--tab-active)}
+.nav-item svg{flex-shrink:0;width:18px;height:18px;opacity:0.6}
+.nav-item.active svg{opacity:1}
+.nav-item-label{overflow:hidden;white-space:nowrap;transition:opacity 0.3s,width 0.3s;font-size:12.5px;font-weight:500}
+.app.collapsed .nav-item-label{opacity:0;width:0}
+.nav-badge{font-size:9px;padding:2px 7px;border-radius:8px;background:var(--glow-cyan);color:var(--cyan);font-weight:700;margin-left:auto;letter-spacing:0.03em}
+.app.collapsed .nav-badge{display:none}
+
+.sidebar-footer{padding:10px 14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sidebar-footer-text{font-size:10px;color:var(--text-faint);overflow:hidden;white-space:nowrap;transition:opacity 0.3s}
+.app.collapsed .sidebar-footer-text{opacity:0;width:0}
+.collapse-btn{background:none;border:none;color:var(--text-faint);cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);transition:all 0.25s var(--ease)}
+.collapse-btn:hover{background:var(--bg-hover);color:var(--text)}
+.app.collapsed .collapse-btn svg{transform:rotate(180deg)}
+
+/* Legacy tab-btn styles hidden — now using nav-item */
+.tab-bar{display:none}
+.tab-btn{display:none}
+.tab-badge{font-size:10px;padding:1px 6px;border-radius:8px;background:var(--glow-cyan);color:var(--cyan);font-weight:600}
+/* header-bar removed, sidebar replaces it */
+.header-bar{display:none}
+
+/* ═══════════════════════════════════════════
+   CONTENT AREA
+   ═══════════════════════════════════════════ */
+.content{display:flex;overflow:hidden;position:relative;min-height:0;min-width:0}
+.tab-panel{display:none;flex:1;overflow:hidden}
+.tab-panel.active{display:flex}
+
+/* ─── EXPLORER LAYOUT ─── */
+.explorer-layout{display:flex;flex:1;overflow:hidden}
+.cpc-sidebar{width:260px;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg-surface);flex-shrink:0;overflow:hidden}
+.cpc-search{padding:10px 12px;border-bottom:1px solid var(--border)}
+.cpc-search input{width:100%;height:30px;padding:0 10px 0 30px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-family:var(--font-body);font-size:12px;outline:none;transition:border-color var(--dur)}
+.cpc-search input:focus{border-color:var(--cyan)}
+.cpc-search input::placeholder{color:var(--text-faint)}
+.cpc-search{position:relative}
+.cpc-search svg{position:absolute;left:22px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--text-faint);pointer-events:none}
+.cpc-tree{flex:1;overflow-y:auto;padding:8px 0}
+.cpc-node{cursor:pointer;user-select:none}
+.cpc-node-row{display:flex;align-items:center;gap:6px;padding:4px 12px;font-size:12px;color:var(--text-muted);transition:all 150ms;border-left:2px solid transparent}
+.cpc-node-row:hover{background:var(--bg-hover);color:var(--text)}
+.cpc-node-row.active{background:var(--tab-active);color:var(--cyan);border-left-color:var(--cyan)}
+.cpc-arrow{width:14px;height:14px;transition:transform 200ms;flex-shrink:0;opacity:0.5}
+.cpc-arrow.open{transform:rotate(90deg)}
+.cpc-arrow.leaf{opacity:0}
+.cpc-code{font-weight:600;font-size:11px;color:var(--cyan);min-width:36px}
+.cpc-label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cpc-count{font-size:10px;padding:1px 5px;border-radius:6px;background:var(--glow-cyan);color:var(--cyan);font-weight:600}
+.cpc-children{display:none;padding-left:12px}
+.cpc-children.open{display:block}
+
+/* ─── MAIN TABLE AREA ─── */
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.filter-bar{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--bg-surface);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.filter-bar select,.filter-bar input[type="text"]{height:28px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-family:var(--font-body);font-size:11px;outline:none}
+.filter-bar select:focus,.filter-bar input[type="text"]:focus{border-color:var(--cyan)}
+.filter-bar label{font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.05em;font-weight:500}
+.filter-group{display:flex;align-items:center;gap:4px}
+.kpi-strip{display:flex;gap:1px;background:var(--border);margin:0}
+.kpi-card{background:var(--bg-surface);padding:8px 14px;flex:1;position:relative}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi-card:nth-child(1)::before{background:var(--cyan)}
+.kpi-card:nth-child(2)::before{background:var(--teal)}
+.kpi-card:nth-child(3)::before{background:var(--amber)}
+.kpi-card:nth-child(4)::before{background:var(--green)}
+.kpi-label{font-size:9px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.06em}
+.kpi-value{font-size:20px;font-weight:700;color:var(--text);line-height:1.2}
+.kpi-sub{font-size:10px;color:var(--text-muted)}
+.table-scroll{flex:1;overflow-y:auto;overflow-x:auto}
+table.ws-table{width:100%;border-collapse:collapse;font-size:12px}
+table.ws-table thead{position:sticky;top:0;z-index:10}
+table.ws-table th{padding:8px 10px;text-align:left;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-faint);background:var(--bg-surface);border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none}
+table.ws-table th:hover{color:var(--text)}
+table.ws-table th .sort-arrow{opacity:0.3;margin-left:3px;font-size:9px}
+table.ws-table th.sorted .sort-arrow{opacity:1;color:var(--cyan)}
+table.ws-table td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text-secondary);white-space:nowrap}
+table.ws-table tr{transition:background 150ms}
+table.ws-table tr:hover{background:var(--bg-hover)}
+table.ws-table tr.selected{background:var(--tab-active)}
+table.ws-table tr.new-item{animation:fadeInRow 0.6s var(--ease)}
+@keyframes fadeInRow{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:0.02em}
+.badge.very_low,.badge.low{background:rgba(34,197,94,0.15);color:var(--green)}
+.badge.medium{background:rgba(234,179,8,0.15);color:var(--yellow)}
+.badge.high,.badge.saturated,.badge.critical{background:rgba(239,68,68,0.15);color:var(--red)}
+.badge.low_moderate,.badge.moderate{background:rgba(212,160,23,0.15);color:var(--amber)}
+.score-bar{width:60px;height:6px;border-radius:3px;background:var(--border);overflow:hidden;display:inline-block;vertical-align:middle}
+.score-bar-fill{height:100%;border-radius:3px;transition:width 0.4s var(--ease)}
+.trl-gauge{display:inline-flex;align-items:center;gap:2px}
+.trl-dot{width:4px;height:10px;border-radius:1px;background:var(--border)}
+.trl-dot.filled{background:var(--cyan)}
+.ws-name-cell{max-width:220px;overflow:hidden;text-overflow:ellipsis;color:var(--text)!important;font-weight:500;cursor:pointer}
+.ws-name-cell:hover{color:var(--cyan)!important}
+.new-badge{font-size:9px;padding:1px 5px;border-radius:3px;background:var(--cyan);color:#000;font-weight:700;margin-left:6px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.checkbox-cell{width:30px;text-align:center}
+.checkbox-cell input{accent-color:var(--cyan)}
+
+/* ═══════════════════════════════════════════
+   GUIDE PANEL (RIGHT SIDE)
+   ═══════════════════════════════════════════ */
+.guide-panel{width:360px;border-left:1px solid var(--border);background:var(--drawer-bg);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:width var(--dur-slow) var(--ease),opacity var(--dur) var(--ease)}
+.guide-panel.collapsed{width:0;opacity:0;border:none;overflow:hidden}
+.guide-toggle{position:absolute;right:360px;top:50%;transform:translateY(-50%);z-index:50;width:20px;height:48px;background:var(--bg-surface);border:1px solid var(--border);border-right:none;border-radius:6px 0 0 6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:all var(--dur)}
+.guide-toggle:hover{color:var(--text);background:var(--bg-hover)}
+.guide-panel.collapsed~.guide-toggle{right:0}
+.guide-toggle svg{width:12px;height:12px}
+.guide-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.guide-title{font-size:13px;font-weight:600;color:var(--text)}
+.guide-close{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px}
+.guide-close:hover{color:var(--text)}
+.guide-body{flex:1;overflow-y:auto;padding:0}
+.guide-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-faint);text-align:center;padding:30px}
+.guide-empty svg{width:48px;height:48px;margin-bottom:12px;opacity:0.3}
+.guide-empty p{font-size:12px;line-height:1.5}
+.guide-section{padding:12px 16px;border-bottom:1px solid var(--border)}
+.guide-section-title{font-size:10px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px}
+.guide-ws-name{font-size:16px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:4px}
+.guide-cpc-badge{display:inline-block;padding:2px 8px;border-radius:4px;background:var(--glow-cyan);color:var(--cyan);font-size:11px;font-weight:600;margin-right:6px}
+.guide-score-ring{width:56px;height:56px;position:relative;flex-shrink:0}
+.guide-score-ring svg{width:100%;height:100%}
+.guide-score-value{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--text)}
+.guide-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.guide-metric{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px}
+.guide-metric-label{font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:2px}
+.guide-metric-value{font-size:14px;font-weight:600;color:var(--text)}
+.guide-tags{display:flex;flex-wrap:wrap;gap:4px}
+.guide-tag{padding:2px 8px;border-radius:10px;font-size:10px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-muted)}
+.guide-challenge{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;margin-bottom:6px;cursor:pointer;transition:all 150ms}
+.guide-challenge:hover{border-color:var(--border-strong)}
+.guide-challenge-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.guide-challenge-desc{font-size:11px;color:var(--text-muted);line-height:1.4;display:none}
+.guide-challenge.open .guide-challenge-desc{display:block;margin-top:6px}
+.severity-dots{display:flex;gap:2px}
+.severity-dot{width:6px;height:6px;border-radius:50%;background:var(--border)}
+.severity-dot.filled{background:var(--red)}
+.guide-solution{background:var(--bg-elevated);border:1px solid var(--border);border-left:2px solid var(--green);border-radius:var(--radius-sm);padding:8px 10px;margin:4px 0 4px 12px;font-size:11px}
+.guide-solution-title{font-weight:600;color:var(--text);margin-bottom:3px}
+.guide-solution-scores{display:flex;gap:10px;font-size:10px;color:var(--text-muted)}
+.guide-solution-claim{font-family:'Courier New',monospace;font-size:10px;color:var(--text-muted);background:var(--bg-card);padding:6px 8px;border-radius:4px;margin-top:4px;line-height:1.4;white-space:pre-wrap}
+.guide-mini-bar{height:4px;border-radius:2px;background:var(--border);overflow:hidden;flex:1}
+.guide-mini-bar-fill{height:100%;border-radius:2px}
+.guide-disclaimer{font-size:9px;color:var(--text-faint);padding:10px 16px;text-align:center;line-height:1.4;border-top:1px solid var(--border)}
+.guide-btn{width:100%;padding:8px 12px;border:1px solid var(--cyan);border-radius:var(--radius-sm);background:transparent;color:var(--cyan);font-family:var(--font-body);font-size:11px;font-weight:600;cursor:pointer;transition:all var(--dur);margin-top:8px}
+.guide-btn:hover{background:var(--cyan);color:#000}
+
+/* ═══════════════════════════════════════════
+   VISUALIZER TAB
+   ═══════════════════════════════════════════ */
+.viz-layout{display:flex;flex:1;overflow:hidden}
+.viz-main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.viz-controls{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--bg-surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.viz-mode-toggle{display:flex;background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2px;gap:0}
+.viz-mode-btn{padding:4px 14px;border:none;background:transparent;color:var(--text-muted);font-family:var(--font-body);font-size:11px;font-weight:500;cursor:pointer;border-radius:18px;transition:all var(--dur)}
+.viz-mode-btn.active{background:var(--cyan);color:#000}
+.viz-breadcrumb{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-muted);margin-left:12px}
+.viz-breadcrumb span{cursor:pointer;transition:color 150ms}
+.viz-breadcrumb span:hover{color:var(--cyan)}
+.viz-breadcrumb .sep{opacity:0.4;cursor:default}
+.viz-breadcrumb .current{color:var(--text);font-weight:500}
+.viz-canvas{flex:1;overflow:hidden;position:relative}
+.viz-canvas svg{width:100%;height:100%}
+.viz-legend{position:absolute;bottom:16px;right:16px;background:rgba(10,10,10,0.92);border:1px solid var(--border);border-radius:var(--radius);padding:12px;font-size:10px;color:var(--text-muted);min-width:160px;z-index:20;backdrop-filter:blur(8px)}
+.viz-legend-title{font-weight:600;color:var(--text);margin-bottom:8px;font-size:11px}
+.viz-legend-item{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.viz-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.viz-legend-line{width:16px;height:2px;border-radius:1px;flex-shrink:0}
+.viz-reset{position:absolute;top:12px;right:16px;z-index:20}
+.viz-reset button{padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text-muted);font-family:var(--font-body);font-size:10px;cursor:pointer;transition:all var(--dur)}
+.viz-reset button:hover{background:var(--bg-hover);color:var(--text)}
+
+/* Tooltip */
+.ws-tooltip{position:fixed;z-index:1000;background:rgba(10,10,10,0.95);border:1px solid var(--border-strong);border-radius:var(--radius);padding:12px;font-size:11px;color:var(--text-secondary);max-width:300px;pointer-events:none;opacity:0;transition:opacity 150ms;box-shadow:var(--shadow-lg);backdrop-filter:blur(8px)}
+.ws-tooltip.visible{opacity:1}
+.ws-tooltip h4{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px}
+.ws-tooltip .tt-row{display:flex;justify-content:space-between;gap:12px;margin-bottom:3px}
+.ws-tooltip .tt-label{color:var(--text-faint)}
+.ws-tooltip .tt-value{font-weight:500;color:var(--text)}
+
+/* ═══════════════════════════════════════════
+   LAB TAB
+   ═══════════════════════════════════════════ */
+.lab-layout{display:flex;flex:1;overflow:hidden}
+.lab-main{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:16px 20px;gap:16px}
+.lab-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:border-color var(--dur)}
+.lab-card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.lab-card-title svg{width:16px;height:16px;color:var(--cyan)}
+.lab-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.lab-field{display:flex;flex-direction:column;gap:3px;flex:1;min-width:180px}
+.lab-field label{font-size:10px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.04em}
+.lab-field select,.lab-field input[type="text"]{height:32px;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-surface);color:var(--text);font-family:var(--font-body);font-size:12px;outline:none}
+.lab-field select:focus,.lab-field input:focus{border-color:var(--cyan)}
+.lab-field textarea{padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-surface);color:var(--text);font-family:var(--font-body);font-size:12px;outline:none;resize:vertical;min-height:60px}
+.lab-slider{display:flex;align-items:center;gap:10px}
+.lab-slider input[type="range"]{flex:1;accent-color:var(--cyan);height:4px}
+.lab-slider-value{font-size:11px;color:var(--text);font-weight:500;min-width:30px;text-align:right}
+.lab-checkboxes{display:flex;flex-wrap:wrap;gap:6px}
+.lab-checkbox{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-muted);cursor:pointer}
+.lab-checkbox input{accent-color:var(--cyan)}
+.lab-actions{display:flex;gap:8px;margin-top:4px}
+.btn-primary{padding:8px 20px;border:none;border-radius:var(--radius-sm);background:var(--cyan);color:#000;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;transition:all var(--dur);display:flex;align-items:center;gap:6px}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.btn-secondary{padding:8px 20px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-muted);font-family:var(--font-body);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--dur)}
+.btn-secondary:hover{border-color:var(--text-faint);color:var(--text)}
+.lab-loading{display:flex;align-items:center;gap:10px;padding:16px;color:var(--text-muted);font-size:12px}
+.lab-spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lab-error{padding:12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius-sm);color:var(--red);font-size:12px;display:flex;align-items:center;gap:8px}
+.lab-results{margin-top:8px}
+.rank-item{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px;cursor:pointer;transition:all 150ms}
+.rank-item:hover{border-color:var(--border-strong)}
+.rank-number{width:28px;height:28px;border-radius:50%;background:var(--glow-cyan);color:var(--cyan);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.rank-info{flex:1;min-width:0}
+.rank-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-score{font-size:11px;color:var(--text-muted)}
+.rank-bar{height:4px;border-radius:2px;background:var(--border);margin-top:4px}
+.rank-bar-fill{height:100%;border-radius:2px;background:var(--cyan);transition:width 0.6s var(--ease)}
+
+/* ═══════════════════════════════════════════
+   COMPETITIVE & FILING TABS
+   ═══════════════════════════════════════════ */
+.comp-layout{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:16px}
+.comp-heatmap{flex:1;overflow:auto}
+.heatmap-cell{width:48px;height:32px;border-radius:3px;cursor:pointer;transition:all 150ms;border:1px solid transparent}
+.heatmap-cell:hover{border-color:var(--text-faint);transform:scale(1.15);z-index:2}
+.filing-layout{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.filing-timeline{flex:1;overflow-x:auto;overflow-y:auto;padding:16px}
+.gantt-bar{height:20px;border-radius:3px;cursor:pointer;transition:all 150ms;position:absolute}
+.gantt-bar:hover{filter:brightness(1.2);transform:scaleY(1.2)}
+
+/* ═══════════════════════════════════════════
+   UTILITY & ANIMATION
+   ═══════════════════════════════════════════ */
+.hidden{display:none!important}
+/* ─── Mobile responsive sidebar ─── */
+@media(max-width:768px){
+  .app{grid-template-columns:var(--sidebar-collapsed) 1fr}
+  .nav-item-label,.sidebar-brand,.sidebar-footer-text,.sidebar-badge,.nav-badge{opacity:0;width:0;display:none}
+  .sidebar-header{justify-content:center;padding:12px 8px}
+  .nav-item{justify-content:center;padding:10px 8px}
+}
+.glow-pulse{animation:glowPulse 2s infinite alternate}
+@keyframes glowPulse{0%{filter:drop-shadow(0 0 3px var(--cyan))}100%{filter:drop-shadow(0 0 8px var(--cyan))}}
+.fade-in{animation:fadeIn 0.3s var(--ease)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:var(--radius);font-size:12px;font-weight:500;z-index:2000;animation:slideUp 0.3s var(--ease)}
+.toast.success{background:rgba(34,197,94,0.9);color:#000}
+.toast.error{background:rgba(239,68,68,0.9);color:#fff}
+@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* ═══════════════════════════════════════════
+   WORKFLOW 2 EDITOR IN WHITESPACE LAB
+   ═══════════════════════════════════════════ */
+.wf2-version-badge{background:var(--cyan);color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.wf2-meta-strip{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 0 12px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.wf2-run-bar{display:flex;gap:10px;align-items:flex-end;padding:10px 0;margin-bottom:10px}
+.wf2-run-field{display:flex;flex-direction:column;gap:4px;flex:1}
+.wf2-run-field label{font-size:10px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.5px}
+.wf2-run-field input{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:var(--text);transition:border-color 150ms}
+.wf2-run-field input:focus{outline:none;border-color:var(--cyan)}
+.wf2-canvas-wrap{overflow-x:auto;overflow-y:hidden;padding:10px 0;position:relative}
+.wf2-canvas{display:flex;align-items:center;gap:0;min-width:max-content;padding:8px 4px}
+.wf2-step{display:flex;align-items:stretch;gap:0;min-width:140px;max-width:180px;background:var(--bg-surface);border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all 150ms ease;position:relative;flex-shrink:0}
+.wf2-step:hover{border-color:var(--cyan);box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+.wf2-step.selected{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(6,182,212,0.25)}
+.wf2-step.dragging{opacity:0.4}
+.wf2-step.drag-over{border-color:var(--cyan);border-style:dashed}
+.wf2-step-bar{width:4px;border-radius:var(--radius) 0 0 var(--radius);flex-shrink:0}
+.wf2-step-info{padding:8px 10px;flex:1;min-width:0}
+.wf2-step-label{font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wf2-step-meta{display:flex;gap:4px;align-items:center;margin-top:4px;flex-wrap:wrap}
+.wf2-step-type{font-size:9px;font-weight:700;text-transform:uppercase;padding:1px 5px;border-radius:3px;background:rgba(148,163,184,0.15);color:var(--text-faint)}
+.wf2-step-dur{font-size:9px;color:var(--text-faint)}
+.wf2-step-actions{display:flex;flex-direction:column;justify-content:center;padding:0 6px}
+.wf2-step-rm{background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:12px;padding:2px;border-radius:3px;transition:all 100ms}
+.wf2-step-rm:hover{color:var(--red);background:rgba(239,68,68,0.1)}
+.wf2-arrow{display:flex;align-items:center;justify-content:center;padding:0 2px;color:var(--text-faint);flex-shrink:0}
+.wf2-arrow svg{width:14px;height:14px}
+.wf2-step-number{position:absolute;top:-8px;left:-8px;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--text-faint)}
+
+/* Properties panel */
+.wf2-props{display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px;animation:fadeIn 0.2s ease}
+.wf2-props.open{display:block}
+.wf2-props-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.wf2-props-title{font-size:13px;font-weight:600;color:var(--text)}
+.wf2-props-close{background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:18px;padding:0 4px;border-radius:4px;transition:all 100ms}
+.wf2-props-close:hover{color:var(--text);background:var(--bg-surface)}
+.wf2-props-section{margin-bottom:14px}
+.wf2-props-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-faint);margin-bottom:6px}
+.wf2-prompt-editor{width:100%;min-height:120px;resize:vertical;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;font-family:monospace;font-size:11px;line-height:1.6;color:var(--text);transition:border-color 150ms}
+.wf2-prompt-editor:focus{outline:none;border-color:var(--cyan)}
+.wf2-token-count{font-size:10px;color:var(--text-faint);text-align:right;margin-top:4px}
+.wf2-role-check{display:flex;flex-wrap:wrap;gap:8px}
+.wf2-role-check label{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;cursor:pointer}
+.wf2-role-check input{accent-color:var(--cyan)}
+.wf2-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0}
+.wf2-toggle-label{font-size:11px;color:var(--text-muted)}
+.wf2-dep-tag{display:inline-block;font-size:9px;padding:2px 6px;background:rgba(6,182,212,0.1);color:var(--cyan);border-radius:3px;margin-right:4px}
+</style>
+
+<style id="ws-light-fixes">
+.theme-toggle-btn{background:none;border:1px solid var(--border);border-radius:var(--radius-sm,6px);color:var(--text-muted);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;flex-shrink:0}
+.theme-toggle-btn:hover{color:var(--text);border-color:var(--text-muted)}
+[data-theme="light"] .theme-toggle-btn svg{display:none}
+[data-theme="light"] .theme-toggle-btn::after{content:"\263D";font-size:16px;line-height:1}
+[data-theme="dark"] .theme-toggle-btn svg{display:block}
+</style>
+<script src="../env.js"></script>
+<script>try{var s=document.createElement('script');s.src='../env.local.js';s.onerror=function(){};document.head.appendChild(s);}catch(e){}</script>
+</head>
+<body>
+<div class="app" id="wsApp">
+  <!-- ═══ LEFT SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <svg class="sidebar-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6" opacity="0.5"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="2" x2="12" y2="6" opacity="0.5"/><line x1="22" y1="12" x2="18" y2="12" opacity="0.5"/></svg>
+      <div class="sidebar-brand">
+        <h1>WhiteSpaces</h1>
+        <span>IP Intelligence</span>
+      </div>
+      <span class="sidebar-badge" id="wsCountBadge">20</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-tab="explorer" onclick="switchTab('explorer')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span class="nav-item-label">Explorer</span>
+      </button>
+      <button class="nav-item" data-tab="visualizer" onclick="switchTab('visualizer')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10"/><path d="M2 12h20"/></svg>
+        <span class="nav-item-label">Visualizer</span>
+      </button>
+      <button class="nav-item" data-tab="lab" onclick="switchTab('lab')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6v7l4 9H5l4-9V3z"/><line x1="9" y1="3" x2="15" y2="3"/></svg>
+        <span class="nav-item-label">WhiteSpace Lab</span>
+        <span class="nav-badge">AI</span>
+      </button>
+      <button class="nav-item" data-tab="competitive" onclick="switchTab('competitive')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+        <span class="nav-item-label">Competitive</span>
+      </button>
+      <button class="nav-item" data-tab="filing" onclick="switchTab('filing')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        <span class="nav-item-label">Filing Strategy</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="sidebar-footer-text">WhiteSpaces v1.0</span>
+      <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle light/dark mode">
+        <svg id="wsThemeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+      <button class="collapse-btn" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ═══ CONTENT ═══ -->
+  <div class="content" id="contentArea">
+
+    <!-- ──── TAB: EXPLORER ──── -->
+    <div class="tab-panel active" id="tab-explorer">
+      <div class="explorer-layout">
+        <div class="cpc-sidebar">
+          <div class="cpc-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search CPC codes..." id="cpcSearchInput" oninput="filterCpcTree(this.value)">
+          </div>
+          <div class="cpc-tree" id="cpcTree"></div>
+        </div>
+        <div class="main-area">
+          <div class="kpi-strip" id="kpiStrip"></div>
+          <div class="filter-bar" id="filterBar">
+            <div class="filter-group">
+              <label>Section</label>
+              <select id="filterSection" onchange="applyFilters()"><option value="">All</option></select>
+            </div>
+            <div class="filter-group">
+              <label>Score</label>
+              <select id="filterScore" onchange="applyFilters()">
+                <option value="">Any</option><option value="8">8+</option><option value="7">7+</option><option value="6">6+</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>Filing Density</label>
+              <select id="filterDensity" onchange="applyFilters()">
+                <option value="">Any</option><option value="very_low">Very Low</option><option value="low">Low</option><option value="medium">Medium</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>FTO Risk</label>
+              <select id="filterFto" onchange="applyFilters()">
+                <option value="">Any</option><option value="low">Low</option><option value="low_moderate">Low-Mod</option><option value="moderate">Moderate</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>Source</label>
+              <select id="filterSource" onchange="applyFilters()">
+                <option value="">All</option><option value="seed">Seed</option><option value="ai_generated">AI Generated</option><option value="user_created">User Created</option>
+              </select>
+            </div>
+            <div class="filter-group" style="margin-left:auto">
+              <input type="text" id="filterSearch" placeholder="Search whitespaces..." oninput="applyFilters()" style="width:160px">
+            </div>
+          </div>
+          <div class="table-scroll" id="tableScroll">
+            <table class="ws-table">
+              <thead id="wsTableHead"></thead>
+              <tbody id="wsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──── TAB: VISUALIZER ──── -->
+    <div class="tab-panel" id="tab-visualizer">
+      <div class="viz-layout">
+        <div class="viz-main">
+          <div class="viz-controls">
+            <div class="viz-mode-toggle">
+              <button class="viz-mode-btn active" onclick="switchVizMode('sunburst')">Sunburst</button>
+              <button class="viz-mode-btn" onclick="switchVizMode('force')">Network</button>
+              <button class="viz-mode-btn" onclick="switchVizMode('sankey')">Flow</button>
+            </div>
+            <div class="viz-breadcrumb" id="vizBreadcrumb">
+              <span class="current">All CPC Sections</span>
+            </div>
+            <div style="margin-left:auto">
+              <button class="btn-secondary" onclick="resetViz()" style="padding:4px 10px;font-size:10px">Reset View</button>
+            </div>
+          </div>
+          <div class="viz-canvas" id="vizCanvas"></div>
+          <div class="viz-legend" id="vizLegend"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──── TAB: LAB ──── -->
+    <div class="tab-panel" id="tab-lab">
+      <div class="lab-layout">
+        <div class="lab-main" id="labMain">
+          <!-- Generator Card -->
+          <div class="lab-card">
+            <div class="lab-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6v7l4 9H5l4-9V3z"/><line x1="9" y1="3" x2="15" y2="3"/></svg>
+              WhiteSpace Discovery Engine
+            </div>
+            <div class="lab-row">
+              <div class="lab-field">
+                <label>CPC Scope</label>
+                <select id="labCpcScope"><option value="">All Sections</option></select>
+              </div>
+              <div class="lab-field">
+                <label>Industry Focus</label>
+                <input type="text" id="labIndustry" placeholder="e.g., EV, Pharma, Aerospace...">
+              </div>
+              <div class="lab-field">
+                <label>Technology Keywords</label>
+                <input type="text" id="labKeywords" placeholder="e.g., solid-state electrolyte, GNN...">
+              </div>
+            </div>
+            <div class="lab-row">
+              <div class="lab-field" style="max-width:200px">
+                <label>Discovery Depth</label>
+                <select id="labDepth">
+                  <option value="broad">Broad Scan (5–10)</option>
+                  <option value="deep">Deep Dive (3–5)</option>
+                  <option value="surgical">Surgical (1–2)</option>
+                </select>
+              </div>
+              <div class="lab-field" style="max-width:200px">
+                <label>Filing Density Target</label>
+                <select id="labDensityTarget">
+                  <option value="very_low">Very Low Only</option>
+                  <option value="low" selected>Low or Below</option>
+                  <option value="any">Any</option>
+                </select>
+              </div>
+              <div class="lab-field" style="max-width:240px">
+                <label>Risk Tolerance</label>
+                <div class="lab-slider">
+                  <span style="font-size:10px;color:var(--text-faint)">Conservative</span>
+                  <input type="range" id="labRisk" min="1" max="10" value="5">
+                  <span style="font-size:10px;color:var(--text-faint)">Aggressive</span>
+                </div>
+              </div>
+            </div>
+            <div class="lab-row">
+              <div class="lab-field">
+                <label>Macro-Driver Alignment</label>
+                <div class="lab-checkboxes">
+                  <label class="lab-checkbox"><input type="checkbox" value="Decarbonization" checked> Decarbonization</label>
+                  <label class="lab-checkbox"><input type="checkbox" value="AI Compute Demand"> AI Compute</label>
+                  <label class="lab-checkbox"><input type="checkbox" value="Supply Chain Sovereignty"> Supply Chain</label>
+                  <label class="lab-checkbox"><input type="checkbox" value="Aging Demographics"> Aging Demographics</label>
+                  <label class="lab-checkbox"><input type="checkbox" value="Data Privacy"> Data Privacy</label>
+                  <label class="lab-checkbox"><input type="checkbox" value="Quantum Advantage"> Quantum Advantage</label>
+                </div>
+              </div>
+            </div>
+            <div class="lab-actions">
+              <button class="btn-primary" id="btnDiscover" onclick="discoverWhitespaces()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/></svg>
+                Discover Whitespaces
+              </button>
+            </div>
+            <div id="labDiscoverResults"></div>
+          </div>
+
+          <!-- Ranking Card -->
+          <div class="lab-card">
+            <div class="lab-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>
+              WhiteSpace Ranking Engine
+            </div>
+            <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Select 2–10 whitespaces from the Explorer table using checkboxes, then rank them with AI.</p>
+            <div class="lab-actions">
+              <button class="btn-primary" id="btnRank" onclick="rankWhitespaces()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>
+                Rank Selected (<span id="selectedCount">0</span>)
+              </button>
+            </div>
+            <div id="labRankResults"></div>
+          </div>
+
+          <!-- ═══ Workflow 2 Editor ═══ -->
+          <div class="lab-card" id="wf2EditorCard">
+            <div class="lab-card-title" style="display:flex;justify-content:space-between;align-items:center">
+              <div style="display:flex;align-items:center;gap:8px">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                Workflow 2 — Whitespace Discovery Pipeline
+              </div>
+              <div style="display:flex;gap:6px;align-items:center">
+                <span class="wf2-version-badge" id="wf2VersionBadge">v1</span>
+                <button class="btn-secondary" style="padding:4px 10px;font-size:10px" onclick="wf2Reset()">Reset</button>
+                <button class="btn-primary" style="padding:4px 12px;font-size:11px" onclick="wf2Save()">Save Workflow</button>
+              </div>
+            </div>
+            <div class="wf2-meta-strip">
+              <span class="stat-pill">&#128260; 10 Steps</span>
+              <span class="stat-pill">&#9200; Weekly Mon 08:00 UTC</span>
+              <span class="stat-pill">&#128176; $25 cost cap</span>
+              <span class="stat-pill">&#128274; Human gate at Step 8</span>
+              <span style="margin-left:auto;font-size:10px;color:var(--text-faint)">Drag steps to reorder &middot; Click to edit</span>
+            </div>
+
+            <!-- Run bar -->
+            <div class="wf2-run-bar">
+              <div class="wf2-run-field">
+                <label>Domain</label>
+                <input type="text" id="wf2Domain" placeholder="e.g., Solid-State Batteries, Neuromorphic Computing..." style="flex:1">
+              </div>
+              <button class="btn-primary" id="btnRunWf2" onclick="wf2Run()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polygon points="5,3 13,8 5,13"/></svg>
+                Run Pipeline
+              </button>
+            </div>
+            <div id="wf2RunStatus"></div>
+
+            <!-- Step canvas -->
+            <div class="wf2-canvas-wrap" id="wf2CanvasWrap">
+              <div class="wf2-canvas" id="wf2Canvas"></div>
+            </div>
+
+            <!-- Properties panel (slides in from right) -->
+            <div class="wf2-props" id="wf2Props">
+              <div class="wf2-props-header">
+                <span class="wf2-props-title" id="wf2PropTitle">Step Properties</span>
+                <button class="wf2-props-close" onclick="wf2CloseProps()">&times;</button>
+              </div>
+              <div class="wf2-props-body" id="wf2PropBody"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──── TAB: COMPETITIVE ──── -->
+    <div class="tab-panel" id="tab-competitive">
+      <div class="comp-layout">
+        <div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text)">Competitive Patent Landscape</div>
+            <div style="font-size:11px;color:var(--text-muted)">Portfolio strength by CPC subclass</div>
+          </div>
+        </div>
+        <div class="comp-heatmap" id="compHeatmap"></div>
+      </div>
+    </div>
+
+    <!-- ──── TAB: FILING STRATEGY ──── -->
+    <div class="tab-panel" id="tab-filing">
+      <div class="filing-layout">
+        <div style="padding:16px 16px 0;display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text)">Filing Strategy Timeline</div>
+            <div style="font-size:11px;color:var(--text-muted)">Recommended prosecution cascade 2026–2030</div>
+          </div>
+        </div>
+        <div class="filing-timeline" id="filingTimeline"></div>
+      </div>
+    </div>
+
+    <!-- ═══ GUIDE PANEL ═══ -->
+    <div class="guide-panel" id="guidePanel">
+      <div class="guide-header">
+        <span class="guide-title">Detail Panel</span>
+        <button class="guide-close" onclick="toggleGuidePanel()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="guide-body" id="guideBody">
+        <div class="guide-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6" opacity="0.5"/><circle cx="12" cy="12" r="2"/></svg>
+          <p>Select a whitespace from the table or visualization to view detailed intelligence.</p>
+        </div>
+      </div>
+      <div class="guide-disclaimer">Data reflects strategic modeling estimates. Validate against USPTO PAIR, Espacenet, and Google Patents before operational decisions.</div>
+    </div>
+    <button class="guide-toggle" id="guideToggle" onclick="toggleGuidePanel()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- Tooltip -->
+<div class="ws-tooltip" id="wsTooltip"></div>
+
+<!-- CPC Taxonomy -->
+<script src="../cpc-taxonomy.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   PATENTIFY WHITESPACES — CORE APPLICATION
+   ═══════════════════════════════════════════════════════════════ */
+'use strict';
+
+/* ─── SEED DATA ─── */
+const SEED_WHITESPACES = [
+  {id:"WS-H01-001",name:"Universal Solid-State Electrolyte Interface",cpcSection:"H",cpcClass:"H01",cpcSubclass:"H01M",cpcGroups:["H01M10/052","H01M10/056","H01M4/62"],description:"High interfacial resistance at solid-solid electrode/electrolyte boundaries remains the critical bottleneck in solid-state battery commercialization. Current solutions are chemistry-specific. This whitespace targets universal, chemistry-agnostic interface engineering platforms applicable across sulfide, oxide, and halide electrolyte families.",challenges:[{id:"CH-001",title:"Interfacial Resistance",severity:5,type:"technical",description:"Solid-solid contacts generate 2-10x higher impedance than liquid electrolyte equivalents, limiting power density and cycle life.",relatedCpcGroups:["H01M10/052"],affectedIndustries:["EV","Grid Storage"],currentApproaches:["Chemistry-specific coatings","High-pressure processing"]},{id:"CH-002",title:"Mechanical Instability During Cycling",severity:4,type:"technical",description:"Volume changes in cathode materials cause contact loss, delamination, and crack propagation through brittle solid electrolytes.",relatedCpcGroups:["H01M4/62"],affectedIndustries:["EV","Consumer Electronics"],currentApproaches:["Composite electrolytes","Elastic interlayers"]}],solutions:[{id:"SOL-001",title:"Gradient Compliance Interlayer",challengeIds:["CH-001","CH-002"],novelty:9,feasibility:7,patentabilityScore:8,description:"A mechanically-compliant gradient interlayer with continuously varying elastic modulus that self-adapts to volume changes during cycling.",claimSketch:"A solid-state battery comprising: a cathode; an anode; a solid electrolyte; and a gradient interlayer disposed between said electrolyte and at least one electrode, wherein the interlayer comprises a continuously varying composition providing a gradient in elastic modulus from a first value matching the electrode to a second value matching the electrolyte.",cpcClassification:"H01M10/052",priorArtRisk:"medium",estimatedTRL:4,filingPriority:1},{id:"SOL-002",title:"Self-Healing Interface Polymer",challengeIds:["CH-002"],novelty:8,feasibility:6,patentabilityScore:7,description:"A self-healing polymer network at the electrode-electrolyte interface that autonomously repairs micro-cracks formed during cycling.",claimSketch:"A method of maintaining interface integrity in a solid-state electrochemical cell, comprising: incorporating a dynamic covalent polymer network at the electrode-electrolyte interface, wherein said network undergoes reversible bond exchange in response to mechanical stress.",cpcClassification:"H01M10/056",priorArtRisk:"low",estimatedTRL:3,filingPriority:2}],tamEstimate:180000,filingDensity:"low",academicDensity:"high",whitespaceScore:9.2,ftoRisk:"moderate",patentabilityRisk:{alice101:2,enablement112:5,priorArt102:4},competitorPresence:[{name:"Toyota",portfolioStrength:8,filingVelocity:7},{name:"QuantumScape",portfolioStrength:6,filingVelocity:8},{name:"Samsung SDI",portfolioStrength:7,filingVelocity:6}],jurisdictions:{USPTO:"active",EPO:"active",CNIPA:"active",JPO:"monitoring",KIPO:"monitoring"},trl:4,industries:["EV","Grid Storage","Aerospace","Medical","Consumer Electronics","Defense"],convergenceZones:["CZ-1","CZ-5"],macroDrivers:["Decarbonization","Solid-State Battery Maturation"],filingStrategy:{phase:"Phase 1",priority:1,provisionalCount:8,pctTarget:true},createdBy:"seed",createdAt:"2026-01-15T00:00:00Z",rank:1},
+  {id:"WS-H01-002",name:"Circular & Earth-Abundant Electronic Materials",cpcSection:"H",cpcClass:"H01",cpcSubclass:"H01L",cpcGroups:["H01L21/02","H01L29/16"],description:"Semiconductor supply chains depend critically on rare earth elements and conflict minerals. This whitespace targets AI-driven discovery of earth-abundant alternative materials for electronic applications.",challenges:[{id:"CH-003",title:"Performance Gap",severity:4,type:"technical",description:"Earth-abundant materials typically show 30-50% lower electron mobility compared to traditional semiconductor materials.",relatedCpcGroups:["H01L29/16"],affectedIndustries:["Semiconductor","Automotive"],currentApproaches:["Doping optimization","Nanostructuring"]},{id:"CH-004",title:"Manufacturing Compatibility",severity:3,type:"commercial",description:"New materials must integrate with existing fab processes to achieve economic viability.",relatedCpcGroups:["H01L21/02"],affectedIndustries:["Semiconductor"],currentApproaches:["Drop-in replacement strategies"]}],solutions:[{id:"SOL-003",title:"GNN-Accelerated Materials Screening",challengeIds:["CH-003"],novelty:8,feasibility:8,patentabilityScore:7,description:"Graph neural network pipeline for screening earth-abundant crystal structures against target electronic properties.",claimSketch:"A computer-implemented method for identifying semiconductor materials comprising: receiving a target set of electronic properties; encoding candidate crystal structures as molecular graphs; processing said graphs through a trained graph neural network to predict electronic band structure; and ranking candidates by proximity to target properties.",cpcClassification:"G16C",priorArtRisk:"medium",estimatedTRL:5,filingPriority:1}],tamEstimate:300000,filingDensity:"very_low",academicDensity:"medium",whitespaceScore:9.0,ftoRisk:"low",patentabilityRisk:{alice101:4,enablement112:3,priorArt102:3},competitorPresence:[{name:"CATL",portfolioStrength:5,filingVelocity:8},{name:"Apple",portfolioStrength:4,filingVelocity:6}],jurisdictions:{USPTO:"active",EPO:"monitoring",CNIPA:"active",JPO:"none",KIPO:"none"},trl:4,industries:["Semiconductor","Battery Mfg","Motor/Actuator","Consumer Electronics","Automotive"],convergenceZones:["CZ-9"],macroDrivers:["Decarbonization","Supply Chain Sovereignty"],filingStrategy:{phase:"Phase 1",priority:2,provisionalCount:6,pctTarget:true},createdBy:"seed",createdAt:"2026-01-15T00:00:00Z",rank:2},
+  {id:"WS-G06-001",name:"Neuromorphic Computing Substrate & Architecture",cpcSection:"G",cpcClass:"G06",cpcSubclass:"G06N",cpcGroups:["G06N3/063","G06N3/049"],description:"Traditional von Neumann architectures face fundamental energy efficiency limits for AI workloads. Neuromorphic computing substrates that process information using brain-inspired spiking neural networks represent a paradigm shift in computing architecture.",challenges:[{id:"CH-005",title:"Scalable Fabrication",severity:4,type:"technical",description:"Current neuromorphic chips are limited to ~1M neurons. Scaling to biologically relevant densities requires novel 3D integration techniques.",relatedCpcGroups:["G06N3/063"],affectedIndustries:["Edge Computing","Robotics"],currentApproaches:["2.5D packaging","Monolithic 3D"]}],solutions:[{id:"SOL-004",title:"Hybrid Analog-Digital Neuromorphic Fabric",challengeIds:["CH-005"],novelty:8,feasibility:6,patentabilityScore:8,description:"A reconfigurable computing fabric combining analog synaptic weights with digital spike routing for scalable neuromorphic processing.",claimSketch:"A neuromorphic computing device comprising: an array of analog synaptic weight elements arranged in a crossbar configuration; a digital spike routing network; and a reconfiguration controller that dynamically maps neural network topologies onto the physical substrate.",cpcClassification:"G06N3/063",priorArtRisk:"medium",estimatedTRL:3,filingPriority:1}],tamEstimate:200000,filingDensity:"low",academicDensity:"high",whitespaceScore:8.8,ftoRisk:"low_moderate",patentabilityRisk:{alice101:3,enablement112:4,priorArt102:5},competitorPresence:[{name:"Intel",portfolioStrength:9,filingVelocity:7},{name:"IBM",portfolioStrength:8,filingVelocity:6}],jurisdictions:{USPTO:"active",EPO:"active",CNIPA:"monitoring",JPO:"active",KIPO:"monitoring"},trl:3,industries:["Edge Computing","Autonomous Vehicles","Robotics","IoT","Aerospace"],convergenceZones:["CZ-3"],macroDrivers:["AI Compute Demand Explosion","Moore's Law Physical Limits"],filingStrategy:{phase:"Phase 1",priority:3,provisionalCount:5,pctTarget:true},createdBy:"seed",createdAt:"2026-01-15T00:00:00Z",rank:3},
+  {id:"WS-C12-001",name:"Cell-Free Biomanufacturing Process Platforms",cpcSection:"C",cpcClass:"C12",cpcSubclass:"C12P",cpcGroups:["C12P21/02","C12P7/04"],description:"Traditional cell-based biomanufacturing is slow, contamination-prone, and limited by cell viability constraints. Cell-free systems using purified enzyme cascades can operate under conditions toxic to living cells, enabling novel synthetic pathways.",challenges:[{id:"CH-006",title:"Enzyme Stability",severity:4,type:"technical",description:"Purified enzymes degrade rapidly outside cellular environments, limiting reaction duration and yield.",relatedCpcGroups:["C12P21/02"],affectedIndustries:["Pharma","Chemical Mfg"],currentApproaches:["Enzyme immobilization","Thermophilic variants"]}],solutions:[{id:"SOL-005",title:"Compartmentalized Enzyme Cascade Reactor",challengeIds:["CH-006"],novelty:8,feasibility:7,patentabilityScore:8,description:"A microfluidic reactor with distinct enzyme compartments connected by selective membranes, mimicking cellular organelle organization.",claimSketch:"A cell-free biomanufacturing system comprising: a plurality of fluidically connected reaction compartments, each containing one or more immobilized enzymes; selective membranes between compartments permitting passage of reaction intermediates while retaining enzymes; and a flow control system maintaining optimal conditions in each compartment independently.",cpcClassification:"C12P21/02",priorArtRisk:"low",estimatedTRL:4,filingPriority:1}],tamEstimate:120000,filingDensity:"very_low",academicDensity:"high",whitespaceScore:8.6,ftoRisk:"low",patentabilityRisk:{alice101:1,enablement112:4,priorArt102:3},competitorPresence:[{name:"Sutro Biopharma",portfolioStrength:6,filingVelocity:5}],jurisdictions:{USPTO:"active",EPO:"monitoring",CNIPA:"none",JPO:"none",KIPO:"none"},trl:4,industries:["Pharma","Chemical Mfg","Agriculture","Food & Beverage","Defense"],convergenceZones:["CZ-4"],macroDrivers:["CRISPR/Gene Editing Revolution"],filingStrategy:{phase:"Phase 1",priority:4,provisionalCount:4,pctTarget:true},createdBy:"seed",createdAt:"2026-01-15T00:00:00Z",rank:4},
+  {id:"WS-H01-003",name:"Universal Thermal Interface Materials",cpcSection:"H",cpcClass:"H01",cpcSubclass:"H01L",cpcGroups:["H01L23/373","H05K7/20"],description:"As semiconductor power densities increase, thermal management becomes the critical limiter. Current thermal interface materials (TIMs) offer a tradeoff between thermal conductivity and mechanical compliance.",challenges:[{id:"CH-007",title:"Thermal-Mechanical Tradeoff",severity:5,type:"technical",description:"High-conductivity materials are rigid; compliant materials are poor thermal conductors. No material simultaneously excels at both.",relatedCpcGroups:["H01L23/373"],affectedIndustries:["Semiconductor","Data Centers"],currentApproaches:["Phase-change materials","Liquid metal TIMs"]}],solutions:[{id:"SOL-006",title:"Hierarchical Carbon Nanotube Forest TIM",challengeIds:["CH-007"],novelty:7,feasibility:6,patentabilityScore:7,description:"Vertically aligned CNT forests with graded density providing both high through-plane conductivity and lateral compliance.",claimSketch:"A thermal interface material comprising: a vertically aligned carbon nanotube forest having a density gradient from a first density at a base surface to a second lower density at a contact surface, wherein the gradient provides anisotropic thermal conductivity exceeding 100 W/mK through-plane while maintaining surface compliance below 50 MPa.",cpcClassification:"H01L23/373",priorArtRisk:"medium",estimatedTRL:3,filingPriority:2}],tamEstimate:250000,filingDensity:"low",academicDensity:"high",whitespaceScore:8.5,ftoRisk:"moderate",patentabilityRisk:{alice101:1,enablement112:5,priorArt102:4},competitorPresence:[{name:"Intel",portfolioStrength:8,filingVelocity:7},{name:"Dow Chemical",portfolioStrength:6,filingVelocity:5}],jurisdictions:{USPTO:"active",EPO:"active",CNIPA:"monitoring",JPO:"monitoring",KIPO:"none"},trl:3,industries:["Semiconductor","EV Battery","Power Electronics","Data Centers","Quantum"],convergenceZones:["CZ-5"],macroDrivers:["AI Compute Demand Explosion","Moore's Law Physical Limits"],filingStrategy:{phase:"Phase 1",priority:5,provisionalCount:4,pctTarget:true},createdBy:"seed",createdAt:"2026-01-15T00:00:00Z",rank:5},
+  {id:"WS-G06-002",name:"Quantum Error Correction Hardware Primitives",cpcSection:"G",cpcClass:"G06",cpcSubclass:"G06N",cpcGroups:["G06N10/70","G06N10/40"],description:"Quantum computers require error correction to achieve fault-tolerant operation. Current QEC approaches require 1000+ physical qubits per logical qubit, making practical quantum computing infeasible without hardware-level innovations in error correction primitives.",challenges:[{id:"CH-008",title:"Qubit Overhead",severity:5,type:"technical",description:"Surface code QEC requires ~1000 physical qubits per logical qubit, demanding millions of qubits for useful computations.",relatedCpcGroups:["G06N10/70"],affectedIndustries:["Quantum Computing"],currentApproaches:["Surface codes","Bosonic codes"]}],solutions:[{id:"SOL-007",title:"Hardware-Native QEC with Bosonic Modes",challengeIds:["CH-008"],novelty:9,feasibility:5,patentabilityScore:8,description:"Encoding logical qubits directly in bosonic modes of superconducting cavities, achieving error correction with 10-100x fewer physical components.",claimSketch:"A quantum error correction system comprising: a superconducting microwave cavity supporting a multi-photon bosonic mode; a transmon ancilla qubit coupled to said cavity; and a real-time feedback controller that performs autonomous error correction by measuring photon number parity and applying conditional displacement operations.",cpcClassification:"G06N10/70",priorArtRisk:"low",estimatedTRL:3,filingPriority:1}],tamEstimate:97000,filingDensity:"low",academicDensity:"very_high",whitespaceScore:8.4,ftoRisk:"moderate",patentabilityRisk:{alice101:2,enablement112:6,priorArt102:3},competitorPresence:[{name:"IBM",portfolioStrength:9,filingVelocity:8},{name:"Google",portfolioStrength:8,filingVelocity:9}],jurisdictions:{USPTO:"active",EPO:"monitoring",CNIPA:"none",JPO:"monitoring",KIPO:"none"},trl:3,industries:["Quantum Computing","Cloud","Pharma R&D","Financial","Defense"],convergenceZones:["CZ-6"],macroDrivers:["Quantum Advantage Demonstrations"],filingStrategy:{phase:"Phase 2",priority:6,provisionalCount:3,pctTarget:true},createdBy:"seed",createdAt:"2026-01-15T00:00:00Z",rank:6},
+  {id:"WS-B33-001",name:"Multi-Material Additive Manufacturing Process Control",cpcSection:"B",cpcClass:"B33",cpcSubclass:"B33Y",cpcGroups:["B33Y10/00","B33Y50/02"],description:"Current additive manufacturing systems are limited to single-material or simple multi-material builds. True multi-material AM with real-time process control enables functionally graded parts with spatially varying mechanical, thermal, and electrical properties.",challenges:[{id:"CH-009",title:"Inter-Material Bond Strength",severity:4,type:"technical",description:"Dissimilar material interfaces in AM builds exhibit weak bonding due to thermal expansion mismatch and poor diffusion.",relatedCpcGroups:["B33Y10/00"],affectedIndustries:["Aerospace","Medical Devices"],currentApproaches:["Gradient transitions","Post-processing HIP"]}],solutions:[{id:"SOL-008",title:"AI-Controlled Gradient Transition Zone",challengeIds:["CH-009"],novelty:8,feasibility:7,patentabilityScore:8,description:"Real-time AI control of laser parameters to create optimized gradient transition zones between dissimilar materials during multi-material AM.",claimSketch:"A method of additive manufacturing a multi-material component, comprising: depositing a first material; monitoring the deposition zone with an in-situ sensor array; computing, by a trained neural network, optimal laser parameters for a transition zone; and depositing a gradient composition transitioning to a second material under said computed parameters.",cpcClassification:"B33Y50/02",priorArtRisk:"medium",estimatedTRL:4,filingPriority:1}],tamEstimate:180000,filingDensity:"low",academicDensity:"medium",whitespaceScore:8.3,ftoRisk:"low_moderate",patentabilityRisk:{alice101:2,enablement112:3,priorArt102:4},competitorPresence:[{name:"GE Aerospace",portfolioStrength:7,filingVelocity:6}],jurisdictions:{USPTO:"active",EPO:"active",CNIPA:"monitoring",JPO:"none",KIPO:"none"},trl:4,industries:["Aerospace","Medical Devices","Automotive","Energy","Defense"],convergenceZones:["CZ-7"],macroDrivers:["Supply Chain Sovereignty"],filingStrategy:{phase:"Phase 1",priority:7,provisionalCount:4,pctTarget:true},createdBy:"seed",createdAt:"2026-01-15T00:00:00Z",rank:7},
+  {id:"WS-G06-003",name:"Federated Learning & Privacy-Preserving Edge AI",cpcSection:"G",cpcClass:"G06",cpcSubclass:"G06N",cpcGroups:["G06N20/00","G06F21/62"],description:"As AI moves to the edge, privacy-preserving machine learning becomes critical. Federated learning enables model training across distributed devices without centralizing sensitive data.",challenges:[{id:"CH-010",title:"Communication Efficiency",severity:3,type:"technical",description:"Federated learning requires frequent model updates between devices and servers, creating bandwidth bottlenecks.",relatedCpcGroups:["G06N20/00"],affectedIndustries:["Healthcare","Autonomous Vehicles"],currentApproaches:["Gradient compression","Asynchronous updates"]}],solutions:[{id:"SOL-009",title:"Sparse Federated Distillation",challengeIds:["CH-010"],novelty:7,feasibility:8,patentabilityScore:7,description:"Knowledge distillation-based federated learning that communicates compact model summaries instead of full gradients.",claimSketch:"A federated learning method comprising: training local models on distributed devices; distilling each local model into a compressed representation; transmitting said compressed representations to an aggregation server; and updating a global model by aggregating the distilled representations.",cpcClassification:"G06N20/00",priorArtRisk:"medium",estimatedTRL:5,filingPriority:2}],tamEstimate:168000,filingDensity:"low",academicDensity:"very_high",whitespaceScore:8.1,ftoRisk:"low",patentabilityRisk:{alice101:5,enablement112:2,priorArt102:5},competitorPresence:[{name:"Google",portfolioStrength:9,filingVelocity:9},{name:"Apple",portfolioStrength:7,filingVelocity:7}],jurisdictions:{USPTO:"active",EPO:"active",CNIPA:"active",JPO:"monitoring",KIPO:"none"},trl:5,industries:["Healthcare","Autonomous Vehicles","Industrial Mfg","Smart Cities"],convergenceZones:["CZ-3"],macroDrivers:["Data Privacy Regulation","AI Compute Demand Explosion"],filingStrategy:{phase:"Phase 2",priority:8,provisionalCount:3,pctTarget:false},createdBy:"seed",createdAt:"2026-01-15T00:00:00Z",rank:8},
+  {id:"WS-H01-004",name:"Cryogenic Control Electronics for Quantum Processors",cpcSection:"H",cpcClass:"H01",cpcSubclass:"H01L",cpcGroups:["H01L27/18","H03K19/195"],description:"Quantum processors operate at millikelvin temperatures but are controlled by room-temperature electronics connected via massive wiring harnesses. Cryogenic control electronics operating at 4K would eliminate this bottleneck.",challenges:[{id:"CH-011",title:"Power Dissipation at 4K",severity:5,type:"technical",description:"Cooling budget at 4K stage is extremely limited. Control electronics must operate at microwatt power levels.",relatedCpcGroups:["H01L27/18"],affectedIndustries:["Quantum Computing"],currentApproaches:["Cryo-CMOS","SFQ logic"]}],solutions:[{id:"SOL-010",title:"Cryo-CMOS Multiplexed Qubit Controller",challengeIds:["CH-011"],novelty:8,feasibility:6,patentabilityScore:8,description:"A CMOS-based qubit controller IC designed for 4K operation using frequency-multiplexed control of multiple qubits from a single output channel.",claimSketch:"An integrated circuit for quantum processor control, designed to operate at cryogenic temperatures below 10K, comprising: a frequency-multiplexed signal generator producing N distinct microwave tones; a demultiplexer distributing said tones to N qubit control lines; wherein total power dissipation is less than 1 milliwatt per controlled qubit.",cpcClassification:"H01L27/18",priorArtRisk:"low",estimatedTRL:3,filingPriority:1}],tamEstimate:97000,filingDensity:"very_low",academicDensity:"high",whitespaceScore:8.0,ftoRisk:"low",patentabilityRisk:{alice101:1,enablement112:5,priorArt102:2},competitorPresence:[{name:"Intel",portfolioStrength:7,filingVelocity:5}],jurisdictions:{USPTO:"monitoring",EPO:"none",CNIPA:"none",JPO:"none",KIPO:"none"},trl:3,industries:["Quantum Computing","Cryogenic Instruments","Aerospace","Particle Physics"],convergenceZones:["CZ-6"],macroDrivers:["Quantum Advantage Demonstrations"],filingStrategy:{phase:"Phase 2",priority:9,provisionalCount:3,pctTarget:true},createdBy:"seed",createdAt:"2026-01-15T00:00:00Z",rank:9},
+  {id:"WS-A61-001",name:"Bio-Electronic Neural Interfaces (Non-Implantable)",cpcSection:"A",cpcClass:"A61",cpcSubclass:"A61B",cpcGroups:["A61B5/0478","A61B5/291"],description:"Non-invasive neural interfaces for brain-computer interaction using advanced EEG, fNIRS, and ultrasonic sensing modalities. Avoids surgical implantation risks while enabling consumer and clinical applications.",challenges:[{id:"CH-012",title:"Signal-to-Noise Ratio",severity:4,type:"technical",description:"Non-invasive sensors suffer from poor SNR compared to implanted electrodes, limiting spatial and temporal resolution.",relatedCpcGroups:["A61B5/0478"],affectedIndustries:["Consumer Electronics/VR","Medical Devices"],currentApproaches:["High-density EEG arrays","AI signal processing"]}],solutions:[{id:"SOL-011",title:"Multi-Modal Sensor Fusion BCI",challengeIds:["CH-012"],novelty:7,feasibility:7,patentabilityScore:7,description:"Combining EEG, fNIRS, and focused ultrasound in a wearable headband with AI fusion algorithms to achieve near-implant-grade resolution.",claimSketch:"A non-invasive brain-computer interface device comprising: a wearable headband housing an array of EEG electrodes, fNIRS optodes, and focused ultrasound transducers; a multi-modal signal processing unit that fuses signals from all three modalities using a trained neural network; and a real-time intent decoder producing control outputs.",cpcClassification:"A61B5/0478",priorArtRisk:"medium",estimatedTRL:3,filingPriority:2}],tamEstimate:90000,filingDensity:"low",academicDensity:"high",whitespaceScore:7.9,ftoRisk:"low",patentabilityRisk:{alice101:3,enablement112:4,priorArt102:4},competitorPresence:[{name:"Meta",portfolioStrength:6,filingVelocity:7}],jurisdictions:{USPTO:"active",EPO:"monitoring",CNIPA:"none",JPO:"none",KIPO:"none"},trl:3,industries:["Consumer Electronics/VR","Medical Devices","Defense","Gaming"],convergenceZones:["CZ-8"],macroDrivers:["Aging Demographics & Labor Shortages"],filingStrategy:{phase:"Phase 2",priority:10,provisionalCount:3,pctTarget:false},createdBy:"seed",createdAt:"2026-01-15T00:00:00Z",rank:10},
+  {id:"WS-G06-004",name:"Autonomous System Safety Verification",cpcSection:"G",cpcClass:"G06",cpcSubclass:"G06F",cpcGroups:["G06F11/36","G06F18/24"],description:"Formal verification of autonomous system behavior remains computationally intractable for real-world complexity. This whitespace targets AI-assisted formal methods that bridge the gap between exhaustive verification and practical time constraints.",challenges:[{id:"CH-013",title:"State Space Explosion",severity:5,type:"technical",description:"Real-world autonomous systems have effectively infinite state spaces that cannot be exhaustively explored.",relatedCpcGroups:["G06F11/36"],affectedIndustries:["Autonomous Vehicles","Drones"],currentApproaches:["Simulation-based testing","Bounded model checking"]}],solutions:[{id:"SOL-012",title:"Neural Certificate Generation",challengeIds:["CH-013"],novelty:9,feasibility:5,patentabilityScore:8,description:"Training neural networks to generate Lyapunov certificates that formally prove safety properties of autonomous controllers without exhaustive state enumeration.",claimSketch:"A method for verifying safety of an autonomous system controller, comprising: training a neural network to approximate a Lyapunov function over the system state space; verifying the neural Lyapunov function satisfies formal safety conditions using an SMT solver; and certifying the controller as safe within the verified domain.",cpcClassification:"G06F11/36",priorArtRisk:"low",estimatedTRL:3,filingPriority:1}],tamEstimate:180000,filingDensity:"very_low",academicDensity:"high",whitespaceScore:7.8,ftoRisk:"low",patentabilityRisk:{alice101:5,enablement112:3,priorArt102:2},competitorPresence:[],jurisdictions:{USPTO:"monitoring",EPO:"none",CNIPA:"none",JPO:"none",KIPO:"none"},trl:3,industries:["Autonomous Vehicles","Drones","Surgical Robotics","Defense"],convergenceZones:["CZ-7"],macroDrivers:["AI Compute Demand Explosion"],filingStrategy:{phase:"Phase 2",priority:11,provisionalCount:3,pctTarget:false},createdBy:"seed",createdAt:"2026-01-15T00:00:00Z",rank:11},
+  {id:"WS-H01-005",name:"Wide-Bandgap Semiconductor Packaging",cpcSection:"H",cpcClass:"H01",cpcSubclass:"H01L",cpcGroups:["H01L23/00","H01L25/07"],description:"SiC and GaN power devices can operate at higher voltages and temperatures than silicon but require novel packaging solutions to realize their full potential.",challenges:[{id:"CH-014",title:"High-Temperature Interconnects",severity:4,type:"technical",description:"Traditional solder joints fail at WBG operating temperatures (250°C+). Novel interconnect technologies are needed.",relatedCpcGroups:["H01L23/00"],affectedIndustries:["EV","Renewable Energy"],currentApproaches:["Silver sintering","Transient liquid phase bonding"]}],solutions:[{id:"SOL-013",title:"Nano-Silver Mesh Interconnect",challengeIds:["CH-014"],novelty:7,feasibility:7,patentabilityScore:7,description:"3D-printed nano-silver mesh interconnects providing both electrical and thermal paths while accommodating CTE mismatch.",claimSketch:"A semiconductor package for wide-bandgap power devices comprising: a nano-porous silver mesh interconnect layer between the die and substrate, said mesh having a porosity gradient from 10% at bonding surfaces to 40% at the center.",cpcClassification:"H01L23/00",priorArtRisk:"medium",estimatedTRL:4,filingPriority:2}],tamEstimate:250000,filingDensity:"low",academicDensity:"medium",whitespaceScore:7.7,ftoRisk:"low",patentabilityRisk:{alice101:1,enablement112:3,priorArt102:4},competitorPresence:[{name:"Infineon",portfolioStrength:8,filingVelocity:7}],jurisdictions:{USPTO:"active",EPO:"active",CNIPA:"monitoring",JPO:"monitoring",KIPO:"none"},trl:4,industries:["EV","Renewable Energy","Industrial Motors","Grid Infrastructure"],convergenceZones:["CZ-5"],macroDrivers:["Decarbonization"],filingStrategy:{phase:"Phase 1",priority:12,provisionalCount:3,pctTarget:true},createdBy:"seed",createdAt:"2026-01-15T00:00:00Z",rank:12},
+  {id:"WS-C12-002",name:"Synthetic Biology Materials Discovery Pipeline",cpcSection:"C",cpcClass:"C12",cpcSubclass:"C12N",cpcGroups:["C12N15/10","C12N1/20"],description:"Engineered microorganisms can produce novel biomaterials with properties unachievable through traditional chemistry. This whitespace targets the computational pipeline from desired material property to engineered organism.",challenges:[{id:"CH-015",title:"Genotype-Phenotype Mapping",severity:4,type:"scientific",description:"Predicting material properties from genetic modifications remains unreliable. The design-build-test cycle is slow and expensive.",relatedCpcGroups:["C12N15/10"],affectedIndustries:["Construction","Textiles"],currentApproaches:["Directed evolution","Machine learning-guided design"]}],solutions:[{id:"SOL-014",title:"Foundation Model for Bio-Material Properties",challengeIds:["CH-015"],novelty:9,feasibility:5,patentabilityScore:7,description:"A large language model trained on genomic and material property datasets to predict how genetic modifications will affect material characteristics.",claimSketch:"A computer-implemented method for designing biological materials, comprising: receiving a target material property specification; encoding said specification into a latent representation; processing said representation through a foundation model trained on paired genomic-material datasets; and outputting a set of genetic modifications predicted to produce a material matching the target specification.",cpcClassification:"C12N15/10",priorArtRisk:"low",estimatedTRL:3,filingPriority:1}],tamEstimate:120000,filingDensity:"very_low",academicDensity:"medium",whitespaceScore:7.6,ftoRisk:"low",patentabilityRisk:{alice101:4,enablement112:5,priorArt102:2},competitorPresence:[],jurisdictions:{USPTO:"monitoring",EPO:"none",CNIPA:"none",JPO:"none",KIPO:"none"},trl:3,industries:["Construction","Textiles","Packaging","Automotive","Aerospace"],convergenceZones:["CZ-4"],macroDrivers:["CRISPR/Gene Editing Revolution","Decarbonization"],filingStrategy:{phase:"Phase 2",priority:13,provisionalCount:2,pctTarget:false},createdBy:"seed",createdAt:"2026-01-15T00:00:00Z",rank:13},
+  {id:"WS-H04-001",name:"Photonic Interconnect Standards & Interoperability",cpcSection:"H",cpcClass:"H04",cpcSubclass:"H04B",cpcGroups:["H04B10/25","H04B10/80"],description:"As data center bandwidth demands outpace electrical interconnect capabilities, photonic interconnects become critical. However, lack of interoperability standards fragments the market.",challenges:[{id:"CH-016",title:"Multi-Vendor Interop",severity:3,type:"commercial",description:"No universal standard exists for photonic interconnect protocols, creating vendor lock-in and integration complexity.",relatedCpcGroups:["H04B10/25"],affectedIndustries:["Data Centers","Telecom"],currentApproaches:["OIF specifications","CXL optical extensions"]}],solutions:[{id:"SOL-015",title:"Universal Photonic Protocol Adapter",challengeIds:["CH-016"],novelty:7,feasibility:8,patentabilityScore:7,description:"A protocol-agnostic photonic adapter that translates between vendor-specific optical signaling formats in real-time.",claimSketch:"A photonic interconnect adapter comprising: an optical input interface supporting a plurality of signaling formats; a programmable optical signal processor that translates between formats; and an output interface, enabling interoperability between photonic devices from different vendors without electrical conversion.",cpcClassification:"H04B10/25",priorArtRisk:"medium",estimatedTRL:4,filingPriority:2}],tamEstimate:150000,filingDensity:"medium",academicDensity:"high",whitespaceScore:7.5,ftoRisk:"moderate",patentabilityRisk:{alice101:2,enablement112:3,priorArt102:5},competitorPresence:[{name:"Intel",portfolioStrength:8,filingVelocity:7},{name:"Cisco",portfolioStrength:7,filingVelocity:6}],jurisdictions:{USPTO:"active",EPO:"active",CNIPA:"active",JPO:"active",KIPO:"monitoring"},trl:4,industries:["Data Centers","HPC","Telecom","AI/ML Infrastructure"],convergenceZones:["CZ-2"],macroDrivers:["AI Compute Demand Explosion","5G/6G Network Deployment"],filingStrategy:{phase:"Phase 2",priority:14,provisionalCount:3,pctTarget:true},createdBy:"seed",createdAt:"2026-01-15T00:00:00Z",rank:14},
+  {id:"WS-G06-005",name:"Quantum-Safe Cryptographic Hardware Accelerators",cpcSection:"G",cpcClass:"G06",cpcSubclass:"G06F",cpcGroups:["G06F21/72","H04L9/00"],description:"Post-quantum cryptographic (PQC) algorithms are significantly more computationally expensive than current algorithms. Hardware acceleration is essential for practical deployment.",challenges:[{id:"CH-017",title:"Lattice Computation Overhead",severity:3,type:"technical",description:"PQC lattice-based schemes require polynomial multiplication operations that are 10-100x slower than current RSA/ECC in software.",relatedCpcGroups:["G06F21/72"],affectedIndustries:["Cybersecurity","Financial"],currentApproaches:["NTT-based accelerators","FPGA implementations"]}],solutions:[{id:"SOL-016",title:"ASIC PQC Accelerator with Configurable Lattice Engine",challengeIds:["CH-017"],novelty:7,feasibility:7,patentabilityScore:7,description:"A dedicated ASIC implementing configurable NTT engines that can support multiple PQC algorithm families (CRYSTALS-Kyber, CRYSTALS-Dilithium, FALCON).",claimSketch:"A cryptographic hardware accelerator comprising: a configurable Number Theoretic Transform engine supporting variable polynomial degrees and moduli; a memory subsystem optimized for lattice polynomial operations; and a control interface supporting at least CRYSTALS-Kyber and CRYSTALS-Dilithium algorithm families.",cpcClassification:"G06F21/72",priorArtRisk:"medium",estimatedTRL:4,filingPriority:2}],tamEstimate:97000,filingDensity:"very_low",academicDensity:"high",whitespaceScore:7.4,ftoRisk:"low",patentabilityRisk:{alice101:2,enablement112:3,priorArt102:4},competitorPresence:[{name:"IBM",portfolioStrength:7,filingVelocity:6}],jurisdictions:{USPTO:"monitoring",EPO:"monitoring",CNIPA:"none",JPO:"none",KIPO:"none"},trl:4,industries:["Cybersecurity","Financial","Government","Healthcare","IoT"],convergenceZones:["CZ-6"],macroDrivers:["Quantum Advantage Demonstrations","Data Privacy Regulation"],filingStrategy:{phase:"Phase 2",priority:15,provisionalCount:2,pctTarget:false},createdBy:"seed",createdAt:"2026-01-15T00:00:00Z",rank:15}
+];
+
+/* ─── APPLICATION STATE ─── */
+const STATE = {
+  whitespaces: [...SEED_WHITESPACES],
+  selectedWs: null,
+  selectedChallenge: null,
+  selectedSolution: null,
+  selectedCpc: { section: null, cls: null, subclass: null },
+  filters: { section:'', score:'', density:'', fto:'', source:'', search:'' },
+  vizMode: 'sunburst',
+  checkedIds: new Set(),
+  sortCol: 'rank',
+  sortDir: 1,
+  tab: 'explorer'
+};
+
+/* ─── EVENT BUS ─── */
+const BUS = {};
+function on(evt, fn) { (BUS[evt] = BUS[evt] || []).push(fn); }
+function emit(evt, data) { (BUS[evt] || []).forEach(fn => fn(data)); }
+
+/* ─── THEME TOGGLE ─── */
+function toggleTheme() {
+  const html = document.documentElement;
+  const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', newTheme);
+  try { window.parent.postMessage({ type: 'theme-changed-by-child', theme: newTheme }, '*'); } catch(e) {}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TAB SWITCHING (LEFT SIDEBAR NAV)
+   ═══════════════════════════════════════════════════════════════ */
+function switchTab(tab) {
+  STATE.tab = tab;
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tab));
+  if (tab === 'visualizer') renderVisualization();
+  if (tab === 'competitive') renderCompetitive();
+  if (tab === 'filing') renderFiling();
+}
+
+/* ─── SIDEBAR COLLAPSE ─── */
+function toggleSidebar() {
+  document.getElementById('wsApp').classList.toggle('collapsed');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CPC TREE
+   ═══════════════════════════════════════════════════════════════ */
+function buildCpcTree() {
+  const tree = document.getElementById('cpcTree');
+  const sections = typeof CPC !== 'undefined' ? CPC.SECTIONS : {};
+  const classes = typeof CPC !== 'undefined' ? CPC.CLASSES : {};
+  const subclasses = typeof CPC !== 'undefined' ? CPC.SUBCLASSES : {};
+  let html = '';
+
+  // "All" node
+  const totalCount = STATE.whitespaces.length;
+  html += `<div class="cpc-node"><div class="cpc-node-row active" data-section="" onclick="selectCpc(null,null,null)"><span class="cpc-arrow leaf">&#9654;</span><span class="cpc-code" style="color:var(--text)">ALL</span><span class="cpc-label">All Sections</span><span class="cpc-count">${totalCount}</span></div></div>`;
+
+  Object.keys(sections).forEach(sec => {
+    const secCount = STATE.whitespaces.filter(w => w.cpcSection === sec).length;
+    if (secCount === 0 && !['A','B','C','G','H'].includes(sec)) return;
+    const secClasses = Object.keys(classes).filter(c => c.startsWith(sec));
+    html += `<div class="cpc-node">`;
+    html += `<div class="cpc-node-row" data-section="${sec}" onclick="toggleCpcNode(this,'sec-${sec}'); selectCpc('${sec}',null,null)"><span class="cpc-arrow ${secClasses.length?'':'leaf'}">&#9654;</span><span class="cpc-code">${sec}</span><span class="cpc-label">${sections[sec]}</span>${secCount?`<span class="cpc-count">${secCount}</span>`:''}</div>`;
+    if (secClasses.length) {
+      html += `<div class="cpc-children" id="sec-${sec}">`;
+      secClasses.forEach(cls => {
+        const clsCount = STATE.whitespaces.filter(w => w.cpcClass === cls).length;
+        const clsSubs = Object.keys(subclasses).filter(s => s.startsWith(cls));
+        html += `<div class="cpc-node">`;
+        html += `<div class="cpc-node-row" data-class="${cls}" onclick="toggleCpcNode(this,'cls-${cls}'); selectCpc('${sec}','${cls}',null)"><span class="cpc-arrow ${clsSubs.length?'':'leaf'}">&#9654;</span><span class="cpc-code">${cls}</span><span class="cpc-label">${(classes[cls]||'').substring(0,40)}</span>${clsCount?`<span class="cpc-count">${clsCount}</span>`:''}</div>`;
+        if (clsSubs.length) {
+          html += `<div class="cpc-children" id="cls-${cls}">`;
+          clsSubs.forEach(sub => {
+            const subCount = STATE.whitespaces.filter(w => w.cpcSubclass === sub).length;
+            html += `<div class="cpc-node"><div class="cpc-node-row" data-subclass="${sub}" onclick="selectCpc('${sec}','${cls}','${sub}')"><span class="cpc-arrow leaf">&#9654;</span><span class="cpc-code">${sub}</span><span class="cpc-label">${(subclasses[sub]||'').substring(0,35)}</span>${subCount?`<span class="cpc-count">${subCount}</span>`:''}</div></div>`;
+          });
+          html += `</div>`;
+        }
+        html += `</div>`;
+      });
+      html += `</div>`;
+    }
+    html += `</div>`;
+  });
+  tree.innerHTML = html;
+  // Populate section filter
+  const sel = document.getElementById('filterSection');
+  sel.innerHTML = '<option value="">All</option>' + Object.keys(sections).map(s => `<option value="${s}">${s}: ${sections[s]}</option>`).join('');
+  // Populate lab CPC scope
+  const labSel = document.getElementById('labCpcScope');
+  labSel.innerHTML = '<option value="">All Sections</option>' + Object.keys(sections).map(s => `<option value="${s}">${s}: ${sections[s]}</option>`).join('');
+}
+
+function toggleCpcNode(el, childId) {
+  const arrow = el.querySelector('.cpc-arrow');
+  const children = document.getElementById(childId);
+  if (children) {
+    children.classList.toggle('open');
+    arrow.classList.toggle('open');
+  }
+}
+
+function selectCpc(section, cls, subclass) {
+  STATE.selectedCpc = { section, cls, subclass };
+  document.querySelectorAll('.cpc-node-row').forEach(r => r.classList.remove('active'));
+  if (!section) {
+    document.querySelector('.cpc-node-row[data-section=""]').classList.add('active');
+  } else if (subclass) {
+    const el = document.querySelector(`.cpc-node-row[data-subclass="${subclass}"]`);
+    if (el) el.classList.add('active');
+  } else if (cls) {
+    const el = document.querySelector(`.cpc-node-row[data-class="${cls}"]`);
+    if (el) el.classList.add('active');
+  } else {
+    const el = document.querySelector(`.cpc-node-row[data-section="${section}"]`);
+    if (el) el.classList.add('active');
+  }
+  applyFilters();
+  emit('cpcChanged', STATE.selectedCpc);
+}
+
+function filterCpcTree(query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll('.cpc-node-row').forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.closest('.cpc-node').style.display = (!q || text.includes(q)) ? '' : 'none';
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FILTERS & TABLE
+   ═══════════════════════════════════════════════════════════════ */
+function getFiltered() {
+  let list = STATE.whitespaces;
+  const { section, cls, subclass } = STATE.selectedCpc;
+  if (subclass) list = list.filter(w => w.cpcSubclass === subclass);
+  else if (cls) list = list.filter(w => w.cpcClass === cls);
+  else if (section) list = list.filter(w => w.cpcSection === section);
+  const f = STATE.filters;
+  if (f.section) list = list.filter(w => w.cpcSection === f.section);
+  if (f.score) list = list.filter(w => w.whitespaceScore >= parseFloat(f.score));
+  if (f.density) list = list.filter(w => w.filingDensity === f.density);
+  if (f.fto) list = list.filter(w => w.ftoRisk === f.fto);
+  if (f.source) list = list.filter(w => w.createdBy === f.source);
+  if (f.search) {
+    const q = f.search.toLowerCase();
+    list = list.filter(w => w.name.toLowerCase().includes(q) || w.description.toLowerCase().includes(q) || w.cpcSubclass.toLowerCase().includes(q));
+  }
+  // Sort
+  list.sort((a, b) => {
+    let va = a[STATE.sortCol], vb = b[STATE.sortCol];
+    if (typeof va === 'string') return STATE.sortDir * va.localeCompare(vb);
+    return STATE.sortDir * ((va || 0) - (vb || 0));
+  });
+  return list;
+}
+
+function applyFilters() {
+  STATE.filters.section = document.getElementById('filterSection').value;
+  STATE.filters.score = document.getElementById('filterScore').value;
+  STATE.filters.density = document.getElementById('filterDensity').value;
+  STATE.filters.fto = document.getElementById('filterFto').value;
+  STATE.filters.source = document.getElementById('filterSource').value;
+  STATE.filters.search = document.getElementById('filterSearch').value;
+  renderTable();
+  renderKpis();
+}
+
+function renderKpis() {
+  const list = getFiltered();
+  const avgScore = list.length ? (list.reduce((s, w) => s + w.whitespaceScore, 0) / list.length).toFixed(1) : '—';
+  const totalTam = list.reduce((s, w) => s + (w.tamEstimate || 0), 0);
+  const veryLow = list.filter(w => w.filingDensity === 'very_low').length;
+  document.getElementById('kpiStrip').innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Whitespaces</div><div class="kpi-value">${list.length}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Avg Score</div><div class="kpi-value">${avgScore}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total TAM</div><div class="kpi-value">$${(totalTam/1000).toFixed(0)}B</div></div>
+    <div class="kpi-card"><div class="kpi-label">Very Low Density</div><div class="kpi-value">${veryLow}</div></div>`;
+  document.getElementById('wsCountBadge').textContent = STATE.whitespaces.length;
+}
+
+function renderTable() {
+  const cols = [
+    {key:'_check',label:'',w:'30px',sortable:false},
+    {key:'rank',label:'#',w:'40px'},
+    {key:'name',label:'Name',w:'auto'},
+    {key:'cpcSubclass',label:'CPC',w:'60px'},
+    {key:'whitespaceScore',label:'Score',w:'90px'},
+    {key:'tamEstimate',label:'TAM ($M)',w:'80px'},
+    {key:'filingDensity',label:'Filing',w:'70px'},
+    {key:'ftoRisk',label:'FTO',w:'70px'},
+    {key:'trl',label:'TRL',w:'60px'},
+    {key:'_challenges',label:'Ch.',w:'40px'},
+    {key:'_solutions',label:'Sol.',w:'40px'}
+  ];
+
+  document.getElementById('wsTableHead').innerHTML = '<tr>' + cols.map(c =>
+    c.sortable === false
+      ? `<th style="width:${c.w}">${c.label}</th>`
+      : `<th style="width:${c.w}" class="${STATE.sortCol===c.key?'sorted':''}" onclick="sortTable('${c.key}')">${c.label}<span class="sort-arrow">${STATE.sortCol===c.key?(STATE.sortDir===1?'▲':'▼'):'▲'}</span></th>`
+  ).join('') + '</tr>';
+
+  const list = getFiltered();
+  document.getElementById('wsTableBody').innerHTML = list.map(w => {
+    const scoreColor = w.whitespaceScore >= 8.5 ? 'var(--green)' : w.whitespaceScore >= 7.5 ? 'var(--cyan)' : w.whitespaceScore >= 6.5 ? 'var(--amber)' : 'var(--red)';
+    const scorePct = (w.whitespaceScore / 10 * 100).toFixed(0);
+    const trlDots = Array.from({length:9},(_, i) => `<div class="trl-dot ${i < w.trl ? 'filled' : ''}"></div>`).join('');
+    const isNew = w.createdBy === 'ai_generated' && Date.now() - new Date(w.createdAt).getTime() < 300000;
+    const checked = STATE.checkedIds.has(w.id) ? 'checked' : '';
+    return `<tr class="${STATE.selectedWs?.id === w.id ? 'selected' : ''} ${isNew ? 'new-item' : ''}" onclick="selectWhitespace('${w.id}')">
+      <td class="checkbox-cell" onclick="event.stopPropagation()"><input type="checkbox" ${checked} onchange="toggleCheck('${w.id}', this.checked)"></td>
+      <td style="color:var(--text-faint)">${w.rank}</td>
+      <td class="ws-name-cell">${w.name}${isNew ? '<span class="new-badge">NEW</span>' : ''}</td>
+      <td><span class="guide-cpc-badge" style="font-size:10px;padding:1px 5px">${w.cpcSubclass}</span></td>
+      <td><span class="score-bar"><span class="score-bar-fill" style="width:${scorePct}%;background:${scoreColor}"></span></span> ${w.whitespaceScore}</td>
+      <td style="text-align:right">${(w.tamEstimate/1000).toFixed(0)}B</td>
+      <td><span class="badge ${w.filingDensity}">${w.filingDensity.replace('_',' ')}</span></td>
+      <td><span class="badge ${w.ftoRisk}">${w.ftoRisk.replace('_',' ')}</span></td>
+      <td><div class="trl-gauge">${trlDots}</div></td>
+      <td style="text-align:center;color:var(--text-faint)">${w.challenges.length}</td>
+      <td style="text-align:center;color:var(--text-faint)">${w.solutions.length}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('selectedCount').textContent = STATE.checkedIds.size;
+}
+
+function sortTable(col) {
+  if (STATE.sortCol === col) STATE.sortDir *= -1;
+  else { STATE.sortCol = col; STATE.sortDir = 1; }
+  renderTable();
+}
+
+function toggleCheck(id, checked) {
+  if (checked) STATE.checkedIds.add(id); else STATE.checkedIds.delete(id);
+  document.getElementById('selectedCount').textContent = STATE.checkedIds.size;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GUIDE PANEL
+   ═══════════════════════════════════════════════════════════════ */
+function toggleGuidePanel() {
+  const panel = document.getElementById('guidePanel');
+  panel.classList.toggle('collapsed');
+  const toggle = document.getElementById('guideToggle');
+  toggle.querySelector('svg').innerHTML = panel.classList.contains('collapsed')
+    ? '<polyline points="9 18 15 12 9 6"/>'
+    : '<polyline points="15 18 9 12 15 6"/>';
+}
+
+function selectWhitespace(id) {
+  const ws = STATE.whitespaces.find(w => w.id === id);
+  if (!ws) return;
+  STATE.selectedWs = ws;
+  STATE.selectedChallenge = null;
+  STATE.selectedSolution = null;
+  renderTable();
+  renderGuidePanel(ws);
+  // Ensure guide panel is open
+  const panel = document.getElementById('guidePanel');
+  if (panel.classList.contains('collapsed')) toggleGuidePanel();
+}
+
+function renderGuidePanel(ws) {
+  const body = document.getElementById('guideBody');
+  const scoreColor = ws.whitespaceScore >= 8.5 ? 'var(--green)' : ws.whitespaceScore >= 7.5 ? 'var(--cyan)' : 'var(--amber)';
+  const circumference = 2 * Math.PI * 24;
+  const offset = circumference - (ws.whitespaceScore / 10) * circumference;
+
+  let html = `
+  <div class="guide-section" style="display:flex;align-items:flex-start;gap:14px">
+    <div style="flex:1">
+      <div class="guide-ws-name">${ws.name}</div>
+      <div style="margin-top:6px"><span class="guide-cpc-badge">${ws.cpcSubclass}</span><span class="badge ${ws.createdBy}" style="font-size:9px">${ws.createdBy.replace('_',' ')}</span></div>
+    </div>
+    <div class="guide-score-ring">
+      <svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="none" stroke="var(--border)" stroke-width="3"/><circle cx="28" cy="28" r="24" fill="none" stroke="${scoreColor}" stroke-width="3" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round" transform="rotate(-90 28 28)"/></svg>
+      <div class="guide-score-value">${ws.whitespaceScore}</div>
+    </div>
+  </div>
+  <div class="guide-section">
+    <div class="guide-section-title">Overview</div>
+    <div style="font-size:11px;color:var(--text-secondary);line-height:1.5">${ws.description.substring(0, 300)}${ws.description.length > 300 ? '...' : ''}</div>
+  </div>
+  <div class="guide-section">
+    <div class="guide-section-title">Key Metrics</div>
+    <div class="guide-metrics">
+      <div class="guide-metric"><div class="guide-metric-label">TAM</div><div class="guide-metric-value">$${(ws.tamEstimate/1000).toFixed(0)}B</div></div>
+      <div class="guide-metric"><div class="guide-metric-label">Filing Density</div><div class="guide-metric-value"><span class="badge ${ws.filingDensity}">${ws.filingDensity.replace('_',' ')}</span></div></div>
+      <div class="guide-metric"><div class="guide-metric-label">FTO Risk</div><div class="guide-metric-value"><span class="badge ${ws.ftoRisk}">${ws.ftoRisk.replace('_',' ')}</span></div></div>
+      <div class="guide-metric"><div class="guide-metric-label">TRL</div><div class="guide-metric-value">${ws.trl}/9</div></div>
+      <div class="guide-metric"><div class="guide-metric-label">§101 Alice Risk</div><div class="guide-metric-value"><div style="display:flex;align-items:center;gap:4px"><div class="guide-mini-bar"><div class="guide-mini-bar-fill" style="width:${ws.patentabilityRisk.alice101*10}%;background:${ws.patentabilityRisk.alice101>5?'var(--red)':'var(--green)'}"></div></div>${ws.patentabilityRisk.alice101}/10</div></div></div>
+      <div class="guide-metric"><div class="guide-metric-label">§112 Enablement</div><div class="guide-metric-value"><div style="display:flex;align-items:center;gap:4px"><div class="guide-mini-bar"><div class="guide-mini-bar-fill" style="width:${ws.patentabilityRisk.enablement112*10}%;background:${ws.patentabilityRisk.enablement112>5?'var(--red)':'var(--green)'}"></div></div>${ws.patentabilityRisk.enablement112}/10</div></div></div>
+    </div>
+  </div>
+  <div class="guide-section">
+    <div class="guide-section-title">Challenges (${ws.challenges.length})</div>
+    ${ws.challenges.map(ch => `
+      <div class="guide-challenge" onclick="this.classList.toggle('open')">
+        <div class="guide-challenge-title">
+          <div class="severity-dots">${Array.from({length:5},(_,i) => `<div class="severity-dot ${i < ch.severity ? 'filled' : ''}"></div>`).join('')}</div>
+          ${ch.title}
+          <span class="badge ${ch.type}" style="margin-left:auto;font-size:9px">${ch.type}</span>
+        </div>
+        <div class="guide-challenge-desc">${ch.description}
+          ${ws.solutions.filter(s => s.challengeIds.includes(ch.id)).map(sol => `
+            <div class="guide-solution">
+              <div class="guide-solution-title">${sol.title}</div>
+              <div class="guide-solution-scores">
+                <span>Novelty: ${sol.novelty}</span>
+                <span>Feasibility: ${sol.feasibility}</span>
+                <span>Patent: ${sol.patentabilityScore}</span>
+              </div>
+              <div class="guide-solution-claim">${sol.claimSketch}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('')}
+  </div>
+  <div class="guide-section">
+    <div class="guide-section-title">Jurisdictions</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      ${Object.entries(ws.jurisdictions).map(([j, s]) => `<span class="guide-tag" style="${s==='active'?'border-color:var(--green);color:var(--green)':s==='monitoring'?'border-color:var(--amber);color:var(--amber)':''}">${j}: ${s}</span>`).join('')}
+    </div>
+  </div>
+  <div class="guide-section">
+    <div class="guide-section-title">Target Industries</div>
+    <div class="guide-tags">${ws.industries.map(i => `<span class="guide-tag">${i}</span>`).join('')}</div>
+  </div>
+  <div class="guide-section">
+    <div class="guide-section-title">Competitors</div>
+    ${ws.competitorPresence.length ? ws.competitorPresence.map(c => `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="font-size:11px;color:var(--text);min-width:80px">${c.name}</span>
+        <div class="guide-mini-bar"><div class="guide-mini-bar-fill" style="width:${c.portfolioStrength*10}%;background:var(--cyan)"></div></div>
+        <span style="font-size:10px;color:var(--text-faint)">${c.portfolioStrength}/10</span>
+      </div>
+    `).join('') : '<div style="font-size:11px;color:var(--text-faint)">No significant competitors identified</div>'}
+  </div>
+  <div class="guide-section">
+    <div class="guide-section-title">Filing Strategy</div>
+    <div style="font-size:11px;color:var(--text-secondary)">
+      <div style="margin-bottom:4px"><strong>${ws.filingStrategy.phase}</strong> · Priority ${ws.filingStrategy.priority}</div>
+      <div>Provisionals planned: ${ws.filingStrategy.provisionalCount} · PCT: ${ws.filingStrategy.pctTarget ? 'Yes' : 'No'}</div>
+    </div>
+  </div>`;
+  body.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   VISUALIZATIONS
+   ═══════════════════════════════════════════════════════════════ */
+function switchVizMode(mode) {
+  STATE.vizMode = mode;
+  document.querySelectorAll('.viz-mode-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().includes(mode === 'force' ? 'network' : mode)));
+  renderVisualization();
+}
+
+function resetViz() {
+  STATE.selectedCpc = { section: null, cls: null, subclass: null };
+  renderVisualization();
+  updateVizBreadcrumb();
+}
+
+function updateVizBreadcrumb() {
+  const bc = document.getElementById('vizBreadcrumb');
+  const { section, cls, subclass } = STATE.selectedCpc;
+  let html = '<span onclick="selectCpc(null,null,null)" style="cursor:pointer">All CPC</span>';
+  if (section) {
+    const sections = typeof CPC !== 'undefined' ? CPC.SECTIONS : {};
+    html += '<span class="sep">›</span><span onclick="selectCpc(\'' + section + '\',null,null)">' + section + ': ' + (sections[section] || '') + '</span>';
+  }
+  if (cls) {
+    const classes = typeof CPC !== 'undefined' ? CPC.CLASSES : {};
+    html += '<span class="sep">›</span><span onclick="selectCpc(\'' + section + '\',\'' + cls + '\',null)">' + cls + '</span>';
+  }
+  if (subclass) html += '<span class="sep">›</span><span class="current">' + subclass + '</span>';
+  else if (cls) html += '';
+  else if (!section) html = '<span class="current">All CPC Sections</span>';
+  bc.innerHTML = html;
+}
+
+function renderVisualization() {
+  const canvas = document.getElementById('vizCanvas');
+  canvas.innerHTML = '';
+  updateVizBreadcrumb();
+
+  if (STATE.vizMode === 'sunburst') renderSunburst(canvas);
+  else if (STATE.vizMode === 'force') renderForceGraph(canvas);
+  else if (STATE.vizMode === 'sankey') renderSankeyFlow(canvas);
+
+  renderVizLegend();
+}
+
+function renderSunburst(container) {
+  const width = container.clientWidth || 800;
+  const height = container.clientHeight || 600;
+  const radius = Math.min(width, height) / 2 - 20;
+  const sections = typeof CPC !== 'undefined' ? CPC.SECTIONS : {};
+  const sectionColors = { A:'#EF4444', B:'#F97316', C:'#EAB308', D:'#84CC16', E:'#22C55E', F:'#14B8A6', G:'#06B6D4', H:'#8B5CF6', Y:'#EC4899' };
+
+  // Build hierarchy
+  const root = { name: 'CPC', children: [] };
+  Object.keys(sections).forEach(sec => {
+    const wsInSec = STATE.whitespaces.filter(w => w.cpcSection === sec);
+    if (wsInSec.length === 0) return;
+    const secNode = { name: sec + ': ' + sections[sec], section: sec, children: [] };
+    // Group by class
+    const classMap = {};
+    wsInSec.forEach(w => {
+      if (!classMap[w.cpcClass]) classMap[w.cpcClass] = [];
+      classMap[w.cpcClass].push(w);
+    });
+    Object.keys(classMap).forEach(cls => {
+      const clsNode = { name: cls, section: sec, children: classMap[cls].map(w => ({
+        name: w.name, ws: w, value: w.tamEstimate / 1000, section: sec
+      }))};
+      secNode.children.push(clsNode);
+    });
+    root.children.push(secNode);
+  });
+
+  const hierarchy = d3.hierarchy(root).sum(d => d.value || 0);
+  const partition = d3.partition().size([2 * Math.PI, radius]);
+  partition(hierarchy);
+
+  const svg = d3.select(container).append('svg')
+    .attr('viewBox', `${-width/2} ${-height/2} ${width} ${height}`)
+    .style('font-family', 'DM Sans, sans-serif');
+
+  const arc = d3.arc()
+    .startAngle(d => d.x0)
+    .endAngle(d => d.x1)
+    .innerRadius(d => d.y0)
+    .outerRadius(d => d.y1 - 1);
+
+  const g = svg.append('g');
+
+  g.selectAll('path')
+    .data(hierarchy.descendants().filter(d => d.depth > 0))
+    .join('path')
+    .attr('d', arc)
+    .attr('fill', d => {
+      const sec = d.data.section || (d.ancestors().find(a => a.data.section) || {}).data?.section;
+      if (d.data.ws) {
+        const score = d.data.ws.whitespaceScore;
+        return score >= 8.5 ? '#22C55E' : score >= 7.5 ? '#06B6D4' : score >= 6.5 ? '#D4A017' : '#EF4444';
+      }
+      const baseColor = sectionColors[sec] || '#64748B';
+      return d.depth === 1 ? baseColor : d3.color(baseColor).darker(0.3 * (d.depth - 1));
+    })
+    .attr('fill-opacity', d => d.data.ws ? 0.85 : 0.4)
+    .attr('stroke', 'var(--bg)')
+    .attr('stroke-width', 0.5)
+    .style('cursor', 'pointer')
+    .on('mouseover', function(event, d) {
+      d3.select(this).attr('fill-opacity', 1);
+      if (d.data.ws) showTooltip(event, d.data.ws);
+    })
+    .on('mouseout', function(event, d) {
+      d3.select(this).attr('fill-opacity', d.data.ws ? 0.85 : 0.4);
+      hideTooltip();
+    })
+    .on('click', function(event, d) {
+      if (d.data.ws) selectWhitespace(d.data.ws.id);
+      else if (d.data.section) selectCpc(d.data.section, null, null);
+    });
+
+  // Center label
+  svg.append('text')
+    .attr('text-anchor', 'middle')
+    .attr('dy', '-0.3em')
+    .attr('fill', 'var(--text)')
+    .attr('font-size', '14px')
+    .attr('font-weight', '600')
+    .text('CPC');
+  svg.append('text')
+    .attr('text-anchor', 'middle')
+    .attr('dy', '1em')
+    .attr('fill', 'var(--text-muted)')
+    .attr('font-size', '10px')
+    .text('Whitespace Map');
+}
+
+function renderForceGraph(container) {
+  const width = container.clientWidth || 800;
+  const height = container.clientHeight || 600;
+  const sections = typeof CPC !== 'undefined' ? CPC.SECTIONS : {};
+  const sectionColors = { A:'#EF4444', B:'#F97316', C:'#EAB308', D:'#84CC16', E:'#22C55E', F:'#14B8A6', G:'#06B6D4', H:'#8B5CF6', Y:'#EC4899' };
+
+  const nodes = [];
+  const links = [];
+  const sectionMap = {};
+
+  // Hub nodes for each section that has whitespaces
+  const usedSections = [...new Set(STATE.whitespaces.map(w => w.cpcSection))];
+  usedSections.forEach(sec => {
+    const node = { id: 'sec-' + sec, label: sec, type: 'hub', section: sec, r: 28 };
+    nodes.push(node);
+    sectionMap[sec] = node;
+  });
+
+  // Whitespace nodes
+  STATE.whitespaces.forEach(w => {
+    const r = Math.max(8, Math.sqrt(w.tamEstimate / 5000));
+    nodes.push({ id: w.id, label: w.name.substring(0, 20), type: 'whitespace', ws: w, section: w.cpcSection, r });
+    links.push({ source: 'sec-' + w.cpcSection, target: w.id, type: 'parent' });
+  });
+
+  // Cross-convergence edges
+  const czMap = {};
+  STATE.whitespaces.forEach(w => {
+    (w.convergenceZones || []).forEach(cz => {
+      if (!czMap[cz]) czMap[cz] = [];
+      czMap[cz].push(w.id);
+    });
+  });
+  Object.values(czMap).forEach(ids => {
+    for (let i = 0; i < ids.length; i++) {
+      for (let j = i + 1; j < ids.length; j++) {
+        links.push({ source: ids[i], target: ids[j], type: 'convergence' });
+      }
+    }
+  });
+
+  const svg = d3.select(container).append('svg')
+    .attr('viewBox', `0 0 ${width} ${height}`)
+    .style('font-family', 'DM Sans, sans-serif');
+
+  const g = svg.append('g');
+
+  const zoom = d3.zoom().scaleExtent([0.3, 5]).on('zoom', e => g.attr('transform', e.transform));
+  svg.call(zoom);
+
+  const simulation = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id).distance(d => d.type === 'convergence' ? 200 : 80))
+    .force('charge', d3.forceManyBody().strength(d => d.type === 'hub' ? -400 : -120))
+    .force('center', d3.forceCenter(width / 2, height / 2))
+    .force('collision', d3.forceCollide().radius(d => d.r + 4));
+
+  const link = g.selectAll('line')
+    .data(links)
+    .join('line')
+    .attr('stroke', d => d.type === 'convergence' ? 'rgba(139,92,246,0.3)' : 'rgba(148,163,184,0.15)')
+    .attr('stroke-width', d => d.type === 'convergence' ? 1.5 : 1)
+    .attr('stroke-dasharray', d => d.type === 'convergence' ? '4,4' : 'none');
+
+  const node = g.selectAll('g.node')
+    .data(nodes)
+    .join('g')
+    .attr('class', 'node')
+    .style('cursor', 'pointer')
+    .call(d3.drag()
+      .on('start', (e, d) => { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on('end', (e, d) => { if (!e.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; })
+    );
+
+  node.append('circle')
+    .attr('r', d => d.r)
+    .attr('fill', d => {
+      if (d.type === 'hub') return sectionColors[d.section] || '#64748B';
+      const score = d.ws?.whitespaceScore || 5;
+      return score >= 8.5 ? '#22C55E' : score >= 7.5 ? '#06B6D4' : score >= 6.5 ? '#D4A017' : '#EF4444';
+    })
+    .attr('fill-opacity', d => d.type === 'hub' ? 0.25 : 0.7)
+    .attr('stroke', d => {
+      if (d.type === 'hub') return sectionColors[d.section] || '#64748B';
+      return 'rgba(255,255,255,0.2)';
+    })
+    .attr('stroke-width', d => d.type === 'hub' ? 2 : 1);
+
+  // Hub labels
+  node.filter(d => d.type === 'hub')
+    .append('text')
+    .attr('text-anchor', 'middle')
+    .attr('dy', '0.35em')
+    .attr('fill', d => sectionColors[d.section])
+    .attr('font-size', '14px')
+    .attr('font-weight', '700')
+    .text(d => d.label);
+
+  // Whitespace labels
+  node.filter(d => d.type === 'whitespace')
+    .append('text')
+    .attr('dx', d => d.r + 4)
+    .attr('dy', '0.35em')
+    .attr('fill', 'var(--text-muted)')
+    .attr('font-size', '9px')
+    .text(d => d.label);
+
+  node.on('mouseover', function(event, d) {
+    if (d.ws) showTooltip(event, d.ws);
+  }).on('mouseout', hideTooltip)
+  .on('click', function(event, d) {
+    if (d.ws) selectWhitespace(d.ws.id);
+    else if (d.type === 'hub') selectCpc(d.section, null, null);
+  });
+
+  // Add glow to high-opportunity nodes
+  node.filter(d => d.ws && d.ws.whitespaceScore > 8.5 && d.ws.filingDensity === 'very_low')
+    .select('circle')
+    .classed('glow-pulse', true);
+
+  simulation.on('tick', () => {
+    link.attr('x1', d => d.source.x).attr('y1', d => d.source.y).attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    node.attr('transform', d => `translate(${d.x},${d.y})`);
+  });
+}
+
+function renderSankeyFlow(container) {
+  const width = container.clientWidth || 800;
+  const height = container.clientHeight || 600;
+  const margin = { top: 30, right: 30, bottom: 30, left: 30 };
+  const iw = width - margin.left - margin.right;
+  const ih = height - margin.top - margin.bottom;
+
+  const svg = d3.select(container).append('svg')
+    .attr('viewBox', `0 0 ${width} ${height}`)
+    .style('font-family', 'DM Sans, sans-serif');
+
+  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+  const sectionColors = { A:'#EF4444', B:'#F97316', C:'#EAB308', D:'#84CC16', E:'#22C55E', F:'#14B8A6', G:'#06B6D4', H:'#8B5CF6', Y:'#EC4899' };
+
+  // Build columns: CPC Subclass → Whitespace → Challenge → Solution
+  const colX = [0, iw * 0.25, iw * 0.55, iw * 0.85];
+  const ws = STATE.whitespaces.slice(0, 12); // Limit for readability
+  const nodeHeight = Math.min(24, (ih - 20) / Math.max(ws.length, 1));
+
+  // Draw whitespace column
+  ws.forEach((w, i) => {
+    const y = i * (nodeHeight + 4);
+    const color = sectionColors[w.cpcSection] || '#64748B';
+
+    // CPC subclass node
+    g.append('rect').attr('x', colX[0]).attr('y', y).attr('width', iw * 0.18).attr('height', nodeHeight)
+      .attr('rx', 3).attr('fill', color).attr('fill-opacity', 0.2).attr('stroke', color).attr('stroke-width', 0.5)
+      .style('cursor', 'pointer').on('click', () => selectCpc(w.cpcSection, w.cpcClass, w.cpcSubclass));
+    g.append('text').attr('x', colX[0] + 6).attr('y', y + nodeHeight / 2).attr('dy', '0.35em')
+      .attr('fill', 'var(--text-muted)').attr('font-size', '9px').text(w.cpcSubclass);
+
+    // Whitespace node
+    const wsWidth = iw * 0.25;
+    g.append('rect').attr('x', colX[1]).attr('y', y).attr('width', wsWidth).attr('height', nodeHeight)
+      .attr('rx', 3).attr('fill', color).attr('fill-opacity', 0.15).attr('stroke', color).attr('stroke-width', 0.5)
+      .style('cursor', 'pointer').on('click', () => selectWhitespace(w.id))
+      .on('mouseover', function(event) { showTooltip(event, w); }).on('mouseout', hideTooltip);
+    g.append('text').attr('x', colX[1] + 6).attr('y', y + nodeHeight / 2).attr('dy', '0.35em')
+      .attr('fill', 'var(--text)').attr('font-size', '8px').attr('font-weight', '500')
+      .text(w.name.substring(0, 28) + (w.name.length > 28 ? '...' : ''));
+
+    // Link CPC → WS
+    const path1 = d3.linkHorizontal()({ source: [colX[0] + iw * 0.18, y + nodeHeight / 2], target: [colX[1], y + nodeHeight / 2] });
+    g.append('path').attr('d', path1).attr('fill', 'none').attr('stroke', color).attr('stroke-opacity', 0.2).attr('stroke-width', nodeHeight * 0.6);
+
+    // Challenges
+    w.challenges.slice(0, 2).forEach((ch, ci) => {
+      const cy = y + ci * (nodeHeight * 0.6);
+      g.append('rect').attr('x', colX[2]).attr('y', cy).attr('width', iw * 0.2).attr('height', nodeHeight * 0.5)
+        .attr('rx', 2).attr('fill', 'rgba(239,68,68,0.15)').attr('stroke', 'rgba(239,68,68,0.3)').attr('stroke-width', 0.5);
+      g.append('text').attr('x', colX[2] + 4).attr('y', cy + nodeHeight * 0.25).attr('dy', '0.35em')
+        .attr('fill', 'var(--text-muted)').attr('font-size', '7px').text(ch.title.substring(0, 22));
+      const path2 = d3.linkHorizontal()({ source: [colX[1] + wsWidth, y + nodeHeight / 2], target: [colX[2], cy + nodeHeight * 0.25] });
+      g.append('path').attr('d', path2).attr('fill', 'none').attr('stroke', color).attr('stroke-opacity', 0.12).attr('stroke-width', 3);
+    });
+
+    // Solutions
+    w.solutions.slice(0, 2).forEach((sol, si) => {
+      const sy = y + si * (nodeHeight * 0.6);
+      g.append('rect').attr('x', colX[3]).attr('y', sy).attr('width', iw * 0.14).attr('height', nodeHeight * 0.5)
+        .attr('rx', 2).attr('fill', 'rgba(34,197,94,0.15)').attr('stroke', 'rgba(34,197,94,0.3)').attr('stroke-width', 0.5)
+        .style('cursor', 'pointer').on('click', () => selectWhitespace(w.id));
+      g.append('text').attr('x', colX[3] + 4).attr('y', sy + nodeHeight * 0.25).attr('dy', '0.35em')
+        .attr('fill', 'var(--text-muted)').attr('font-size', '7px').text(sol.title.substring(0, 20));
+    });
+  });
+
+  // Column headers
+  ['CPC Subclass', 'Whitespace', 'Challenges', 'Solutions'].forEach((label, i) => {
+    g.append('text').attr('x', colX[i]).attr('y', -10).attr('fill', 'var(--text-faint)').attr('font-size', '10px').attr('font-weight', '600').attr('text-transform', 'uppercase').text(label);
+  });
+}
+
+function renderVizLegend() {
+  const legend = document.getElementById('vizLegend');
+  legend.innerHTML = `
+    <div class="viz-legend-title">Legend</div>
+    <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#22C55E"></div> Score 8.5+</div>
+    <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#06B6D4"></div> Score 7.5–8.4</div>
+    <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#D4A017"></div> Score 6.5–7.4</div>
+    <div class="viz-legend-item"><div class="viz-legend-dot" style="background:#EF4444"></div> Score &lt; 6.5</div>
+    <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">
+      <div class="viz-legend-item"><div class="viz-legend-line" style="background:var(--text-faint)"></div> Parent link</div>
+      <div class="viz-legend-item"><div class="viz-legend-line" style="background:var(--violet);border-style:dashed"></div> Convergence</div>
+    </div>`;
+}
+
+/* ─── Tooltip ─── */
+function showTooltip(event, ws) {
+  const tt = document.getElementById('wsTooltip');
+  tt.innerHTML = `<h4>${ws.name}</h4>
+    <div class="tt-row"><span class="tt-label">CPC</span><span class="tt-value">${ws.cpcSubclass}</span></div>
+    <div class="tt-row"><span class="tt-label">Score</span><span class="tt-value">${ws.whitespaceScore}/10</span></div>
+    <div class="tt-row"><span class="tt-label">TAM</span><span class="tt-value">$${(ws.tamEstimate/1000).toFixed(0)}B</span></div>
+    <div class="tt-row"><span class="tt-label">Filing</span><span class="tt-value">${ws.filingDensity.replace('_',' ')}</span></div>
+    <div class="tt-row"><span class="tt-label">FTO Risk</span><span class="tt-value">${ws.ftoRisk.replace('_',' ')}</span></div>`;
+  tt.classList.add('visible');
+  tt.style.left = (event.clientX + 16) + 'px';
+  tt.style.top = (event.clientY - 10) + 'px';
+}
+function hideTooltip() { document.getElementById('wsTooltip').classList.remove('visible'); }
+
+/* ═══════════════════════════════════════════════════════════════
+   WHITESPACE LAB — CLAUDE API INTEGRATION
+   ═══════════════════════════════════════════════════════════════ */
+async function discoverWhitespaces() {
+  const btn = document.getElementById('btnDiscover');
+  const results = document.getElementById('labDiscoverResults');
+  btn.disabled = true;
+  results.innerHTML = '<div class="lab-loading"><div class="lab-spinner"></div>Analyzing CPC landscape & discovering whitespaces...</div>';
+
+  const scope = document.getElementById('labCpcScope').value;
+  const industry = document.getElementById('labIndustry').value;
+  const keywords = document.getElementById('labKeywords').value;
+  const depth = document.getElementById('labDepth').value;
+  const densityTarget = document.getElementById('labDensityTarget').value;
+  const risk = document.getElementById('labRisk').value;
+  const macroDrivers = [...document.querySelectorAll('.lab-checkboxes input:checked')].map(c => c.value);
+
+  const count = depth === 'broad' ? '5-8' : depth === 'deep' ? '3-5' : '1-2';
+
+  const systemPrompt = `You are an elite Chief Intellectual Property Officer (CIPO) specializing in CPC-driven patent whitespace discovery. You identify under-patented technology areas with high commercial potential.
+
+CRITICAL: Respond with ONLY valid JSON. No preamble, no markdown, no explanation. Return a JSON array of whitespace objects.
+
+Each whitespace object must have exactly these fields:
+{
+  "name": "string (descriptive name)",
+  "cpcSection": "string (A-H or Y)",
+  "cpcClass": "string (e.g. G06)",
+  "cpcSubclass": "string (e.g. G06N)",
+  "cpcGroups": ["array of CPC group codes"],
+  "description": "string (200-300 words technical description)",
+  "challenges": [{"id":"string","title":"string","severity":1-5,"type":"technical|regulatory|commercial|scientific","description":"string","relatedCpcGroups":[],"affectedIndustries":[],"currentApproaches":[]}],
+  "solutions": [{"id":"string","title":"string","challengeIds":[],"novelty":1-10,"feasibility":1-10,"patentabilityScore":1-10,"description":"string","claimSketch":"string (independent claim language)","cpcClassification":"string","priorArtRisk":"low|medium|high","estimatedTRL":1-9,"filingPriority":1-5}],
+  "tamEstimate": number (in millions USD),
+  "filingDensity": "very_low|low|medium",
+  "academicDensity": "low|medium|high|very_high",
+  "whitespaceScore": number (0-10),
+  "ftoRisk": "low|low_moderate|moderate",
+  "patentabilityRisk": {"alice101":1-10,"enablement112":1-10,"priorArt102":1-10},
+  "trl": 1-9,
+  "industries": ["array of industry names"],
+  "convergenceZones": [],
+  "macroDrivers": ["array of macro driver names"]
+}
+
+Generate ${count} novel whitespaces. Each must have 2-4 challenges and 1-3 solutions per challenge. Focus on areas where academic publication density is HIGH but patent filing density is LOW (the classic whitespace signature).`;
+
+  const userMessage = JSON.stringify({
+    cpcScope: scope || 'All sections',
+    industryFocus: industry || 'Any',
+    technologyKeywords: keywords || 'Open',
+    discoveryDepth: depth,
+    filingDensityTarget: densityTarget,
+    riskTolerance: parseInt(risk),
+    macroDriverAlignment: macroDrivers
+  });
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
+    const data = await PatentifyEnv.claudeRequest({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }]
+    });
+    clearTimeout(timeout);
+    const text = data.content.map(c => c.text || '').join('');
+    const cleaned = text.replace(/```json|```/g, '').trim();
+    const newWs = JSON.parse(cleaned);
+
+    if (!Array.isArray(newWs) || newWs.length === 0) throw new Error('Invalid response format');
+
+    // Add to state
+    const now = new Date().toISOString();
+    newWs.forEach((w, i) => {
+      w.id = 'WS-AI-' + Date.now() + '-' + i;
+      w.createdBy = 'ai_generated';
+      w.createdAt = now;
+      w.rank = STATE.whitespaces.length + i + 1;
+      w.filingStrategy = { phase: 'Phase 2', priority: w.rank, provisionalCount: 2, pctTarget: false };
+      w.competitorPresence = w.competitorPresence || [];
+      w.jurisdictions = w.jurisdictions || { USPTO: 'monitoring', EPO: 'none', CNIPA: 'none', JPO: 'none', KIPO: 'none' };
+      w.convergenceZones = w.convergenceZones || [];
+      STATE.whitespaces.push(w);
+    });
+
+    results.innerHTML = `<div style="padding:12px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);border-radius:var(--radius-sm);color:var(--green);font-size:12px;margin-top:8px">✓ Discovered ${newWs.length} new whitespace${newWs.length > 1 ? 's' : ''}. Added to Explorer.</div>`;
+    showToast(`${newWs.length} whitespaces discovered`, 'success');
+    buildCpcTree();
+    renderTable();
+    renderKpis();
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      results.innerHTML = '<div class="lab-error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Request timed out (30s). Try a narrower CPC scope or shallower discovery depth.</div>';
+    } else {
+      results.innerHTML = `<div class="lab-error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Discovery failed. ${err.message}. <button class="btn-secondary" style="margin-left:8px;padding:2px 10px;font-size:11px" onclick="discoverWhitespaces()">Retry</button></div>`;
+    }
+  }
+  btn.disabled = false;
+}
+
+async function rankWhitespaces() {
+  if (STATE.checkedIds.size < 2) { showToast('Select at least 2 whitespaces', 'error'); return; }
+  if (STATE.checkedIds.size > 10) { showToast('Select at most 10 whitespaces', 'error'); return; }
+
+  const btn = document.getElementById('btnRank');
+  const results = document.getElementById('labRankResults');
+  btn.disabled = true;
+  results.innerHTML = '<div class="lab-loading"><div class="lab-spinner"></div>Ranking whitespaces with multi-criteria analysis...</div>';
+
+  const selected = STATE.whitespaces.filter(w => STATE.checkedIds.has(w.id));
+  const wsData = selected.map(w => ({
+    id: w.id, name: w.name, cpc: w.cpcSubclass, score: w.whitespaceScore,
+    tam: w.tamEstimate, filingDensity: w.filingDensity, ftoRisk: w.ftoRisk,
+    trl: w.trl, industries: w.industries, macroDrivers: w.macroDrivers
+  }));
+
+  try {
+    const data = await PatentifyEnv.claudeRequest({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2048,
+      system: `You are an IP strategy analyst. Rank the provided whitespaces using these weighted criteria: TAM potential (25%), filing density attractiveness (20%), patentability risk (20%), TRL feasibility (15%), cross-industry convergence (10%), macro-driver alignment (10%). Respond with ONLY valid JSON array, no markdown. Each item: {"id":"string","rank":number,"compositeScore":number (0-100),"justification":"string (1-2 sentences)","criteria":{"tam":0-100,"filing":0-100,"patentability":0-100,"trl":0-100,"convergence":0-100,"macroDriver":0-100}}`,
+      messages: [{ role: 'user', content: JSON.stringify(wsData) }]
+    });
+    const text = data.content.map(c => c.text || '').join('');
+    const ranked = JSON.parse(text.replace(/```json|```/g, '').trim());
+
+    results.innerHTML = '<div class="lab-results">' + ranked.sort((a, b) => a.rank - b.rank).map(r => {
+      const ws = STATE.whitespaces.find(w => w.id === r.id);
+      return `<div class="rank-item" onclick="selectWhitespace('${r.id}')">
+        <div class="rank-number">${r.rank}</div>
+        <div class="rank-info">
+          <div class="rank-name">${ws?.name || r.id}</div>
+          <div class="rank-score">${r.justification || ''}</div>
+          <div class="rank-bar"><div class="rank-bar-fill" style="width:${r.compositeScore}%"></div></div>
+        </div>
+        <div style="font-size:16px;font-weight:700;color:var(--cyan);min-width:40px;text-align:right">${r.compositeScore}</div>
+      </div>`;
+    }).join('') + '</div>';
+  } catch (err) {
+    results.innerHTML = `<div class="lab-error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Ranking failed: ${err.message}</div>`;
+  }
+  btn.disabled = false;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPETITIVE LANDSCAPE
+   ═══════════════════════════════════════════════════════════════ */
+function renderCompetitive() {
+  const container = document.getElementById('compHeatmap');
+  const competitors = ['Toyota', 'Samsung SDI', 'CATL', 'Intel', 'IBM', 'Google', 'Apple', 'Meta', 'QuantumScape', 'Infineon'];
+  const subclasses = [...new Set(STATE.whitespaces.map(w => w.cpcSubclass))].sort();
+
+  let html = '<table style="border-collapse:collapse;font-size:11px;width:100%"><thead><tr><th style="padding:6px 10px;text-align:left;color:var(--text-faint);font-size:10px;position:sticky;left:0;background:var(--bg);z-index:5">CPC</th>';
+  competitors.forEach(c => { html += `<th style="padding:6px 4px;text-align:center;color:var(--text-faint);font-size:9px;writing-mode:vertical-lr;transform:rotate(180deg);min-width:36px">${c}</th>`; });
+  html += '</tr></thead><tbody>';
+
+  subclasses.forEach(sub => {
+    html += `<tr><td style="padding:4px 10px;color:var(--text);font-weight:500;font-size:10px;position:sticky;left:0;background:var(--bg);z-index:2;border-bottom:1px solid var(--border)">${sub}</td>`;
+    competitors.forEach(comp => {
+      // Find strength from whitespace data
+      const ws = STATE.whitespaces.find(w => w.cpcSubclass === sub);
+      const cp = ws?.competitorPresence?.find(c => c.name === comp);
+      const strength = cp?.portfolioStrength || Math.floor(Math.random() * 3);
+      const alpha = strength / 10;
+      const color = strength > 6 ? `rgba(239,68,68,${alpha})` : strength > 3 ? `rgba(212,160,23,${alpha})` : `rgba(34,197,94,${alpha * 0.5 + 0.05})`;
+      html += `<td style="padding:2px;border-bottom:1px solid var(--border)"><div class="heatmap-cell" style="background:${color};width:100%;height:28px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-muted);border-radius:3px" title="${comp}: ${strength}/10 in ${sub}">${strength || ''}</div></td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FILING STRATEGY TIMELINE
+   ═══════════════════════════════════════════════════════════════ */
+function renderFiling() {
+  const container = document.getElementById('filingTimeline');
+  const width = container.clientWidth || 900;
+  const years = [2026, 2027, 2028, 2029, 2030];
+  const quarters = years.flatMap(y => [1, 2, 3, 4].map(q => ({ year: y, q })));
+  const colW = (width - 200) / quarters.length;
+  const ws = STATE.whitespaces.slice(0, 10);
+  const rowH = 36;
+  const sectionColors = { A:'#EF4444', B:'#F97316', C:'#EAB308', G:'#06B6D4', H:'#8B5CF6' };
+
+  let html = '<div style="position:relative;min-height:' + ((ws.length + 2) * rowH + 60) + 'px">';
+
+  // Header
+  html += '<div style="display:flex;position:sticky;top:0;z-index:10;background:var(--bg)">';
+  html += '<div style="width:200px;padding:6px 10px;font-size:10px;color:var(--text-faint);font-weight:600">WHITESPACE</div>';
+  quarters.forEach(q => {
+    html += `<div style="width:${colW}px;padding:4px 2px;text-align:center;font-size:9px;color:var(--text-faint);border-left:1px solid var(--border)">${q.year} Q${q.q}</div>`;
+  });
+  html += '</div>';
+
+  // Rows
+  ws.forEach((w, i) => {
+    const y = (i + 1) * rowH + 30;
+    const color = sectionColors[w.cpcSection] || '#64748B';
+    html += `<div style="display:flex;align-items:center;height:${rowH}px;border-bottom:1px solid var(--border)">`;
+    html += `<div style="width:200px;padding:4px 10px;font-size:10px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer" onclick="selectWhitespace('${w.id}')">${w.name.substring(0, 26)}</div>`;
+
+    // Bars — provisionals start at priority-based quarter
+    const startQ = Math.min(w.filingStrategy.priority, quarters.length - 4);
+    const provWidth = Math.min(3, quarters.length - startQ);
+    quarters.forEach((q, qi) => {
+      let bar = '';
+      if (qi === startQ) bar = `<div style="background:${color};opacity:0.7;height:16px;width:${provWidth * colW - 4}px;border-radius:3px;position:absolute;left:2px;font-size:8px;color:#fff;display:flex;align-items:center;padding-left:4px">Prov.</div>`;
+      else if (qi === startQ + 4 && w.filingStrategy.pctTarget) bar = `<div style="background:${color};opacity:0.5;height:16px;width:${2 * colW - 4}px;border-radius:3px;position:absolute;left:2px;font-size:8px;color:#fff;display:flex;align-items:center;padding-left:4px">PCT</div>`;
+      html += `<div style="width:${colW}px;position:relative;height:100%;display:flex;align-items:center;border-left:1px solid var(--border)">${bar}</div>`;
+    });
+    html += '</div>';
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOAST NOTIFICATION
+   ═══════════════════════════════════════════════════════════════ */
+function showToast(msg, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   WORKFLOW 2 — WHITESPACE DISCOVERY PIPELINE EDITOR
+   ═══════════════════════════════════════════════════════════════ */
+
+const WF2_ROLES = {
+  'admin':           { label: 'Admin' },
+  'ip-strategist':   { label: 'IP Strategist' },
+  'ip-analyst':      { label: 'IP Analyst' },
+  'patent-engineer': { label: 'Patent Engineer' },
+  'patent-lawyer':   { label: 'Patent Lawyer' },
+  'inventor':        { label: 'Inventor' }
+};
+
+/* Default 10-step whitespace discovery pipeline */
+function wf2CreateDefault() {
+  return {
+    id: 'wf-whitespace-discovery', name: 'Whitespace Discovery & Analysis Pipeline', version: 1,
+    type: 'landscape_scan', schedule: '0 8 * * 1', cost_cap: 25, human_gate: true,
+    steps: [
+      { id:'wsd-1',  label:'Domain & Scope Definition',                   type:'task',         order:0,  color:'#94A3B8', roleGate:['admin','ip-strategist'],                   autoSkip:false, approvalRequired:false, estimatedDuration:'30 min',   dependencies:[],        prompt:'You are an elite CIPO. Define the scope for a whitespace analysis in the {{domain_name}} technology domain.\n\n1. Identify relevant CPC classification codes.\n2. Map primary CPC groups and cross-references.\n3. Identify 3-6 target industry verticals.\n4. List 2-4 macro-drivers.\n5. Identify convergence zones.\n\nReturn JSON: cpcSection, cpcClass, cpcSubclass, cpcGroups[], industries[], macroDrivers[], convergenceZones[], scopeRationale.' },
+      { id:'wsd-2',  label:'Patent Landscape Scan',                       type:'task',         order:1,  color:'#06B6D4', roleGate:['admin','ip-strategist','ip-analyst'],       autoSkip:true,  approvalRequired:false, estimatedDuration:'2 hours',  dependencies:['wsd-1'], prompt:'Patent landscape analyst. For {{domain_name}}: filing density, academic density, competitor presence, jurisdictional coverage (USPTO/EPO/CNIPA/JPO/KIPO), patentability risk (alice101, enablement112, priorArt102). Flag LOW filing + HIGH academic as priority candidates.' },
+      { id:'wsd-3',  label:'Whitespace Identification & Scoring',         type:'task',         order:2,  color:'#3B82F6', roleGate:['admin','ip-strategist'],                   autoSkip:true,  approvalRequired:false, estimatedDuration:'3 hours',  dependencies:['wsd-2'], prompt:'Whitespace discovery strategist. From landscape data for {{domain_name}}, identify discrete whitespace opportunities. Each: ID WS-{{cpcClass}}-NNN, name, description, whitespaceScore 0-10 (gap 30%, commercial 25%, feasibility 20%, window 15%, cross-domain 10%), TAM, TRL, FTO risk, 1-3 challenges. Target 5-20 per domain.' },
+      { id:'wsd-4',  label:'Solution Architecture & Claim Sketching',     type:'task',         order:3,  color:'#8B5CF6', roleGate:['admin','patent-engineer','ip-strategist'], autoSkip:true,  approvalRequired:false, estimatedDuration:'4 hours',  dependencies:['wsd-3'], prompt:'Patent engineer. For each whitespace in {{domain_name}}, 1-3 solutions: SOL-NNN, title, novelty/feasibility/patentabilityScore 1-10, description, independent claim sketch (USPTO format, 3+ limitations), CPC classification, prior art risk, TRL, filing priority.' },
+      { id:'wsd-5',  label:'FTO & Prior Art Deep Dive',                   type:'task',         order:4,  color:'#06B6D4', roleGate:['admin','ip-strategist','ip-analyst'],       autoSkip:true,  approvalRequired:false, estimatedDuration:'3 hours',  dependencies:['wsd-4'], prompt:'FTO analyst. For high-priority solutions in {{domain_name}}: blocking patent search, claim overlap (clear/design-around/caution/blocked), updated FTO risk, design-around recommendations. Flag high/critical FTO escalations.' },
+      { id:'wsd-6',  label:'Filing Strategy & Jurisdiction Planning',     type:'task',         order:5,  color:'#D4A017', roleGate:['admin','ip-strategist'],                   autoSkip:true,  approvalRequired:false, estimatedDuration:'2 hours',  dependencies:['wsd-5'], prompt:'Filing strategist. For {{domain_name}} whitespaces: phase assignment (Phase 1: 6mo / Phase 2: 12-18mo), priority ranking, provisional count, PCT target, jurisdictional strategy, continuation cascade. Portfolio summary with total provisionals, costs, milestones.' },
+      { id:'wsd-7',  label:'Competitive Intelligence & Retaliation Risk', type:'task',         order:6,  color:'#EF4444', roleGate:['admin','ip-strategist'],                   autoSkip:true,  approvalRequired:false, estimatedDuration:'2 hours',  dependencies:['wsd-6'], prompt:'Competitive intelligence analyst. For {{domain_name}}: competitor deep dive (strength, velocity, retaliation risk, key patents, posture), PTAB survivability, open-source risk, convergence dynamics, defensive recommendations.' },
+      { id:'wsd-8',  label:'Strategic Review Gate',                       type:'approval',     order:7,  color:'#F59E0B', roleGate:['admin','patent-lawyer','ip-strategist'],   autoSkip:false, approvalRequired:true,  estimatedDuration:'1-2 days', dependencies:['wsd-7'], prompt:'STRATEGIC REVIEW GATE — MANUAL APPROVAL REQUIRED\n\nVerify: (1) Whitespace validity, (2) Score calibration, (3) Claim §101/102/103/112 compliance, (4) FTO clearance, (5) Budget alignment, (6) Competitive sensitivity.\n\nDECISION: APPROVE / REJECT / REVISE' },
+      { id:'wsd-9',  label:'Whitespace Record Finalization',              type:'document-gen', order:8,  color:'#22C55E', roleGate:['admin','ip-strategist'],                   autoSkip:true,  approvalRequired:false, estimatedDuration:'1 hour',   dependencies:['wsd-8'], prompt:'Data engineer for Patentify. Compile approved whitespace analysis for {{domain_name}} into platform-compatible JSON records matching the full whitespace schema. Validate all scores within ranges.' },
+      { id:'wsd-10', label:'Portfolio Dashboard Update',                  type:'task',         order:9,  color:'#2563EB', roleGate:['admin'],                                   autoSkip:true,  approvalRequired:false, estimatedDuration:'30 min',   dependencies:['wsd-9'], prompt:'Portfolio analytics engine. Generate dashboard data for {{domain_name}}: convergenceMap (x=TRL, y=CommercialReadiness), radarData, 24-month filingTimeline, revenueProjections.' }
+    ],
+    metadata: { createdBy: 'system', createdAt: '2026-01-01', sourceDocument: 'whitespace_workflow_import.json' }
+  };
+}
+
+/* Workflow 2 state */
+let wf2 = wf2CreateDefault();
+let wf2SelectedStepId = null;
+let wf2DragSrcIdx = null;
+
+/* Escape utility (reuse-safe) */
+function wf2Esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+/* ─── Render canvas ─── */
+function wf2RenderCanvas() {
+  const canvas = document.getElementById('wf2Canvas');
+  if (!wf2 || !canvas) return;
+  const steps = wf2.steps.sort((a, b) => a.order - b.order);
+  let html = '';
+
+  steps.forEach((step, idx) => {
+    const sel = wf2SelectedStepId === step.id ? ' selected' : '';
+    const typeLabel = step.type === 'approval' ? 'APPROVAL' : step.type === 'document-gen' ? 'DOC-GEN' : 'TASK';
+
+    html += `<div class="wf2-step${sel}" draggable="true" data-step-id="${step.id}" data-step-idx="${idx}">`;
+    html += `<span class="wf2-step-number">${idx + 1}</span>`;
+    html += `<div class="wf2-step-bar" style="background:${step.color || '#64748B'}"></div>`;
+    html += `<div class="wf2-step-info">`;
+    html += `<div class="wf2-step-label" title="${wf2Esc(step.label)}">${wf2Esc(step.label)}</div>`;
+    html += `<div class="wf2-step-meta">`;
+    html += `<span class="wf2-step-type">${typeLabel}</span>`;
+    if (step.estimatedDuration) html += `<span class="wf2-step-dur">${wf2Esc(step.estimatedDuration)}</span>`;
+    if (step.approvalRequired) html += `<span style="color:#F59E0B;font-size:10px">&#9888;</span>`;
+    html += `</div></div>`;
+    html += `<div class="wf2-step-actions"><button class="wf2-step-rm" onclick="event.stopPropagation();wf2RemoveStep('${step.id}')" title="Remove">&#10005;</button></div>`;
+    html += `</div>`;
+
+    if (idx < steps.length - 1) {
+      html += `<div class="wf2-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h8M9 4l4 4-4 4"/></svg></div>`;
+    }
+  });
+
+  canvas.innerHTML = html;
+
+  /* Wire events */
+  canvas.querySelectorAll('.wf2-step').forEach(el => {
+    el.addEventListener('dragstart', e => {
+      wf2DragSrcIdx = parseInt(el.dataset.stepIdx);
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', el.dataset.stepId);
+    });
+    el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      const targetIdx = parseInt(el.dataset.stepIdx);
+      if (wf2DragSrcIdx === null || wf2DragSrcIdx === targetIdx) return;
+      const moved = wf2.steps.splice(wf2DragSrcIdx, 1)[0];
+      wf2.steps.splice(targetIdx, 0, moved);
+      wf2.steps.forEach((s, i) => { s.order = i; });
+      wf2RenderCanvas();
+      showToast('Step reordered', 'success');
+    });
+    el.addEventListener('dragend', () => { el.classList.remove('dragging'); wf2DragSrcIdx = null; });
+    el.addEventListener('click', e => {
+      if (e.target.closest('.wf2-step-rm')) return;
+      wf2SelectStep(el.dataset.stepId);
+    });
+  });
+}
+
+/* ─── Select step → Properties panel ─── */
+function wf2SelectStep(stepId) {
+  wf2SelectedStepId = stepId;
+  const step = wf2.steps.find(s => s.id === stepId);
+  if (!step) return;
+  wf2RenderCanvas();
+  wf2RenderProps(step);
+}
+
+function wf2CloseProps() {
+  document.getElementById('wf2Props').classList.remove('open');
+  wf2SelectedStepId = null;
+  wf2RenderCanvas();
+}
+
+function wf2RenderProps(step) {
+  const panel = document.getElementById('wf2Props');
+  const title = document.getElementById('wf2PropTitle');
+  const body = document.getElementById('wf2PropBody');
+  panel.classList.add('open');
+  title.textContent = step.label;
+
+  let html = '';
+
+  /* Label */
+  html += `<div class="wf2-props-section"><div class="wf2-props-section-title">Step Label</div>`;
+  html += `<input style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;color:var(--text)" value="${wf2Esc(step.label)}" onchange="wf2UpdateField('${step.id}','label',this.value)">`;
+  html += `</div>`;
+
+  /* Type */
+  html += `<div class="wf2-props-section"><div class="wf2-props-section-title">Step Type</div>`;
+  html += `<select style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;color:var(--text)" onchange="wf2UpdateField('${step.id}','type',this.value)">`;
+  ['task','approval','gate','document-gen'].forEach(t => {
+    html += `<option value="${t}"${step.type === t ? ' selected' : ''}>${t}</option>`;
+  });
+  html += `</select></div>`;
+
+  /* Prompt */
+  html += `<div class="wf2-props-section"><div class="wf2-props-section-title">AI Prompt</div>`;
+  html += `<textarea class="wf2-prompt-editor" onchange="wf2UpdateField('${step.id}','prompt',this.value)" oninput="this.nextElementSibling.textContent='~'+Math.ceil(this.value.length/4)+' tokens'">${wf2Esc(step.prompt || '')}</textarea>`;
+  html += `<div class="wf2-token-count">~${Math.ceil((step.prompt||'').length/4)} tokens</div>`;
+  html += `<div style="margin-top:6px"><button class="btn-secondary" style="padding:3px 10px;font-size:10px" onclick="showToast('Test prompt sent (mock)','success')">&#9654; Test Prompt</button></div>`;
+  html += `</div>`;
+
+  /* Role Gates */
+  html += `<div class="wf2-props-section"><div class="wf2-props-section-title">Role Gates</div>`;
+  html += `<div class="wf2-role-check">`;
+  Object.keys(WF2_ROLES).forEach(rk => {
+    const checked = (step.roleGate || []).includes(rk) ? ' checked' : '';
+    html += `<label><input type="checkbox"${checked} onchange="wf2ToggleRole('${step.id}','${rk}',this.checked)"> ${WF2_ROLES[rk].label}</label>`;
+  });
+  html += `</div></div>`;
+
+  /* Execution settings */
+  html += `<div class="wf2-props-section"><div class="wf2-props-section-title">Execution Settings</div>`;
+  html += `<div class="wf2-toggle-row"><span class="wf2-toggle-label">Auto-skip (in auto mode)</span><input type="checkbox"${step.autoSkip ? ' checked' : ''} onchange="wf2UpdateField('${step.id}','autoSkip',this.checked)" style="accent-color:var(--cyan)"></div>`;
+  html += `<div class="wf2-toggle-row"><span class="wf2-toggle-label">Approval required</span><input type="checkbox"${step.approvalRequired ? ' checked' : ''} onchange="wf2UpdateField('${step.id}','approvalRequired',this.checked)" style="accent-color:var(--cyan)"></div>`;
+  html += `<div class="wf2-toggle-row"><span class="wf2-toggle-label">Duration estimate</span><input style="width:120px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;font-size:11px;color:var(--text)" value="${wf2Esc(step.estimatedDuration||'')}" onchange="wf2UpdateField('${step.id}','estimatedDuration',this.value)" placeholder="e.g. 2 hours"></div>`;
+  html += `</div>`;
+
+  /* Dependencies */
+  html += `<div class="wf2-props-section"><div class="wf2-props-section-title">Dependencies</div>`;
+  if (step.dependencies && step.dependencies.length) {
+    step.dependencies.forEach(dep => {
+      const depStep = wf2.steps.find(s => s.id === dep);
+      html += `<span class="wf2-dep-tag">${depStep ? depStep.label : dep}</span>`;
+    });
+  } else {
+    html += `<span style="font-size:11px;color:var(--text-faint)">None (first step)</span>`;
+  }
+  html += `</div>`;
+
+  /* Color */
+  html += `<div class="wf2-props-section"><div class="wf2-props-section-title">Step Color</div>`;
+  html += `<input type="color" value="${step.color||'#64748B'}" onchange="wf2UpdateField('${step.id}','color',this.value)" style="width:40px;height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer">`;
+  html += `</div>`;
+
+  body.innerHTML = html;
+}
+
+/* ─── Field updates ─── */
+function wf2UpdateField(stepId, field, value) {
+  const step = wf2.steps.find(s => s.id === stepId);
+  if (!step) return;
+  step[field] = value;
+  if (field === 'label' || field === 'type' || field === 'color') wf2RenderCanvas();
+}
+
+function wf2ToggleRole(stepId, role, checked) {
+  const step = wf2.steps.find(s => s.id === stepId);
+  if (!step) return;
+  if (checked && !step.roleGate.includes(role)) step.roleGate.push(role);
+  if (!checked) step.roleGate = step.roleGate.filter(r => r !== role);
+}
+
+/* ─── Remove step ─── */
+function wf2RemoveStep(stepId) {
+  const step = wf2.steps.find(s => s.id === stepId);
+  if (!step) return;
+  if (step.approvalRequired && !confirm(`Remove approval gate "${step.label}"?`)) return;
+  wf2.steps = wf2.steps.filter(s => s.id !== stepId);
+  wf2.steps.forEach((s, i) => { s.order = i; });
+  if (wf2SelectedStepId === stepId) { wf2SelectedStepId = null; wf2CloseProps(); }
+  wf2RenderCanvas();
+  showToast('Step removed: ' + step.label, 'success');
+}
+
+/* ─── Save / Reset ─── */
+function wf2Save() {
+  wf2.version++;
+  document.getElementById('wf2VersionBadge').textContent = 'v' + wf2.version;
+  showToast('Workflow 2 saved — v' + wf2.version, 'success');
+}
+
+function wf2Reset() {
+  if (!confirm('Reset Workflow 2 to default 10-step pipeline? All customizations will be lost.')) return;
+  wf2 = wf2CreateDefault();
+  wf2SelectedStepId = null;
+  wf2CloseProps();
+  wf2RenderCanvas();
+  document.getElementById('wf2VersionBadge').textContent = 'v' + wf2.version;
+  showToast('Workflow 2 reset to default', 'success');
+}
+
+/* ─── Run pipeline ─── */
+async function wf2Run() {
+  const domain = document.getElementById('wf2Domain').value.trim();
+  if (!domain) { showToast('Enter a technology domain to scan', 'error'); return; }
+
+  const btn = document.getElementById('btnRunWf2');
+  const status = document.getElementById('wf2RunStatus');
+  btn.disabled = true;
+
+  /* Animate steps sequentially */
+  const steps = wf2.steps.sort((a, b) => a.order - b.order);
+  status.innerHTML = '';
+
+  for (let i = 0; i < steps.length; i++) {
+    const step = steps[i];
+    const stepEl = document.querySelector(`.wf2-step[data-step-id="${step.id}"]`);
+    if (stepEl) stepEl.style.borderColor = step.color;
+
+    status.innerHTML = `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;font-size:12px;color:var(--text-muted)">`
+      + `<div class="lab-spinner"></div>`
+      + `Step ${i+1}/${steps.length}: ${wf2Esc(step.label)}`
+      + `<span style="margin-left:auto;font-size:10px;color:var(--text-faint)">${step.estimatedDuration || ''}</span>`
+      + `</div>`;
+
+    /* Simulate execution delay */
+    await new Promise(r => setTimeout(r, 800 + Math.random() * 600));
+
+    if (stepEl) {
+      stepEl.style.borderColor = '#22C55E';
+      stepEl.querySelector('.wf2-step-bar').style.background = '#22C55E';
+    }
+
+    /* If approval step, simulate gate */
+    if (step.approvalRequired) {
+      status.innerHTML = `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;font-size:12px;color:#F59E0B">`
+        + `&#9888; Step ${i+1}: ${wf2Esc(step.label)} — Awaiting manual approval...`
+        + `<button class="btn-primary" style="padding:3px 10px;font-size:10px;margin-left:8px" onclick="this.closest('div').remove();document.getElementById('wf2GateResolved').value='1'">Approve</button>`
+        + `</div><input type="hidden" id="wf2GateResolved" value="0">`;
+      /* Wait for approval click */
+      await new Promise(r => {
+        const check = setInterval(() => {
+          const inp = document.getElementById('wf2GateResolved');
+          if (!inp || inp.value === '1') { clearInterval(check); r(); }
+        }, 300);
+      });
+    }
+  }
+
+  /* Completion */
+  status.innerHTML = `<div style="padding:10px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);border-radius:var(--radius-sm);color:var(--green);font-size:12px;margin-top:4px">`
+    + `\u2713 Whitespace Discovery Pipeline complete for <strong>${wf2Esc(domain)}</strong>. ${steps.length} steps executed. Results staged for Explorer integration.`
+    + `</div>`;
+  showToast(`Workflow 2 complete for ${domain}`, 'success');
+  btn.disabled = false;
+
+  /* Reset step colors after 3s */
+  setTimeout(() => wf2RenderCanvas(), 3000);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INITIALIZATION
+   ═══════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  buildCpcTree();
+  renderKpis();
+  renderTable();
+  wf2RenderCanvas();
+});
+</script>
+
+<script>
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'theme-change') {
+    document.documentElement.setAttribute('data-theme', e.data.theme);
+  }
+});
+</script>
+</body>
+</html>

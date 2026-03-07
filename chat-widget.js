@@ -8,10 +8,17 @@
 (function() {
   'use strict';
 
-  const API = 'port/8000';
+  const API = (window.Patentify && window.Patentify.API_BASE) || (function() {
+    const meta = document.querySelector('meta[name="api-base"]');
+    return meta ? meta.getAttribute('content') : 'http://localhost:8000';
+  })();
   let currentView = 'dashboard';
   let chatOpen = false;
-  let sessionId = 'sess-' + Math.random().toString(36).slice(2, 10);
+  let sessionId = (function() {
+    const arr = new Uint8Array(8);
+    crypto.getRandomValues(arr);
+    return 'sess-' + Array.from(arr).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+  })();
   let chatHistory = [];
   let isStreaming = false;
 
@@ -498,6 +505,8 @@
   /* ── Listen for View Changes from Parent ── */
 
   window.addEventListener('message', function(e) {
+    // Validate message origin for security
+    if (e.origin !== window.location.origin && e.origin !== 'null') return;
     if (e.data && e.data.type === 'view-change') {
       currentView = e.data.view;
     }
