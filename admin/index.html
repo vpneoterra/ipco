@@ -604,34 +604,9 @@ body {
 .api-test-result.pending { background: var(--bg-hover); border: 1px solid var(--border); color: var(--text-muted); }
 
 /* ============================================
-   API USAGE SUB-TABS
+   ERROR LOG BADGE (nav sidebar)
    ============================================ */
-.usage-subtab-bar {
-  display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 24px;
-}
-.usage-subtab {
-  padding: 10px 20px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-muted);
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  transition: color 150ms, border-color 150ms;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.usage-subtab:hover { color: var(--text); }
-.usage-subtab.active {
-  color: var(--accent-blue);
-  border-bottom-color: var(--accent-blue);
-}
-.usage-subtab .subtab-count {
+.subtab-count {
   font-size: 10px;
   font-weight: 600;
   padding: 1px 6px;
@@ -641,12 +616,10 @@ body {
   min-width: 18px;
   text-align: center;
 }
-.usage-subtab .subtab-count.zero {
+.subtab-count.zero {
   background: var(--bg-hover);
   color: var(--text-faint);
 }
-.usage-subpanel { display: none; }
-.usage-subpanel.active { display: block; }
 
 /* ============================================
    ERROR LOG STYLES
@@ -1837,6 +1810,11 @@ tr:hover td { background: rgba(255,255,255,0.02); }
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v14h14"/><path d="M6 13l3-4 3 2 4-5"/></svg>
         <span class="nav-item-label">Activity Log</span>
       </button>
+      <button class="nav-item" data-tab="error-log" onclick="switchTab('error-log')">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L2 17h16L10 3z"/><path d="M10 10v3M10 14.5v.5"/></svg>
+        <span class="nav-item-label">Error Log</span>
+        <span class="subtab-count zero" id="errlogBadge" style="margin-left:auto">0</span>
+      </button>
     </nav>
 
     <div class="sidebar-footer">
@@ -2260,22 +2238,6 @@ tr:hover td { background: rgba(255,255,255,0.02); }
            ================== -->
       <div class="tab-panel" id="panel-api-usage">
 
-        <!-- Sub-tab navigation -->
-        <div class="usage-subtab-bar">
-          <button class="usage-subtab active" data-usagesub="usage-main" onclick="switchUsageSub('usage-main')">
-            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v14h14"/><path d="M6 13l3-4 3 2 4-5"/></svg>
-            Usage Dashboard
-          </button>
-          <button class="usage-subtab" data-usagesub="error-log" onclick="switchUsageSub('error-log')">
-            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L2 17h16L10 3z"/><path d="M10 10v3M10 14.5v.5"/></svg>
-            Error Log
-            <span class="subtab-count zero" id="errlogBadge">0</span>
-          </button>
-        </div>
-
-        <!-- SUB-PANEL: Usage Dashboard -->
-        <div class="usage-subpanel active" id="subpanel-usage-main">
-
         <!-- KPI Strip -->
         <div class="usage-kpi-grid" id="usageKpiGrid">
           <div class="usage-kpi" style="--kpi-accent: var(--accent-blue)">
@@ -2456,44 +2418,6 @@ tr:hover td { background: rgba(255,255,255,0.02); }
           </div>
         </div>
 
-        </div><!-- /subpanel-usage-main -->
-
-        <!-- SUB-PANEL: Error Log -->
-        <div class="usage-subpanel" id="subpanel-error-log">
-          <div class="errlog-controls">
-            <select class="form-select" id="errlogSevFilter" onchange="renderErrorLog()">
-              <option value="">All Severities</option>
-              <option value="critical">Critical</option>
-              <option value="error">Error</option>
-              <option value="warning">Warning</option>
-              <option value="info">Info</option>
-            </select>
-            <select class="form-select" id="errlogSourceFilter" onchange="renderErrorLog()">
-              <option value="">All Sources</option>
-              <option value="api">API Call</option>
-              <option value="runtime">Runtime JS</option>
-              <option value="promise">Unhandled Promise</option>
-              <option value="network">Network</option>
-              <option value="manual">Manual</option>
-            </select>
-            <button class="btn btn-sm btn-secondary" onclick="downloadErrorLog()">
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10v3h10v-3M8 2v8M5 7l3 3 3-3"/></svg>
-              Download Log
-            </button>
-            <button class="btn btn-sm btn-secondary" onclick="clearErrorLog()" style="color:var(--accent-red);border-color:rgba(239,68,68,0.3)">
-              Clear
-            </button>
-            <span class="errlog-stat" id="errlogStat">0 entries</span>
-          </div>
-
-          <div id="errlogContent">
-            <div class="errlog-empty">
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M10 2a8 8 0 100 16 8 8 0 000-16z"/><path d="M7 7l6 6M13 7l-6 6"/></svg>
-              No errors recorded. Errors from API calls, runtime exceptions, and promise rejections will appear here with full diagnostic context.
-            </div>
-          </div>
-        </div><!-- /subpanel-error-log -->
-
       </div>
 
       <!-- ==================
@@ -2523,6 +2447,45 @@ tr:hover td { background: rgba(255,255,255,0.02); }
           </table>
         </div>
       </div>
+
+      <!-- ==================
+           TAB 8: ERROR LOG
+           ================== -->
+      <div class="tab-panel" id="panel-error-log">
+        <div class="errlog-controls">
+          <select class="form-select" id="errlogSevFilter" onchange="renderErrorLog()">
+            <option value="">All Severities</option>
+            <option value="critical">Critical</option>
+            <option value="error">Error</option>
+            <option value="warning">Warning</option>
+            <option value="info">Info</option>
+          </select>
+          <select class="form-select" id="errlogSourceFilter" onchange="renderErrorLog()">
+            <option value="">All Sources</option>
+            <option value="api">API Call</option>
+            <option value="runtime">Runtime JS</option>
+            <option value="promise">Unhandled Promise</option>
+            <option value="network">Network</option>
+            <option value="manual">Manual</option>
+          </select>
+          <button class="btn btn-sm btn-secondary" onclick="downloadErrorLog()">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10v3h10v-3M8 2v8M5 7l3 3 3-3"/></svg>
+            Download Log
+          </button>
+          <button class="btn btn-sm btn-secondary" onclick="clearErrorLog()" style="color:var(--accent-red);border-color:rgba(239,68,68,0.3)">
+            Clear
+          </button>
+          <span class="errlog-stat" id="errlogStat">0 entries</span>
+        </div>
+
+        <div id="errlogContent">
+          <div class="errlog-empty">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M10 2a8 8 0 100 16 8 8 0 000-16z"/><path d="M7 7l6 6M13 7l-6 6"/></svg>
+            No errors recorded. Errors from API calls, runtime exceptions, and promise rejections will appear here with full diagnostic context.
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <footer class="page-footer">
@@ -2838,7 +2801,8 @@ var tabTitles = {
   'inventions': 'Inventions',
   'collaterals': 'Patent Collaterals',
   'api-usage': 'API Usage',
-  'activity': 'Activity Log'
+  'activity': 'Activity Log',
+  'error-log': 'Error Log'
 };
 
 function switchTab(tab) {
@@ -2862,6 +2826,7 @@ function switchTab(tab) {
   if (tab === 'collaterals') loadCollaterals();
   if (tab === 'api-usage') loadApiUsageDashboard();
   if (tab === 'activity') { loadActivity(); startActivityRefresh(); }
+  if (tab === 'error-log') renderErrorLog();
   if (tab !== 'activity') stopActivityRefresh();
 }
 
@@ -5554,16 +5519,6 @@ window.addEventListener('unhandledrejection', function(event) {
 /* ============================================
    ERROR LOG UI FUNCTIONS
    ============================================ */
-function switchUsageSub(subId) {
-  document.querySelectorAll('.usage-subtab').forEach(function(el) {
-    el.classList.toggle('active', el.dataset.usagesub === subId);
-  });
-  document.querySelectorAll('.usage-subpanel').forEach(function(el) {
-    el.classList.toggle('active', el.id === 'subpanel-' + subId);
-  });
-  if (subId === 'error-log') renderErrorLog();
-}
-
 function renderErrorLog() {
   var log = PatentifyErrorLog.getLog();
   var sevFilter = document.getElementById('errlogSevFilter').value;
