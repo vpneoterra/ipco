@@ -180,11 +180,20 @@ var PatentifyEnv = (function() {
     });
 
     if (resp.status === 401) {
-      throw new Error('Invalid API key. Check your Claude API key in Settings.');
+      var authErr = new Error('Invalid API key. Check your Claude API key in Settings.');
+      authErr._httpStatus = 401;
+      authErr._anthropicType = 'authentication_error';
+      throw authErr;
     }
     if (!resp.ok) {
       var errorData = await resp.json().catch(function() { return {}; });
-      throw new Error('Anthropic API error: ' + (errorData.error?.message || 'HTTP ' + resp.status));
+      var errObj = errorData.error || {};
+      var apiErr = new Error('Anthropic API error: ' + (errObj.message || 'HTTP ' + resp.status));
+      apiErr._httpStatus = resp.status;
+      apiErr._anthropicType = errObj.type || null;
+      apiErr._anthropicMsg = errObj.message || null;
+      apiErr._responseBody = errorData;
+      throw apiErr;
     }
 
     var data = await resp.json();
@@ -287,28 +296,40 @@ window.PLATFORM_CONTEXT = {
     '3. Maintain strictly clinical, objective, neutral-technical tone in all patent documents. No advocacy, marketing, or emotive language.\n' +
     '4. When referencing whitespace domains or ideas, use the canonical IDs (WS-1, Idea 42, etc.) for consistency across all modules.\n' +
     '5. Cost awareness: use the most efficient model for each task. Simple classification → Haiku. Standard drafting → Sonnet. Complex legal analysis → Opus.\n' +
-    '6. All generated content should be self-contained and production-ready — no placeholders, no TODO markers, no incomplete sections.',
+    '6. All generated content should be self-contained and production-ready — no placeholders, no TODO markers, no incomplete sections.\n\n' +
+
+    '=== AVAILABLE DOMAIN SKILLS ===\n' +
+    'The following specialized skill modules are dynamically injected based on the current workflow step. When a skill is active, its full knowledge base is available to you as a cached system block.\n' +
+    '1. USPTO Patent Drafting — Specification structure (37 CFR §1.77), claim construction (§1.75), document formatting (§1.52), prohibited terms blocklist, quantitative language patterns, negative limitations, four deliverables (Filing Draft, Attorney Memo, Prior-Art Table, Claim Support Matrix), pre-filing checklist. Active for: WF1 idea/claims/draft steps, WF2 solution architecture.\n' +
+    '2. Competitive Intelligence & FTO — Prior art search methodology (5-database cascade), claim-by-claim comparison matrix, FTO risk classification (weighted scoring), design-around decision tree, PTAB/IPR survivability scoring, competitor profiling, patent thicket density analysis, cross-licensing leverage assessment. Active for: WF1 FTO step, WF2 landscape scan/FTO deep dive/competitive intel steps.\n' +
+    '3. Patent Language & Compliance Audit — Prohibited terms blocklist (3 categories), section-by-section 37 CFR compliance checklist, claim antecedent basis validation, cross-reference validation (spec↔claims↔figures), tone & register audit, structured audit report format. Active for: WF1 lawyer-review/admin-approval steps, WF2 strategic review.\n' +
+    '4. USPTO Patent Figures — Drawing standards (37 CFR §1.84), figure type selection matrix, reference numeral conventions (3-digit system), shading & hatching rules, flowchart/mechanical/design patent specifics, 20-point pre-filing checklist, common PTO-948 objections. Active for: WF1 figures step, WF2 solution architecture.\n' +
+    '5. Portfolio Valuation & Filing Strategy — TAM/SAM/SOM modeling for deep-tech patents, royalty benchmarks by sector, three-approach valuation (Income/Market/Cost with triangulation), filing phase assignment (Phase 1/Phase 2/No-File), provisional→PCT→national phase timeline, continuation cascade planning, 10-year revenue projection, jurisdiction cost analysis. Active for: WF2 filing strategy/dashboard update steps, WF4 training.\n' +
+    'If no domain skill is injected for the current step, rely on the platform context and general patent knowledge.\n',
 
   /**
-   * Helper: Build the full 3-block cached system prompt.
+   * Helper: Build the multi-block cached system prompt.
    *
-   * Architecture:
-   *   Block 1: PLATFORM_CONTEXT (cached) — project identity, taxonomy, workflows
-   *   Block 2: USPTO_SKILL (cached)      — drafting rules, claim standards, figures
-   *   Block 3: stepRole (uncached)        — per-call step instructions
+   * Architecture (dynamic):
+   *   Block 1: PLATFORM_CONTEXT (cached)     — project identity, taxonomy, workflows
+   *   Block 2…N: Domain skill(s) (cached)    — resolved via SKILL_REGISTRY per step
+   *   Block N+1: stepRole (uncached)          — per-call step instructions
    *
-   * Blocks 1+2 are marked cache_control: "ephemeral" so Anthropic caches
-   * the entire ~6,300-token prefix. Block 3 changes per call and is uncached.
+   * The cached prefix (Block 1 + skills) is marked cache_control: "ephemeral".
+   * Anthropic caches the entire prefix; subsequent calls within 5 min pay ~90% less.
+   * The last skill block gets cache_control to mark the boundary.
    *
    * @param {string} [stepRole] - Step-specific instruction (optional)
    * @param {Object} [opts] - Options
-   * @param {boolean} [opts.includeUSPTO=true] - Include USPTO skill block
+   * @param {string} [opts._step] - Current step ID for skill resolution
+   * @param {string} [opts._workflow] - Current workflow ID for skill resolution
+   * @param {boolean} [opts.includeUSPTO=true] - Legacy: include USPTO skill (ignored if _step resolves skills)
    * @returns {Array} - System prompt content block array
    */
   buildFullSystem: function(stepRole, opts) {
     opts = opts || {};
-    var includeUSPTO = opts.includeUSPTO !== false;
 
+    // Block 1: Platform Context (always cached)
     var blocks = [
       {
         type: 'text',
@@ -317,8 +338,23 @@ window.PLATFORM_CONTEXT = {
       }
     ];
 
-    // Add USPTO skill as second cached block (for patent-related steps)
-    if (includeUSPTO && window.PATENTIFY_USPTO_SKILL) {
+    // Block 2…N: Resolve domain skills via SKILL_REGISTRY
+    var resolvedSkills = [];
+    if (window.SKILL_REGISTRY && opts._step) {
+      resolvedSkills = window.SKILL_REGISTRY.resolve(opts._step, opts._workflow);
+    }
+
+    if (resolvedSkills.length > 0) {
+      // Inject resolved skills — last one gets cache_control for boundary
+      for (var i = 0; i < resolvedSkills.length; i++) {
+        var skillBlock = { type: 'text', text: resolvedSkills[i].systemPrompt };
+        if (i === resolvedSkills.length - 1) {
+          skillBlock.cache_control = { type: 'ephemeral' };
+        }
+        blocks.push(skillBlock);
+      }
+    } else if (opts.includeUSPTO !== false && window.PATENTIFY_USPTO_SKILL) {
+      // Legacy fallback: include USPTO skill when no step-based resolution
       blocks.push({
         type: 'text',
         text: window.PATENTIFY_USPTO_SKILL.systemPrompt,
@@ -326,7 +362,7 @@ window.PLATFORM_CONTEXT = {
       });
     }
 
-    // Add step-specific role (uncached — changes per call)
+    // Final block: step-specific role instruction (uncached — changes per call)
     if (stepRole) {
       blocks.push({ type: 'text', text: stepRole });
     }
@@ -455,6 +491,222 @@ window.PATENTIFY_USPTO_SKILL = {
       blocks.push({ type: 'text', text: stepRole });
     }
     return blocks;
+  }
+};
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SKILL: COMPETITIVE INTELLIGENCE & FTO (Block S2)
+// Source: competitive-intelligence-fto.skill
+// Consumed by: WF1 Step 1 (FTO), WF2 Steps 5+7 (FTO Deep Dive, Comp Intel)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+window.SKILL_CI_FTO = {
+  id: 'ci-fto',
+  version: '1.0',
+  source: 'competitive-intelligence-fto.skill',
+  lastUpdated: '2026-03-07',
+  workflows: ['wf1', 'wf2'],
+  steps: ['fto', 'wsd-2', 'wsd-5', 'wsd-7'],
+
+  systemPrompt:
+    '=== COMPETITIVE INTELLIGENCE & FTO SKILL ===\n' +
+    'PRIOR ART SEARCH METHODOLOGY:\n' +
+    'Search across: USPTO (PatFT/AppFT), EPO (Espacenet, 120M+ docs), WIPO (PatentScope), Google Patents, Semantic Scholar/arXiv (NPL). Execution order: (1) CPC/IPC classification search using primary and secondary codes, (2) Keyword search in title/abstract and full text with Boolean operators, (3) Citation network tracing — forward and backward, 3 hops minimum, (4) Assignee search for top 5 competitors, (5) NPL search for academic prior art under §102(a)(1).\n\n' +
+    'CLAIM-BY-CLAIM COMPARISON MATRIX:\n' +
+    'For each prior art reference, produce: Reference info (patent/pub number, assignee, title, date) → Table with columns: Claim Element | Invention Claim Language | Reference Disclosure | Overlap | Gap. Classify overlap as ANTICIPATORY / PARTIAL / MINOR / NONE. Rate claim vulnerability as HIGH / MEDIUM / LOW.\n\n' +
+    'FTO RISK CLASSIFICATION:\n' +
+    'Assess each third-party patent on: Claim Overlap (weight 0.35), Enforceability (0.15), Jurisdiction Match (0.15), Doctrine of Equivalents (0.20), Design-Around Feasibility (0.15).\n' +
+    'Risk levels: HIGH (≥80% overlap + in force + same jurisdiction + low design-around) → mandatory design-around or license; MEDIUM (50-79% overlap OR DoE risk OR costly design-around) → design-around recommended; LOW (<50% overlap + clear distinctions) → document only; CLEAR (no meaningful overlap) → no concern.\n\n' +
+    'DESIGN-AROUND DECISION TREE:\n' +
+    '1. Can feature be OMITTED? → YES: omit. 2. Can feature be SUBSTITUTED? → YES: substitute, verify. 3. Is blocking patent NARROW enough? → YES: minor modifications. 4. Is blocking patent VULNERABLE to invalidity? → YES: consider IPR. 5. Is LICENSING viable? → YES: estimate cost. → NO to all: flag as BLOCKING.\n\n' +
+    'PTAB/IPR SURVIVABILITY SCORING:\n' +
+    'Score 0-1 on: Prior Art Distance (0.30), Claim Specificity (0.25), Secondary Considerations (0.20), Specification Support (0.15), Prosecution History (0.10). Composite ≥0.75 = STRONG, 0.50-0.74 = MODERATE, 0.25-0.49 = WEAK, <0.25 = VULNERABLE.\n\n' +
+    'COMPETITOR PROFILING:\n' +
+    'For each competitor: entity type (corp/university/gov/startup), portfolio metrics (total patents, active, pending, filing velocity, geographic coverage, CPC concentration), strategic assessment (portfolio strength: DOMINANT/STRONG/MODERATE/EMERGING/NICHE, filing trajectory, retaliation risk, licensing posture), blocking patents list, open source risk.\n\n' +
+    'RETALIATION RISK: Portfolio >10× ours in CPC class = HIGH. Active litigation history (3 yrs) = HIGH. Cross-licensing/pools = MEDIUM. Defensive-only posture = LOW. Startup/academic = LOW.\n\n' +
+    'PATENT THICKET DENSITY:\n' +
+    '>500 filings/year = dense thicket → narrow claims to unclaimed space. HHI >0.25 = concentrated → target dominant player gaps. <100 filings/year = open field → broad claims viable. Accelerating filings + low total = emerging → file quickly with provisionals.\n\n' +
+    'CROSS-LICENSING LEVERAGE:\n' +
+    'Leverage = Our_Portfolio_Value_in_Their_Space / Their_Portfolio_Value_in_Our_Space. >1.0 = we have leverage. 0.5-1.0 = balanced. <0.5 = they have leverage. <0.1 = license or design-around.\n\n' +
+    'OUTPUT SCHEMAS:\n' +
+    'FTO Output: invention_id, analysis_date, executive_summary, overall_fto_risk, patentability_assessment (§101/§102/§103/§112 each with risk + detail), prior_art_references[], claim_comparison_matrix[], blocking_patents[], design_around_recommendations[], risk_matrix_summary, strategic_recommendations[].\n' +
+    'Competitive Intel Output: domain, analysis_date, competitor_profiles[], thicket_density, ptab_survivability, open_source_risk, cross_licensing_leverage, defensive_recommendations[], offensive_opportunities[].'
+};
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SKILL: PATENT LANGUAGE & COMPLIANCE AUDIT (Block S3)
+// Source: patent-language-compliance-audit.skill
+// Consumed by: WF1 Steps 6+7 (Lawyer Review, Admin Approval), any review gate
+// ═══════════════════════════════════════════════════════════════════════════════
+
+window.SKILL_COMPLIANCE_AUDIT = {
+  id: 'compliance-audit',
+  version: '1.0',
+  source: 'patent-language-compliance-audit.skill',
+  lastUpdated: '2026-03-07',
+  workflows: ['wf1'],
+  steps: ['lawyer-review', 'admin-approval'],
+
+  systemPrompt:
+    '=== PATENT LANGUAGE & COMPLIANCE AUDIT SKILL ===\n' +
+    'This skill validates USPTO patent filings. It does NOT draft — it audits and flags deficiencies.\n\n' +
+    'PROHIBITED TERMS BLOCKLIST (flag every occurrence, propose replacement):\n' +
+    'Category A — Absolute/Categorical: critical→important/significant (whitelist scientific uses), only→in at least one embodiment, requires→may employ, must→may/is configured to, best→preferred, optimal→advantageous, essential→advantageous, exclusively→preferentially, necessary→beneficial, impossible→not readily achievable, uniquely→in certain embodiments, solely→primarily, never→in some embodiments does not, always→in various embodiments, ideal→preferred, perfect→substantially matched.\n' +
+    'Category B — Advocacy/Comparative: the invention is→the present disclosure relates to, superior→improved/enhanced, no prior art exists→existing approaches have not addressed, fundamentally limited→has not demonstrated, the prior art fails→the art does not disclose, our invention→the present disclosure, solves→provides/achieves, completely eliminates→reduces or eliminates.\n' +
+    'Category C — Stylistic: DELETE all metaphors, colloquialisms, emotive descriptors (groundbreaking, remarkable), pitch-deck headers.\n' +
+    'For each hit output: {section, paragraph_number, original_text, flagged_term, proposed_replacement, context_note}. Mark scientific uses as WHITELISTED.\n\n' +
+    'SECTION-BY-SECTION 37 CFR COMPLIANCE CHECKLIST:\n' +
+    'Document Format (§1.52): English only, no mixed formatting, UPPERCASE headings, sequential [0001] numbering, no bullets in Detailed Description.\n' +
+    'Specification Structure (§1.71/§1.77): Verify 12-section order (Title→Cross-Ref→Fed Sponsored→Incorporation→Prior Disclosures→Background→Summary→Drawing Desc→Detailed Desc→Claims→Abstract→Sequence). All sections present + substantive. Continuous prose for §112 Enablement. Best mode disclosed. Reference numerals match drawings.\n' +
+    'Title (§1.72a): ≤500 chars, specific and descriptive.\n' +
+    'Abstract (§1.72b): Separate sheet, ≤150 words, no merits/advocacy.\n' +
+    'Claims (§1.75): Separate sheet, consecutive Arabic numerals, each starts capital + ends period, each is one sentence, multi-element indentation, substantially different, correct dependent references.\n' +
+    'Drawings (§1.84): Ref chars ≥0.32cm plain legible, same part = same char, no orphaned refs in either direction, lead lines don\'t cross, no solid black shading, hatching at 45°.\n\n' +
+    'CLAIM ANTECEDENT BASIS VALIDATION:\n' +
+    'Introduction rule: introduce with "a/an", refer back with "the/said". Flag any "the [term]" without prior "a/an [term]" in the claim or its parent chain. Trace full dependency chains to independent claims. Flag circular dependencies. Flag unresolved synonyms without "as used herein" bridge. Flag coined terms in claims without specification definition.\n\n' +
+    'CROSS-REFERENCE VALIDATION:\n' +
+    'Spec→Claims: identical terminology required. Claims→Figures: claimed elements should have reference numerals. Figures→Spec: every ref numeral in figures must be in description and vice versa. Every figure mentioned in Brief Description of Drawings.\n\n' +
+    'TONE & REGISTER AUDIT:\n' +
+    'Single clinical neutral-technical register throughout. Flag: advocacy ("This breakthrough"), marketing ("state-of-the-art"), pedagogy ("To understand why"), business strategy, emotive descriptors. Working examples = past tense. Prophetic = present/subjunctive with uncertainty. Background: no competitor names, no author citations, 3-4 paragraphs, no absolute prior art claims. Content separation: flag any IP strategy, design-around analysis, claim breadth rationale, prosecution arguments, or internal notes in the specification.\n\n' +
+    'AUDIT REPORT FORMAT:\n' +
+    'Title + Date + Summary (total issues: Critical/Warning/Info) + Section Scores (PASS/FAIL per section) + Detailed Findings (ordered by severity, each with ID, Section, Location, Description, Suggested Fix).'
+};
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SKILL: USPTO PATENT FIGURES (Block S4)
+// Source: uspto-patent-figures.skill
+// Consumed by: WF1 Step 3 (Generate Figures), WF2 Step 4 (Solution Architecture)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+window.SKILL_PATENT_FIGURES = {
+  id: 'patent-figures',
+  version: '1.0',
+  source: 'uspto-patent-figures.skill',
+  lastUpdated: '2026-03-07',
+  workflows: ['wf1', 'wf2'],
+  steps: ['figures', 'wsd-4'],
+
+  systemPrompt:
+    '=== USPTO PATENT FIGURES SKILL (37 CFR §1.84, MPEP §§507, 608.02) ===\n\n' +
+    'LEGAL BASIS: 35 U.S.C. §113 mandates drawings whenever the nature of the invention admits of it.\n\n' +
+    'COMPLIANCE REQUIREMENTS:\n' +
+    'Ink: Black-and-white line art only. No color (unless petition §1.17(h) + 3 color sets), no grayscale fills. Paper: US Letter or DIN A4, consistent. Margins: Top ≥1", Left ≥1", Right ≥5/8", Bottom ≥3/8". No frames/borders. Figure labels: "FIG. X" consecutive Arabic numerals. Sheet numbers: fraction format (1/5, 2/5) top center. Ref chars: ≥0.32cm height, plain, no enclosures (circles/brackets/quotes), same part = same number across all figures. Lead lines: connect ref char to feature, straight/curved, short as possible, NEVER cross each other. Lines: heavy enough for reproduction at 2/3 reduction, min 0.3mm stroke. Text: English only, minimal legends. Scale: detail visible at 2/3 reduction, no scale notations.\n\n' +
+    'FIGURE TYPE SELECTION:\n' +
+    'System Block Diagram — software/electronics. Method Flowchart — processes/methods (rectangles for steps, diamonds for decisions, YES/NO branches). Perspective View — mechanical 3D. Exploded View — multi-component (brackets indicating assembly). Sectional/Cross-Section — internal mechanisms (hatching at 45°, different patterns per material). Plan/Elevation — structural/design patents. Circuit/Schematic — electronics. Waveform — signals. UI Screenshot — GUI (B&W). Sequence Diagram — protocols.\n' +
+    'Selection: Software/method → block diagram + flowchart. Hardware/mechanical → perspective + exploded + sectional. Design patent → 6 standard views + perspective. Mixed → combine.\n\n' +
+    'REFERENCE NUMERAL CONVENTION:\n' +
+    'Three-digit starting at 100, increment by 10 for major components, by 1 for sub-components (100, 110, 111, 112, 120, 200). Generate a Reference Numeral Table: Ref# | Component Name | Appears in Figures. Every ref in drawings must appear in description and vice versa (§1.84(p)(5)).\n\n' +
+    'SHADING & HATCHING:\n' +
+    'Shading for surface contour: spaced lines, light from upper-left 45°. No solid black (except bar graphs or color black). Sectional hatching: regularly spaced oblique parallel lines at ~45° to principal axes, different patterns for different materials.\n\n' +
+    'FLOWCHART SPECIFICS: Rectangles for process steps, diamonds for decisions, ovals for start/end. Unique ref numeral per step (S100, S110...). Decision diamonds show YES/NO branches. Flow: top-to-bottom primary, left-to-right for branches. Multi-sheet: connector circles with matching letters.\n\n' +
+    'MECHANICAL SPECIFICS: Standard orthographic views as needed. Exploded views: separate along assembly axis with brackets. Sectional views: cut plane + hatching. Phantom (dashed) lines for hidden/adjacent structure.\n\n' +
+    'DESIGN PATENT FIGURES (35 U.S.C. Chapter 16): Drawings ARE the claim. All 6 standard views (front, rear, left, right, top, bottom) + perspective. Broken lines for environmental (unclaimed) structure. No hidden planes through opaque materials. Color permitted without petition. No sectional construction views.\n\n' +
+    'PRE-FILING CHECKLIST (20 items): 1. All B&W line art 2. Consistent paper size 3. Margins compliant 4. No frames 5. FIG. labels consecutive 6. Sheet numbers as fractions 7. Ref chars ≥0.32cm 8. Same part = same ref 9. All refs bidirectionally matched 10. No enclosed ref chars 11. Lead lines non-crossing 12. Lines survive 2/3 reduction 13. Shading thin spaced 14. Hatching at 45° 15. English only 16. Views separated 17. Front page figure selected 18. ID info in top margin 19. Scale adequate 20. Output: PDF vector or TIFF 300DPI.\n\n' +
+    'COMMON OBJECTIONS (PTO-948): Lines too light → min 0.3mm. Missing lead lines → verify all refs. Excessive text → minimize. Wrong margins → use template. Unlabeled figures → add FIG. X. Color without petition → convert B&W. Ref chars too small → min 10pt. Crossing lead lines → reposition. Frames → remove.\n\n' +
+    'FILING FORMATS: PDF vector (preferred), PDF raster ≥300DPI, TIFF 300DPI B&W Group 4, avoid JPEG. Replacement sheets: per §1.121(d), annotated + clean + explanation. No new matter (35 U.S.C. §132).'
+};
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SKILL: PORTFOLIO VALUATION & FILING STRATEGY (Block S5)
+// Source: portfolio-valuation-filing-strategy.skill
+// Consumed by: WF2 Step 6 (Filing Strategy), WF4 Step 6, Investor Module
+// ═══════════════════════════════════════════════════════════════════════════════
+
+window.SKILL_VALUATION_FILING = {
+  id: 'valuation-filing',
+  version: '1.0',
+  source: 'portfolio-valuation-filing-strategy.skill',
+  lastUpdated: '2026-03-07',
+  workflows: ['wf2', 'wf4'],
+  steps: ['wsd-6', 'wsd-9', 'wsd-10'],
+
+  systemPrompt:
+    '=== PORTFOLIO VALUATION & FILING STRATEGY SKILL ===\n\n' +
+    'TAM/SAM/SOM FOR DEEP-TECH PATENTS:\n' +
+    'TAM = Total revenue of infringing products × industry royalty rate. SAM = TAM × geographic coverage × TRL-adjusted adoption probability × time-to-market discount. SOM = SAM × licensing success rate × portfolio strength multiplier × enforcement credibility.\n' +
+    'Royalty benchmarks: Semiconductors 1.0-3.5%, Battery/Energy 2.0-5.0%, Advanced Materials 2.5-6.0%, Software/AI 0.5-2.5%, Biotech/SynBio 3.0-8.0%, Quantum 3.0-7.0%, Photonics 1.5-4.0%, Robotics 1.0-3.0%.\n' +
+    'TRL discount: TRL 1-3 → 0.05-0.15, TRL 4-5 → 0.15-0.35, TRL 6-7 → 0.35-0.60, TRL 8-9 → 0.60-0.90.\n\n' +
+    'PORTFOLIO VALUATION (triangulate all three approaches):\n' +
+    'Income Approach (primary): NPV = Σ(t=1→20) [Annual_Royalties(t) / (1+r)^t]. S-curve ramp: years 1-3 minimal, 4-8 growth, 9-15 plateau, 16-20 decline. Discount rate 15-25%. Enforcement probability 0.3-0.7.\n' +
+    'Market Approach: Comparable_Value = Median(Transaction_Price/Patent_Count) × Our_Count × (Our_CII / Median_CII). Sources: IFI CLAIMS, RPX, M&A disclosures. Flag as low-confidence if <5 comparables.\n' +
+    'Cost Approach (floor): Replacement_Cost = Σ(Filing + Prosecution + R&D_Attribution) × Obsolescence_Factor.\n' +
+    'Triangulation: low = max(Cost, Income_Low), mid = Income_Mid×0.50 + Market×0.30 + Cost×0.20, high = min(Income_High, Market_High×1.5). Always report range + confidence + assumptions.\n\n' +
+    'FILING PHASE ASSIGNMENT:\n' +
+    'Phase 1 (file immediately): CII ≥0.65 AND FTO ≤MEDIUM AND Pat Score ≥7.5 AND TAM ≥$80M. OR: competitor filing in CPC subclass within 6 months, standards body activity, active acquisition interest.\n' +
+    'Phase 2 (defer): CII 0.55-0.64, or FTO HIGH (needs design-around), or Pat Score 6.0-7.4, or TAM <$80M but strategic value.\n' +
+    'No-File: CII <0.55 AND TAM <$50M AND no blocking value, or FTO HIGH with no design-around, or all claims anticipated.\n\n' +
+    'PROVISIONAL → PCT → NATIONAL PHASE:\n' +
+    'Month 0: Provisional filed (priority date). Month 10: Decision gate. Month 12: PCT filed. Month 18: PCT publication. Month 22: Preliminary exam. Month 30: National phase deadline.\n' +
+    'Path selection: ≥3 jurisdictions → PCT. US-only → direct non-provisional. Urgent → accelerated PCT. Uncertain value → wait 11 months. Budget-constrained → provisional only.\n' +
+    'Jurisdiction priority = (Market_Size × Royalty_Rate × Enforcement_Strength) / (Filing_Cost + 10yr_Maintenance).\n\n' +
+    'CONTINUATION CASCADE:\n' +
+    'Continuation: new claims, same spec. CIP: new claims + new matter. Divisional: restriction requirement. High-value (CII ≥0.70): Provisional → Non-provisional/PCT → Continuation (competitor targeting) + Continuation (manufacturing) + Divisional (if restricted) → CIP (with new data). Budget: CII ≥0.70 → 1.5-2.0× initial cost. CII 0.60-0.69 → 0.75-1.0×. CII <0.60 → no continuations unless blocking.\n\n' +
+    'REVENUE PROJECTION (10-YEAR):\n' +
+    'Year 1-2: $0 (filing+prosecution). Year 3-4: 5-15% of SOM×rate. Year 5-7: 30-60%. Year 8-10: 50-80%. Streams: Royalty licensing 40-60%, Lump-sum 15-25%, Litigation settlements 10-20%, Cross-licensing value 5-15%. Model three scenarios (Conservative/Base/Optimistic) varying royalty ±1%, adoption ±2yr, licensing success ±20%, enforcement ±0.15.\n\n' +
+    'JURISDICTION COSTS (10-YEAR TOTAL):\n' +
+    'USPTO: $13K-$28K, STRONG enforcement. EPO (DE+FR+GB): $27K-$55K, STRONG (UPC). CNIPA: $7K-$14K, MODERATE. JPO: $11K-$22K, STRONG. KIPO: $7K-$14K, MOD-STRONG.\n' +
+    'Tiers: Tier 1 (always) = US. Tier 2 (TAM>$100M) = EP, CN. Tier 3 (TAM>$200M) = JP, KR. Tier 4 (selective) = IN, TW, AU, CA, IL.\n' +
+    'Selection weights: Market revenue 0.30, Competitor presence 0.20, Enforcement reliability 0.20, Cost efficiency 0.15, Strategic value 0.15.'
+};
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SKILL REGISTRY — Routes workflow steps to the correct skill(s)
+// The auto-injection wrapper in admin/index.html uses this to select which
+// skill blocks to include as cached system content for each API call.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+window.SKILL_REGISTRY = {
+  version: '1.0',
+  skills: {
+    'uspto-drafting':    function() { return window.PATENTIFY_USPTO_SKILL; },
+    'ci-fto':            function() { return window.SKILL_CI_FTO; },
+    'compliance-audit':  function() { return window.SKILL_COMPLIANCE_AUDIT; },
+    'patent-figures':    function() { return window.SKILL_PATENT_FIGURES; },
+    'valuation-filing':  function() { return window.SKILL_VALUATION_FILING; }
+  },
+  stepSkills: {
+    // WF1 — Patent Pipeline
+    'idea':            ['uspto-drafting'],
+    'fto':             ['ci-fto'],
+    'claims':          ['uspto-drafting'],
+    'figures':         ['patent-figures'],
+    'draft':           ['uspto-drafting'],
+    'lawyer-review':   ['compliance-audit'],
+    'admin-approval':  ['compliance-audit'],
+    // WF2 — Whitespace Discovery
+    'wsd-1':  [],
+    'wsd-2':  ['ci-fto'],
+    'wsd-3':  [],
+    'wsd-4':  ['patent-figures', 'uspto-drafting'],
+    'wsd-5':  ['ci-fto'],
+    'wsd-6':  ['valuation-filing'],
+    'wsd-7':  ['ci-fto'],
+    'wsd-8':  ['compliance-audit'],
+    'wsd-9':  ['valuation-filing'],
+    'wsd-10': ['valuation-filing'],
+    // WF4 — CII Training
+    'wf4-step6': ['valuation-filing']
+  },
+  resolve: function(step, workflow) {
+    var skillIds = this.stepSkills[step];
+    if (!skillIds) {
+      if (workflow === 'wf1') skillIds = ['uspto-drafting'];
+      else skillIds = [];
+    }
+    var resolved = [];
+    for (var i = 0; i < skillIds.length; i++) {
+      var getter = this.skills[skillIds[i]];
+      if (getter) {
+        var skill = getter();
+        if (skill && skill.systemPrompt) resolved.push(skill);
+      }
+    }
+    return resolved;
   }
 };
 

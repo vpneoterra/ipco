@@ -1,6 +1,6 @@
 # Patentify Workflow API Test Report
 
-**Date:** 2026-03-07 05:14:02  
+**Date:** 2026-03-07 05:31:13  
 **Model:** `claude-sonnet-4-5-20250929`  
 **Test Invention:** Chemistry-Agnostic Gradient Interlayer for Solid-State Battery Interface
 
@@ -13,10 +13,10 @@
 | Passed | 0 |
 | Failed | 13 |
 | Skipped (local/dedup) | 21 |
-| Total API Latency | 1,951ms (2.0s) |
+| Total API Latency | 2,000ms (2.0s) |
 | Total Input Tokens | 0 |
 | Total Output Tokens | 0 |
-| Avg Latency/Call | 150ms |
+| Avg Latency/Call | 153ms |
 
 ## Detailed Results
 
@@ -24,22 +24,22 @@
 
 | Step | Name | Status | Latency | Tokens (in→out) | Response Format | Data Integration |
 |------|------|--------|---------|-----------------|-----------------|------------------|
-| 1 | FTO & Patentability Analysis | ❌ FAIL | 175ms | 0→0 | None | — |
-| 2 | Patent Construction Prompt | ❌ FAIL | 143ms | 0→0 | None | — |
+| 1 | FTO & Patentability Analysis | ❌ FAIL | 230ms | 0→0 | None | — |
+| 2 | Patent Construction Prompt | ❌ FAIL | 129ms | 0→0 | None | — |
 | 3 | Patent Document Creation (DOCX) | ❌ FAIL | 163ms | 0→0 | None | — |
-| 4 | Cover Sheet & Claim Architecture Mindmap | ❌ FAIL | 131ms | 0→0 | None | — |
-| 5 | USPTO-Compliant Figures Generation | ❌ FAIL | 136ms | 0→0 | None | — |
-| 6 | Strengthening Recommendations | ❌ FAIL | 127ms | 0→0 | None | — |
-| 7 | Document Integrity Audit | ❌ FAIL | 126ms | 0→0 | None | — |
+| 4 | Cover Sheet & Claim Architecture Mindmap | ❌ FAIL | 122ms | 0→0 | None | — |
+| 5 | USPTO-Compliant Figures Generation | ❌ FAIL | 134ms | 0→0 | None | — |
+| 6 | Strengthening Recommendations | ❌ FAIL | 133ms | 0→0 | None | — |
+| 7 | Document Integrity Audit | ❌ FAIL | 157ms | 0→0 | None | — |
 | 8 | Bundle & Package | ⏭️ SKIP | — | — | n/a | Local ZIP packaging of all 7 prior step outputs. No API call required. |
 
 ### WF2: Whitespace Discovery
 
 | Step | Name | Status | Latency | Tokens (in→out) | Response Format | Data Integration |
 |------|------|--------|---------|-----------------|-----------------|------------------|
-| 1 | Domain & Scope Definition | ❌ FAIL | 127ms | 0→0 | None | — |
-| 2 | Patent Landscape Scan | ❌ FAIL | 131ms | 0→0 | None | — |
-| 3 | Whitespace Identification & Scoring | ❌ FAIL | 156ms | 0→0 | None | — |
+| 1 | Domain & Scope Definition | ❌ FAIL | 143ms | 0→0 | None | — |
+| 2 | Patent Landscape Scan | ❌ FAIL | 143ms | 0→0 | None | — |
+| 3 | Whitespace Identification & Scoring | ❌ FAIL | 140ms | 0→0 | None | — |
 | 4 | Solution Architecture | ⏭️ SKIP_DEDUP | — | — | json/text | Same request/response pattern. Output stored as {domain}_solution_architecture.j |
 | 5 | FTO Deep Dive | ⏭️ SKIP_DEDUP | — | — | json/text | Same request/response pattern. Output stored as {domain}_fto_deep_dive.json |
 | 6 | Filing Strategy | ⏭️ SKIP_DEDUP | — | — | json/text | Same request/response pattern. Output stored as {domain}_filing_strategy.json |
@@ -52,9 +52,9 @@
 
 | Step | Name | Status | Latency | Tokens (in→out) | Response Format | Data Integration |
 |------|------|--------|---------|-----------------|-----------------|------------------|
-| 1 | Data Extraction & Normalization | ❌ FAIL | 232ms | 0→0 | None | — |
+| 1 | Data Extraction & Normalization | ❌ FAIL | 161ms | 0→0 | None | — |
 | 2 | Data Validation Gate | ⏭️ SKIP_DEDUP | — | — | json | Output: {patent_id}_data_validation_gate.json → feeds aggregation. |
-| 3 | Compute NC Pillar | ❌ FAIL | 175ms | 0→0 | None | — |
+| 3 | Compute NC Pillar | ❌ FAIL | 218ms | 0→0 | None | — |
 | 4 | Compute EV Pillar | ⏭️ SKIP_DEDUP | — | — | json | Output: {patent_id}_compute_ev_pillar.json → feeds aggregation. |
 | 5 | Compute CDE Pillar | ⏭️ SKIP_DEDUP | — | — | json | Output: {patent_id}_compute_cde_pillar.json → feeds aggregation. |
 | 6 | Compute MSI Pillar | ⏭️ SKIP_DEDUP | — | — | json | Output: {patent_id}_compute_msi_pillar.json → feeds aggregation. |
@@ -65,7 +65,7 @@
 
 | Step | Name | Status | Latency | Tokens (in→out) | Response Format | Data Integration |
 |------|------|--------|---------|-----------------|-----------------|------------------|
-| 1 | CPC Scope & Feature Engineering | ❌ FAIL | 129ms | 0→0 | None | — |
+| 1 | CPC Scope & Feature Engineering | ❌ FAIL | 127ms | 0→0 | None | — |
 | 2 | Synthetic Patent Generation | ⏭️ SKIP_DEDUP | — | — | json | Output feeds next step in sequence → final calibration review. |
 | 3 | Feature Extraction | ⏭️ SKIP_DEDUP | — | — | json | Output feeds next step in sequence → final calibration review. |
 | 4 | Weight Optimization | ⏭️ SKIP_DEDUP | — | — | json | Output feeds next step in sequence → final calibration review. |

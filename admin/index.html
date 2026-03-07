@@ -603,6 +603,163 @@ body {
 .api-test-result.error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: var(--accent-red); }
 .api-test-result.pending { background: var(--bg-hover); border: 1px solid var(--border); color: var(--text-muted); }
 
+/* ============================================
+   API USAGE SUB-TABS
+   ============================================ */
+.usage-subtab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+.usage-subtab {
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 150ms, border-color 150ms;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.usage-subtab:hover { color: var(--text); }
+.usage-subtab.active {
+  color: var(--accent-blue);
+  border-bottom-color: var(--accent-blue);
+}
+.usage-subtab .subtab-count {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 9px;
+  background: rgba(239,68,68,0.12);
+  color: var(--accent-red);
+  min-width: 18px;
+  text-align: center;
+}
+.usage-subtab .subtab-count.zero {
+  background: var(--bg-hover);
+  color: var(--text-faint);
+}
+.usage-subpanel { display: none; }
+.usage-subpanel.active { display: block; }
+
+/* ============================================
+   ERROR LOG STYLES
+   ============================================ */
+.errlog-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.errlog-controls .form-select { font-size: 12px; max-width: 180px; }
+.errlog-stat {
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-left: auto;
+}
+.errlog-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.errlog-table th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.errlog-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  color: var(--text);
+}
+.errlog-table tr:last-child td { border-bottom: none; }
+.errlog-table tr:hover td { background: var(--bg-hover); }
+.errlog-sev {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.errlog-sev.critical { background: rgba(239,68,68,0.12); color: var(--accent-red); }
+.errlog-sev.error    { background: rgba(239,68,68,0.08); color: #f87171; }
+.errlog-sev.warning  { background: rgba(212,160,23,0.12); color: var(--accent-amber); }
+.errlog-sev.info     { background: rgba(59,130,246,0.10); color: var(--accent-blue); }
+.errlog-msg {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--accent-red);
+  word-break: break-all;
+}
+.errlog-ctx {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 4px;
+}
+.errlog-ctx code {
+  background: var(--bg-hover);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+.errlog-expand {
+  cursor: pointer;
+  color: var(--accent-blue);
+  font-size: 10px;
+  border: none;
+  background: none;
+  padding: 0;
+  margin-top: 4px;
+  text-decoration: underline;
+}
+.errlog-detail {
+  display: none;
+  margin-top: 8px;
+  padding: 10px;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 240px;
+  overflow-y: auto;
+  color: var(--text-muted);
+}
+.errlog-detail.open { display: block; }
+.errlog-empty {
+  text-align: center;
+  color: var(--text-faint);
+  padding: 40px 20px;
+  font-size: 13px;
+}
+.errlog-empty svg {
+  display: block;
+  margin: 0 auto 12px;
+  width: 40px;
+  height: 40px;
+  opacity: 0.3;
+}
+
 @media (max-width: 900px) {
   .usage-kpi-grid { grid-template-columns: repeat(2, 1fr); }
   .usage-two-col { grid-template-columns: 1fr; }
@@ -2103,6 +2260,22 @@ tr:hover td { background: rgba(255,255,255,0.02); }
            ================== -->
       <div class="tab-panel" id="panel-api-usage">
 
+        <!-- Sub-tab navigation -->
+        <div class="usage-subtab-bar">
+          <button class="usage-subtab active" data-usagesub="usage-main" onclick="switchUsageSub('usage-main')">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v14h14"/><path d="M6 13l3-4 3 2 4-5"/></svg>
+            Usage Dashboard
+          </button>
+          <button class="usage-subtab" data-usagesub="error-log" onclick="switchUsageSub('error-log')">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L2 17h16L10 3z"/><path d="M10 10v3M10 14.5v.5"/></svg>
+            Error Log
+            <span class="subtab-count zero" id="errlogBadge">0</span>
+          </button>
+        </div>
+
+        <!-- SUB-PANEL: Usage Dashboard -->
+        <div class="usage-subpanel active" id="subpanel-usage-main">
+
         <!-- KPI Strip -->
         <div class="usage-kpi-grid" id="usageKpiGrid">
           <div class="usage-kpi" style="--kpi-accent: var(--accent-blue)">
@@ -2282,6 +2455,45 @@ tr:hover td { background: rgba(255,255,255,0.02); }
             </div>
           </div>
         </div>
+
+        </div><!-- /subpanel-usage-main -->
+
+        <!-- SUB-PANEL: Error Log -->
+        <div class="usage-subpanel" id="subpanel-error-log">
+          <div class="errlog-controls">
+            <select class="form-select" id="errlogSevFilter" onchange="renderErrorLog()">
+              <option value="">All Severities</option>
+              <option value="critical">Critical</option>
+              <option value="error">Error</option>
+              <option value="warning">Warning</option>
+              <option value="info">Info</option>
+            </select>
+            <select class="form-select" id="errlogSourceFilter" onchange="renderErrorLog()">
+              <option value="">All Sources</option>
+              <option value="api">API Call</option>
+              <option value="runtime">Runtime JS</option>
+              <option value="promise">Unhandled Promise</option>
+              <option value="network">Network</option>
+              <option value="manual">Manual</option>
+            </select>
+            <button class="btn btn-sm btn-secondary" onclick="downloadErrorLog()">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10v3h10v-3M8 2v8M5 7l3 3 3-3"/></svg>
+              Download Log
+            </button>
+            <button class="btn btn-sm btn-secondary" onclick="clearErrorLog()" style="color:var(--accent-red);border-color:rgba(239,68,68,0.3)">
+              Clear
+            </button>
+            <span class="errlog-stat" id="errlogStat">0 entries</span>
+          </div>
+
+          <div id="errlogContent">
+            <div class="errlog-empty">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M10 2a8 8 0 100 16 8 8 0 000-16z"/><path d="M7 7l6 6M13 7l-6 6"/></svg>
+              No errors recorded. Errors from API calls, runtime exceptions, and promise rejections will appear here with full diagnostic context.
+            </div>
+          </div>
+        </div><!-- /subpanel-error-log -->
+
       </div>
 
       <!-- ==================
@@ -3835,7 +4047,9 @@ async function handleDocUpload(input) {
     var data = await PatentifyEnv.claudeRequest({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 4000,
-      messages: messages
+      messages: messages,
+      _workflow: 'wf-editor',
+      _step: 'doc-parse'
     });
     var text = (data.content || []).map(function(c) { return c.text || ''; }).join('');
     var clean = text.replace(/```json|```/g, '').trim();
@@ -5169,6 +5383,310 @@ var PatentifyUsage = (function() {
 
 
 /* ============================================
+   ERROR LOG MODULE
+   Captures API errors, runtime exceptions,
+   unhandled promise rejections with full
+   diagnostic context for troubleshooting.
+   ============================================ */
+var PatentifyErrorLog = (function() {
+  'use strict';
+  var STORAGE_KEY = 'patentify_error_log';
+  var MAX_ENTRIES = 500;
+
+  function getLog() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch(e) { return []; }
+  }
+
+  function saveLog(log) {
+    try {
+      while (log.length > MAX_ENTRIES) log.shift();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
+    } catch(e) {}
+  }
+
+  /**
+   * Record an error with rich diagnostic context.
+   * @param {Object} entry
+   * @param {string} entry.severity - 'critical' | 'error' | 'warning' | 'info'
+   * @param {string} entry.source - 'api' | 'runtime' | 'promise' | 'network' | 'manual'
+   * @param {string} entry.message - Human-readable error message
+   * @param {Object} [entry.context] - Contextual data for debugging
+   * @param {string} [entry.context.workflow] - Workflow ID (e.g., 'wf1', 'wf2')
+   * @param {string} [entry.context.step] - Step ID (e.g., 'fto', 'draft')
+   * @param {string} [entry.context.model] - Claude model used
+   * @param {number} [entry.context.httpStatus] - HTTP status code
+   * @param {string} [entry.context.apiErrorType] - Anthropic error type
+   * @param {string} [entry.context.apiErrorMsg] - Anthropic error message
+   * @param {Object} [entry.context.requestBody] - Sanitized request (system prompt truncated)
+   * @param {Object} [entry.context.responseBody] - Full error response body
+   * @param {string} [entry.context.stackTrace] - JS stack trace
+   * @param {string} [entry.context.file] - Source file
+   * @param {number} [entry.context.line] - Line number
+   * @param {number} [entry.context.col] - Column number
+   * @param {string} [entry.context.userAgent] - Browser UA
+   * @param {number} [entry.context.latencyMs] - Time elapsed before error
+   * @param {Object} [entry.context.skillsResolved] - Skills that were injected
+   * @param {number} [entry.context.systemPromptTokens] - Estimated system prompt size
+   */
+  function record(entry) {
+    var log = getLog();
+    var record = {
+      id: 'err-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2,6),
+      ts: new Date().toISOString(),
+      severity: entry.severity || 'error',
+      source: entry.source || 'unknown',
+      message: entry.message || 'Unknown error',
+      context: entry.context || {}
+    };
+    // Always capture browser environment
+    record.context.userAgent = record.context.userAgent || navigator.userAgent;
+    record.context.url = record.context.url || window.location.href;
+    record.context.platform = 'admin';
+    record.context.envVersion = (window.PLATFORM_CONTEXT && window.PLATFORM_CONTEXT.version) || 'unknown';
+    record.context.registryVersion = (window.SKILL_REGISTRY && window.SKILL_REGISTRY.version) || 'unknown';
+
+    log.push(record);
+    saveLog(log);
+    updateBadge(log.length);
+    console.error('[ErrorLog] ' + record.severity.toUpperCase() + ': ' + record.message, record.context);
+    return record;
+  }
+
+  function clearLog() {
+    try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+    updateBadge(0);
+  }
+
+  function updateBadge(count) {
+    var badge = document.getElementById('errlogBadge');
+    if (badge) {
+      badge.textContent = count;
+      badge.classList.toggle('zero', count === 0);
+    }
+  }
+
+  /**
+   * Build a sanitized copy of the request body for logging.
+   * Truncates long system prompts to save storage space.
+   */
+  function sanitizeRequestBody(options) {
+    if (!options) return null;
+    var safe = {
+      model: options.model || 'default',
+      max_tokens: options.max_tokens,
+      _workflow: options._workflow,
+      _step: options._step,
+      _skipContext: options._skipContext,
+      useFullSystem: options.useFullSystem,
+      useCache: options.useCache,
+      messageCount: (options.messages || []).length
+    };
+    // Capture first user message (truncated)
+    if (options.messages && options.messages.length > 0) {
+      var firstMsg = options.messages[0];
+      var text = typeof firstMsg.content === 'string' ? firstMsg.content : JSON.stringify(firstMsg.content);
+      safe.firstMessage = text.length > 300 ? text.substring(0, 300) + '...[truncated]' : text;
+    }
+    // System prompt summary
+    if (options.system) {
+      if (Array.isArray(options.system)) {
+        safe.systemBlocks = options.system.map(function(b, i) {
+          var t = b.text || '';
+          return {
+            index: i,
+            length: t.length,
+            cached: !!(b.cache_control),
+            preview: t.substring(0, 120) + (t.length > 120 ? '...' : '')
+          };
+        });
+      } else {
+        safe.systemPromptLength = options.system.length;
+        safe.systemPreview = options.system.substring(0, 200) + (options.system.length > 200 ? '...' : '');
+      }
+    }
+    return safe;
+  }
+
+  // Initialize badge on load
+  setTimeout(function() { updateBadge(getLog().length); }, 100);
+
+  return {
+    record: record,
+    getLog: getLog,
+    clearLog: clearLog,
+    updateBadge: updateBadge,
+    sanitizeRequestBody: sanitizeRequestBody
+  };
+})();
+
+/* ── Global error handlers ── */
+window.addEventListener('error', function(event) {
+  PatentifyErrorLog.record({
+    severity: 'error',
+    source: 'runtime',
+    message: event.message || 'Uncaught error',
+    context: {
+      file: event.filename || '',
+      line: event.lineno || 0,
+      col: event.colno || 0,
+      stackTrace: (event.error && event.error.stack) || ''
+    }
+  });
+});
+
+window.addEventListener('unhandledrejection', function(event) {
+  var reason = event.reason || {};
+  PatentifyErrorLog.record({
+    severity: 'error',
+    source: 'promise',
+    message: (typeof reason === 'string') ? reason : (reason.message || 'Unhandled promise rejection'),
+    context: {
+      stackTrace: reason.stack || '',
+      rawReason: String(reason).substring(0, 500)
+    }
+  });
+});
+
+
+/* ============================================
+   ERROR LOG UI FUNCTIONS
+   ============================================ */
+function switchUsageSub(subId) {
+  document.querySelectorAll('.usage-subtab').forEach(function(el) {
+    el.classList.toggle('active', el.dataset.usagesub === subId);
+  });
+  document.querySelectorAll('.usage-subpanel').forEach(function(el) {
+    el.classList.toggle('active', el.id === 'subpanel-' + subId);
+  });
+  if (subId === 'error-log') renderErrorLog();
+}
+
+function renderErrorLog() {
+  var log = PatentifyErrorLog.getLog();
+  var sevFilter = document.getElementById('errlogSevFilter').value;
+  var srcFilter = document.getElementById('errlogSourceFilter').value;
+
+  var filtered = log.filter(function(e) {
+    if (sevFilter && e.severity !== sevFilter) return false;
+    if (srcFilter && e.source !== srcFilter) return false;
+    return true;
+  });
+
+  // Update stat
+  document.getElementById('errlogStat').textContent = filtered.length + ' of ' + log.length + ' entries';
+
+  var container = document.getElementById('errlogContent');
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="errlog-empty">' +
+      '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M10 2a8 8 0 100 16 8 8 0 000-16z"/><path d="M7 7l6 6M13 7l-6 6"/></svg>' +
+      (log.length === 0
+        ? 'No errors recorded. Errors from API calls, runtime exceptions, and promise rejections will appear here with full diagnostic context.'
+        : 'No errors match the current filters.') +
+      '</div>';
+    return;
+  }
+
+  // Render table (most recent first)
+  var html = '<table class="errlog-table">' +
+    '<thead><tr>' +
+    '<th style="width:140px">Timestamp</th>' +
+    '<th style="width:70px">Severity</th>' +
+    '<th style="width:70px">Source</th>' +
+    '<th>Error Details</th>' +
+    '</tr></thead><tbody>';
+
+  for (var i = filtered.length - 1; i >= 0; i--) {
+    var e = filtered[i];
+    var ctx = e.context || {};
+    var tsLocal = new Date(e.ts).toLocaleString();
+
+    // Build context summary
+    var ctxParts = [];
+    if (ctx.workflow) ctxParts.push('Workflow: <code>' + escapeHtml(ctx.workflow) + '</code>');
+    if (ctx.step) ctxParts.push('Step: <code>' + escapeHtml(ctx.step) + '</code>');
+    if (ctx.model) ctxParts.push('Model: <code>' + escapeHtml(ctx.model) + '</code>');
+    if (ctx.httpStatus) ctxParts.push('HTTP: <code>' + ctx.httpStatus + '</code>');
+    if (ctx.apiErrorType) ctxParts.push('Type: <code>' + escapeHtml(ctx.apiErrorType) + '</code>');
+    if (ctx.latencyMs) ctxParts.push('Latency: <code>' + ctx.latencyMs + 'ms</code>');
+    if (ctx.file) ctxParts.push('File: <code>' + escapeHtml(ctx.file.split('/').pop()) + ':' + (ctx.line || '?') + '</code>');
+    if (ctx.skillsResolved && ctx.skillsResolved.length > 0) {
+      ctxParts.push('Skills: <code>' + ctx.skillsResolved.map(function(s){ return escapeHtml(s); }).join(', ') + '</code>');
+    }
+
+    var detailId = 'errdetail-' + i;
+    html += '<tr>' +
+      '<td style="font-size:10px;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--text-muted)">' + escapeHtml(tsLocal) + '</td>' +
+      '<td><span class="errlog-sev ' + escapeHtml(e.severity) + '">' + escapeHtml(e.severity) + '</span></td>' +
+      '<td style="font-size:11px;color:var(--text-muted)">' + escapeHtml(e.source) + '</td>' +
+      '<td>' +
+        '<div class="errlog-msg">' + escapeHtml(e.message) + '</div>' +
+        (ctxParts.length ? '<div class="errlog-ctx">' + ctxParts.join(' &middot; ') + '</div>' : '') +
+        '<button class="errlog-expand" onclick="toggleErrDetail(\'' + detailId + '\')">▶ Full diagnostic JSON</button>' +
+        '<div class="errlog-detail" id="' + detailId + '">' + escapeHtml(JSON.stringify(e, null, 2)) + '</div>' +
+      '</td>' +
+      '</tr>';
+  }
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function toggleErrDetail(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+
+function downloadErrorLog() {
+  var log = PatentifyErrorLog.getLog();
+  if (log.length === 0) {
+    toast('No errors to download', 'info');
+    return;
+  }
+
+  var output = {
+    exportedAt: new Date().toISOString(),
+    platform: 'IP Strategy Platform — Command Center',
+    totalErrors: log.length,
+    environment: {
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+      platformContextVersion: (window.PLATFORM_CONTEXT && window.PLATFORM_CONTEXT.version) || 'unknown',
+      skillRegistryVersion: (window.SKILL_REGISTRY && window.SKILL_REGISTRY.version) || 'unknown',
+      defaultModel: (window.PatentifyEnv && window.PatentifyEnv.config.DEFAULT_MODEL) || 'unknown',
+      cacheEnabled: (window.PatentifyEnv && window.PatentifyEnv.config.ENABLE_PROMPT_CACHE) || false
+    },
+    skillRegistry: window.SKILL_REGISTRY ? {
+      skills: Object.keys(window.SKILL_REGISTRY.skills),
+      stepMappings: window.SKILL_REGISTRY.stepSkills
+    } : null,
+    errors: log
+  };
+
+  var blob = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'error-log-' + new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Error log downloaded (' + log.length + ' entries)', 'success');
+}
+
+function clearErrorLog() {
+  if (!confirm('Clear all ' + PatentifyErrorLog.getLog().length + ' error log entries?')) return;
+  PatentifyErrorLog.clearLog();
+  renderErrorLog();
+  toast('Error log cleared', 'success');
+}
+
+
+/* ============================================
    INSTRUMENT claudeRequest FOR AUTO-TRACKING
    + AUTO-INJECT PLATFORM CONTEXT
    ============================================ */
@@ -5179,36 +5697,37 @@ var PatentifyUsage = (function() {
     var t0 = performance.now();
     var model = options.model || PatentifyEnv.config.DEFAULT_MODEL;
 
-    /* ── Auto-inject Platform Context + USPTO Skill as cached system blocks ──
-     * If the caller already provided a system prompt (string or array),
-     * we prepend the cached platform context + USPTO skill blocks.
-     * If no system prompt, we build the full 3-block architecture:
-     *   Block 1: PLATFORM_CONTEXT (cached)  — project identity, taxonomy
-     *   Block 2: USPTO_SKILL (cached)       — drafting rules, standards
-     *   Block 3: caller's system (uncached) — step-specific instructions
+    /* ── Auto-inject Platform Context + Domain Skills as cached system blocks ──
+     * Uses SKILL_REGISTRY to dynamically resolve which skill(s) to inject
+     * based on the current workflow step (options._step, options._workflow).
+     *
+     * Architecture:
+     *   Block 1: PLATFORM_CONTEXT (cached)         — project identity, taxonomy
+     *   Block 2…N: Domain skill(s) (cached)        — resolved per step via registry
+     *   Block N+1: caller's system prompt (uncached)— step-specific instructions
      *
      * Skip injection if options._skipContext is true (e.g., for API test pings).
      */
     if (!options._skipContext && window.PLATFORM_CONTEXT) {
       var existingSystem = options.system;
-      var includeUSPTO = options.useFullSystem !== false;
 
+      // Extract step text from caller's system prompt
+      var stepText = '';
       if (existingSystem) {
-        // Caller provided a system prompt — wrap it as Block 3
-        var stepText = '';
         if (typeof existingSystem === 'string') {
           stepText = existingSystem;
         } else if (Array.isArray(existingSystem)) {
-          // Already structured — extract text for re-wrapping
           stepText = existingSystem.map(function(b) { return b.text || ''; }).join('\n');
         }
-        options.system = window.PLATFORM_CONTEXT.buildFullSystem(stepText, { includeUSPTO: includeUSPTO });
-        options.useCache = true;
-      } else {
-        // No system prompt — inject platform context + USPTO as the system
-        options.system = window.PLATFORM_CONTEXT.buildFullSystem(null, { includeUSPTO: includeUSPTO });
-        options.useCache = true;
       }
+
+      // Build multi-block system with SKILL_REGISTRY resolution
+      options.system = window.PLATFORM_CONTEXT.buildFullSystem(stepText || null, {
+        _step: options._step || '',
+        _workflow: options._workflow || '',
+        includeUSPTO: options.useFullSystem !== false  // legacy fallback
+      });
+      options.useCache = true;
     }
 
     try {
@@ -5228,14 +5747,71 @@ var PatentifyUsage = (function() {
       });
       return data;
     } catch (err) {
+      var errLatency = Math.round(performance.now() - t0);
       PatentifyUsage.record({
         model: model,
         workflow: options._workflow || 'manual',
         step: options._step || '',
-        latencyMs: Math.round(performance.now() - t0),
+        latencyMs: errLatency,
         success: false,
         error: err.message
       });
+
+      /* ── Rich error logging ── */
+      if (typeof PatentifyErrorLog !== 'undefined') {
+        var errSeverity = 'error';
+        var errSource = 'api';
+        // Parse HTTP status and Anthropic error type from error message
+        var httpStatus = err._httpStatus || null;
+        if (!httpStatus) {
+          var httpMatch = err.message.match(/HTTP (\d+)/);
+          httpStatus = httpMatch ? parseInt(httpMatch[1]) : null;
+        }
+        // Classify severity
+        if (httpStatus === 401 || httpStatus === 403) errSeverity = 'critical';
+        else if (httpStatus === 429) errSeverity = 'warning';
+        else if (err.message.match(/credit balance|insufficient/i)) errSeverity = 'critical';
+        else if (err.message.match(/network|fetch|Failed to fetch|CORS/i)) { errSeverity = 'error'; errSource = 'network'; }
+
+        // Resolve which skills were selected for this call
+        var skillsResolved = [];
+        if (window.SKILL_REGISTRY && options._step) {
+          try {
+            var resolved = window.SKILL_REGISTRY.resolve(options._step, options._workflow);
+            skillsResolved = resolved.map(function(s) { return s.id || 'unknown'; });
+          } catch(e) {}
+        }
+
+        // Estimate system prompt token count
+        var systemTokens = 0;
+        if (options.system) {
+          var sysTxt = Array.isArray(options.system)
+            ? options.system.map(function(b) { return b.text || ''; }).join('')
+            : (options.system || '');
+          systemTokens = Math.round(sysTxt.length / 4); // rough estimate
+        }
+
+        PatentifyErrorLog.record({
+          severity: errSeverity,
+          source: errSource,
+          message: err.message,
+          context: {
+            workflow: options._workflow || 'manual',
+            step: options._step || '',
+            model: model,
+            httpStatus: httpStatus,
+            apiErrorType: err._anthropicType || null,
+            apiErrorMsg: err._anthropicMsg || null,
+            responseBody: err._responseBody || null,
+            latencyMs: errLatency,
+            skillsResolved: skillsResolved,
+            systemPromptTokens: systemTokens,
+            requestBody: PatentifyErrorLog.sanitizeRequestBody(options),
+            stackTrace: err.stack || ''
+          }
+        });
+      }
+
       throw err;
     }
   };
